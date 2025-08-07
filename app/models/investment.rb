@@ -1,7 +1,8 @@
-class BankStatement < ApplicationRecord
+class Investment < ApplicationRecord
   belongs_to :user
 
   validates :date, presence: true
+  validates :action, presence: true
   validates :description, presence: true
   validates :amount, presence: true, numericality: true
   validates :account, presence: true
@@ -9,34 +10,16 @@ class BankStatement < ApplicationRecord
   # Prevent duplicate transactions (including account for database-level uniqueness)
   validates :date, uniqueness: {
     scope: [ :user_id, :amount, :description, :account ],
-    message: "Transaction already exists with the same date, amount, description, and account"
+    message: "Investment transaction already exists with the same date, amount, description, and account"
   }
 
   # Additional validation for application-level duplicate checking (ignoring account)
   validate :no_duplicate_transaction_ignoring_account
 
-  private
-
-  def no_duplicate_transaction_ignoring_account
-    return unless date && amount && description && user_id
-
-    existing = self.class.where(
-      user_id: user_id,
-      date: date,
-      amount: amount,
-      description: description
-    ).where.not(id: id)
-
-    if existing.exists?
-      errors.add(:base, "A transaction with the same date, amount, and description already exists (possibly in a different account)")
-    end
-  end
-
-  public
-
   scope :recent, -> { order(date: :desc) }
   scope :by_account, ->(account) { where(account: account) }
   scope :by_date_range, ->(start_date, end_date) { where(date: start_date..end_date) }
+  scope :by_symbol, ->(symbol) { where(symbol: symbol) }
 
   # Helper method to find potential duplicates (ignoring account name)
   def self.find_duplicates(user_id = nil)
@@ -64,5 +47,31 @@ class BankStatement < ApplicationRecord
   # Helper method to get just the date part
   def date_only
     date&.to_date
+  end
+
+  # Helper method to format amount with proper sign
+  def formatted_amount
+    if amount >= 0
+      "+$#{amount.abs}"
+    else
+      "-$#{amount.abs}"
+    end
+  end
+
+  private
+
+  def no_duplicate_transaction_ignoring_account
+    return unless date && amount && description && user_id
+
+    existing = self.class.where(
+      user_id: user_id,
+      date: date,
+      amount: amount,
+      description: description
+    ).where.not(id: id)
+
+    if existing.exists?
+      errors.add(:base, "An investment transaction with the same date, amount, and description already exists (possibly in a different account)")
+    end
   end
 end

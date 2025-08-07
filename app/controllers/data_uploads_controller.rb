@@ -96,36 +96,37 @@ class DataUploadsController < ApplicationController
     end.to_h
   end
 
-  def transactions
-    # Show transaction upload form
-  end
+  def manage_duplicates
+    # Find duplicates based on date, amount, description (ignoring account name)
+    # First get the duplicate groups, then fetch details for each
+    duplicate_groups = current_user.bank_statements
+                                  .group(:date, :amount, :description)
+                                  .having("COUNT(*) > 1")
+                                  .count
 
-  def process_transactions
-    # Process uploaded transaction CSV
-    if params[:file].present?
-      begin
-        result = TransactionProcessor.new(params[:file], current_user).process
-        redirect_to data_uploads_path, notice: "Successfully imported #{result[:count]} transaction records."
-      rescue => e
-        redirect_to transactions_data_uploads_path, alert: "Error processing file: #{e.message}"
-      end
-    else
-      redirect_to transactions_data_uploads_path, alert: "Please select a file to upload."
+    @duplicates = []
+    duplicate_groups.each do |(date, amount, description), count|
+      records = current_user.bank_statements.where(
+        date: date,
+        amount: amount,
+        description: description
+      )
+
+      @duplicates << {
+        date: date,
+        amount: amount,
+        description: description,
+        count: count,
+        ids: records.pluck(:id).join(","),
+        accounts: records.pluck(:account).uniq.join(",")
+      }
     end
   end
 
-  def manage_duplicates
-    # Find any remaining duplicates (shouldn't be any after migration, but just in case)
-    @duplicates = current_user.bank_statements
-                             .select("date, amount, description, account, COUNT(*) as count, GROUP_CONCAT(id) as ids")
-                             .group(:date, :amount, :description, :account)
-                             .having("COUNT(*) > 1")
-  end
-
   def remove_duplicates
-    # Remove duplicates, keeping the first occurrence
+    # Remove duplicates, keeping the first occurrence (ignoring account name)
     current_user.bank_statements.where(
-      "id NOT IN (SELECT MIN(id) FROM bank_statements GROUP BY user_id, date, amount, description, account)"
+      "id NOT IN (SELECT MIN(id) FROM bank_statements GROUP BY user_id, date, amount, description)"
     ).delete_all
 
     redirect_to manage_duplicates_data_uploads_path, notice: "Removed duplicate transactions."
@@ -150,5 +151,150 @@ class DataUploadsController < ApplicationController
 
     redirect_to data_uploads_path,
                 notice: "Removed all #{deleted_count} bank statement transactions."
+  end
+
+  # Investment upload methods
+  def fidelity_investments
+    # Show Fidelity investment upload form
+  end
+
+  def upload_fidelity_investments
+    puts "DEBUGGING: upload_fidelity_investments called"
+    Rails.logger.info "DEBUGGING: upload_fidelity_investments called with params: #{params.inspect}"
+
+    # Process uploaded Fidelity investment CSV
+    if params[:file].present?
+      puts "DEBUGGING: File present: #{params[:file].original_filename}"
+      Rails.logger.info "DEBUGGING: File present: #{params[:file].original_filename}"
+
+      begin
+        result = FidelityInvestmentProcessor.new(params[:file], current_user).process
+
+        message = "Successfully imported #{result[:count]} Fidelity investment records."
+        if result[:skipped] && result[:skipped] > 0
+          message += " Skipped #{result[:skipped]} records"
+          if result[:duplicates] && result[:duplicates] > 0
+            message += " (#{result[:duplicates]} duplicates)"
+          end
+          message += "."
+        end
+
+        redirect_to data_uploads_path, notice: message
+      rescue => e
+        puts "DEBUGGING: Error processing file: #{e.message}"
+        Rails.logger.error "DEBUGGING: Error processing file: #{e.message}"
+        Rails.logger.error "DEBUGGING: Backtrace: #{e.backtrace.join("\n")}"
+        redirect_to fidelity_investments_data_uploads_path, alert: "Error processing file: #{e.message}"
+      end
+    else
+      redirect_to fidelity_investments_data_uploads_path, alert: "Please select a file to upload."
+    end
+  end
+
+  def fidelity_portfolio
+    # Show Fidelity portfolio upload form
+  end
+
+  def upload_fidelity_portfolio
+    # Process uploaded Fidelity portfolio positions CSV
+    if params[:file].present?
+      begin
+        result = FidelityPortfolioProcessor.process(params[:file].path, current_user)
+
+        message = "Successfully imported #{result[:imported]} Fidelity portfolio positions."
+        if result[:skipped] && result[:skipped] > 0
+          message += " Skipped #{result[:skipped]} records."
+        end
+
+        redirect_to data_uploads_path, notice: message
+      rescue => e
+        Rails.logger.error "Error processing Fidelity portfolio: #{e.message}"
+        redirect_to fidelity_portfolio_data_uploads_path, alert: "Error processing file: #{e.message}"
+      end
+    else
+      redirect_to fidelity_portfolio_data_uploads_path, alert: "Please select a file to upload."
+    end
+  end
+
+  def principal_investments
+    # Show Principal investment upload form
+  end
+
+  def upload_principal_investments
+    # Process uploaded Principal investment OFX
+    if params[:file].present?
+      begin
+        result = PrincipalOfxProcessor.new(params[:file], current_user).process
+
+        message = "Successfully imported #{result[:count]} Principal investment records."
+        if result[:skipped] && result[:skipped] > 0
+          message += " Skipped #{result[:skipped]} records"
+          if result[:duplicates] && result[:duplicates] > 0
+            message += " (#{result[:duplicates]} duplicates)"
+          end
+          message += "."
+        end
+
+        redirect_to data_uploads_path, notice: message
+      rescue => e
+        redirect_to principal_investments_data_uploads_path, alert: "Error processing file: #{e.message}"
+      end
+    else
+      redirect_to principal_investments_data_uploads_path, alert: "Please select a file to upload."
+    end
+  end
+
+  def view_investments
+    # Show imported investment records
+    page = params[:page].to_i
+    page = 1 if page < 1
+    per_page = 50
+    offset = (page - 1) * per_page
+
+    # Filter by account if specified
+    investments_scope = current_user.investments
+    investments_scope = investments_scope.where(account: params[:account]) if params[:account].present?
+
+    @investments = investments_scope.order(date: :desc).limit(per_page).offset(offset)
+    @total_count = investments_scope.count
+    @current_page = page
+    @total_pages = (@total_count.to_f / per_page).ceil
+    @has_next = page < @total_pages
+    @has_prev = page > 1
+    @filtered_account = params[:account]
+
+    # Overall totals (always show all accounts in summary)
+    @total_purchases = current_user.investments.where("amount < 0").sum(:amount).abs
+    @total_sales = current_user.investments.where("amount > 0").sum(:amount)
+    @date_range = {
+      earliest: current_user.investments.minimum(:date),
+      latest: current_user.investments.maximum(:date)
+    }
+
+    # Account-based groupings (always show all accounts)
+    @account_summaries = current_user.investments
+      .group(:account)
+      .group("CASE WHEN amount > 0 THEN 'sales' ELSE 'purchases' END")
+      .sum(:amount)
+      .each_with_object({}) do |((account, type), total), hash|
+        hash[account] ||= { purchases: 0, sales: 0, count: 0 }
+        if type == "sales"
+          hash[account][:sales] = total
+        else
+          hash[account][:purchases] = total.abs
+        end
+      end
+
+    # Add investment counts per account
+    account_counts = current_user.investments.group(:account).count
+    @account_summaries.each do |account, data|
+      data[:count] = account_counts[account] || 0
+      data[:net] = data[:sales] - data[:purchases]
+    end
+
+    # Sort accounts by total activity (purchases + sales)
+    @account_summaries = @account_summaries.sort_by do |account, data|
+      -(data[:purchases] + data[:sales])
+    end.to_h
   end
 end

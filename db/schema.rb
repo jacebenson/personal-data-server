@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_07_055559) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_07_062955) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -52,16 +52,25 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_07_055559) do
     t.index ["user_id"], name: "index_bank_statements_on_user_id"
   end
 
-  create_table "transactions", force: :cascade do |t|
+  create_table "investments", force: :cascade do |t|
     t.integer "user_id", null: false
-    t.date "date"
+    t.datetime "date"
+    t.string "action"
+    t.string "symbol"
     t.string "description"
+    t.string "investment_type"
+    t.decimal "quantity"
+    t.decimal "price"
+    t.decimal "commission"
+    t.decimal "fees"
     t.decimal "amount"
-    t.string "transaction_type"
-    t.string "reference"
+    t.string "account"
+    t.string "account_number"
+    t.datetime "settlement_date"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["user_id"], name: "index_transactions_on_user_id"
+    t.index ["user_id", "date", "amount", "description", "account"], name: "index_investments_on_unique_transaction", unique: true
+    t.index ["user_id"], name: "index_investments_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -79,5 +88,5 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_07_055559) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "bank_statements", "users"
-  add_foreign_key "transactions", "users"
+  add_foreign_key "investments", "users"
 end

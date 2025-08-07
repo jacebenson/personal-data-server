@@ -38,12 +38,11 @@ class BankStatementProcessor
     parsed_date = parse_date_time(date_value, time_value)
     parsed_amount = parse_amount(amount_value)
 
-    # Check if this transaction already exists
+    # Check if this transaction already exists (ignoring account name)
     existing_transaction = @user.bank_statements.find_by(
       date: parsed_date,
       amount: parsed_amount,
-      description: description_value,
-      account: account_value
+      description: description_value
     )
 
     if existing_transaction

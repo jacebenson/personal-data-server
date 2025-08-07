@@ -6,5 +6,5 @@ class User < ApplicationRecord
 
   # Associations
   has_many :bank_statements, dependent: :destroy
-  has_many :transactions, dependent: :destroy
+  has_many :investments, dependent: :destroy
 end

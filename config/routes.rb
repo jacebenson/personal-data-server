@@ -5,9 +5,21 @@ Rails.application.routes.draw do
   # Data uploads routes
   resources :data_uploads, only: [ :index ] do
     collection do
+      # Ally Bank specific routes
       get :ally_bank_statements
       post :upload_ally_bank_statements
       get :view_ally_bank_statements
+
+      # Investment routes
+      get :fidelity_investments
+      post :upload_fidelity_investments
+      get :fidelity_portfolio
+      post :upload_fidelity_portfolio
+      get :principal_investments
+      post :upload_principal_investments
+      get :view_investments
+
+      # Duplicate and account management
       get :manage_duplicates
       delete :remove_duplicates
       delete :remove_account_transactions

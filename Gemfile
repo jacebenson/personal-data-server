@@ -18,6 +18,9 @@ gem "stimulus-rails"
 gem "tailwindcss-rails"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
+
+# XML parsing for OFX files
+gem "nokogiri"
 # CSV parsing library [https://github.com/ruby/csv]
 gem "csv"
 
