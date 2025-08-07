@@ -1,0 +1,121 @@
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Data Uploads</h1>
+      <p class="mt-2 text-gray-600 dark:text-gray-400">Upload and transform your personal data files</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Bank Statements Upload -->
+      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+        <div class="p-6">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+            </div>
+            <div class="ml-4">
+              <h3 class="text-lg font-medium text-gray-900 dark:text-white">Ally Bank Statements</h3>
+              <p class="text-sm text-gray-500 dark:text-gray-400">Upload CSV files from Ally Bank</p>
+            </div>
+          </div>
+          <div class="mt-6 space-y-3">
+            <%= link_to "Upload Ally Bank Statements", ally_bank_statements_data_uploads_path,
+                class: "w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
+            <% if current_user.bank_statements.any? %>
+              <%= link_to "View Records", view_ally_bank_statements_data_uploads_path,
+                  class: "w-full flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
+              <%= link_to "Manage Duplicates", manage_duplicates_data_uploads_path,
+                  class: "w-full flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Investment Statements (Future) -->
+      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg opacity-50">
+        <div class="p-6">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg class="h-8 w-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+              </svg>
+            </div>
+            <div class="ml-4">
+              <h3 class="text-lg font-medium text-gray-400">Investment Statements</h3>
+              <p class="text-sm text-gray-500">Coming soon</p>
+            </div>
+          </div>
+          <div class="mt-6">
+            <button disabled class="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-400 bg-gray-100 cursor-not-allowed">
+              Coming Soon
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Future: Add more upload types here -->
+      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg opacity-50">
+        <div class="p-6">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg class="h-8 w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+              </svg>
+            </div>
+            <div class="ml-4">
+              <h3 class="text-lg font-medium text-gray-400">More Coming Soon</h3>
+              <p class="text-sm text-gray-500">Additional data types</p>
+            </div>
+          </div>
+          <div class="mt-6">
+            <button disabled class="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-400 bg-gray-100 cursor-not-allowed">
+              Coming Soon
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="mt-12">
+      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white">Recent Data</h3>
+        </div>
+        <div class="p-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Ally Bank Statements</h4>
+              <p class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">
+                <%= current_user.bank_statements.count %>
+              </p>
+              <p class="text-sm text-gray-500 dark:text-gray-400">
+                Last upload: <%= current_user.bank_statements.maximum(:created_at)&.strftime("%B %d, %Y") || "Never" %>
+              </p>
+              <% if current_user.bank_statements.any? %>
+                <div class="mt-2">
+                  <%= link_to view_ally_bank_statements_data_uploads_path, class: "text-blue-600 hover:text-blue-500 text-sm font-medium" do %>
+                    View all records →
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+            <!-- TODO: Add when Transaction model is created
+            <div>
+              <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Transactions</h4>
+              <p class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">
+                <%= current_user.transactions.count %>
+              </p>
+              <p class="text-sm text-gray-500 dark:text-gray-400">
+                Last upload: <%= current_user.transactions.maximum(:created_at)&.strftime("%B %d, %Y") || "Never" %>
+              </p>
+            </div>
+            -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
