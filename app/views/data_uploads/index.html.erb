@@ -62,24 +62,27 @@
         </div>
       </div>
 
-      <!-- Future: Add more upload types here -->
-      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg opacity-50">
+      <!-- Social Security Earnings -->
+      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
         <div class="p-6">
           <div class="flex items-center">
             <div class="flex-shrink-0">
-              <svg class="h-8 w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+              <svg class="h-8 w-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
               </svg>
             </div>
             <div class="ml-4">
-              <h3 class="text-lg font-medium text-gray-400">More Coming Soon</h3>
-              <p class="text-sm text-gray-500">Additional data types</p>
+              <h3 class="text-lg font-medium text-gray-900 dark:text-white">Social Security Earnings</h3>
+              <p class="text-sm text-gray-500 dark:text-gray-400">Upload lifetime earnings from SSA.gov</p>
             </div>
           </div>
-          <div class="mt-6">
-            <button disabled class="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-400 bg-gray-100 cursor-not-allowed">
-              Coming Soon
-            </button>
+          <div class="mt-6 space-y-3">
+            <%= link_to "Upload SSA XML", social_security_earnings_data_uploads_path,
+                class: "w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500" %>
+            <% if current_user.social_security_earnings.any? %>
+              <%= link_to "View Lifetime Earnings", view_social_security_earnings_data_uploads_path,
+                  class: "w-full flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500" %>
+            <% end %>
           </div>
         </div>
       </div>
@@ -92,7 +95,7 @@
           <h3 class="text-lg font-medium text-gray-900 dark:text-white">Recent Data</h3>
         </div>
         <div class="p-6">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
               <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Ally Bank Statements</h4>
               <p class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">
@@ -121,6 +124,26 @@
                 <div class="mt-2">
                   <%= link_to view_investments_data_uploads_path, class: "text-green-600 hover:text-green-500 text-sm font-medium" do %>
                     View all records →
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+            <div>
+              <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Social Security Earnings</h4>
+              <p class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">
+                <%= current_user.social_security_earnings.count %>
+              </p>
+              <p class="text-sm text-gray-500 dark:text-gray-400">
+                <% if current_user.social_security_earnings.any? %>
+                  Years: <%= current_user.social_security_earnings.minimum(:year) %>-<%= current_user.social_security_earnings.maximum(:year) %>
+                <% else %>
+                  No data uploaded
+                <% end %>
+              </p>
+              <% if current_user.social_security_earnings.any? %>
+                <div class="mt-2">
+                  <%= link_to view_social_security_earnings_data_uploads_path, class: "text-orange-600 hover:text-orange-500 text-sm font-medium" do %>
+                    View lifetime earnings →
                   <% end %>
                 </div>
               <% end %>

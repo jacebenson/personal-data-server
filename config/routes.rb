@@ -19,6 +19,11 @@ Rails.application.routes.draw do
       post :upload_principal_investments
       get :view_investments
 
+      # Social Security routes
+      get :social_security_earnings
+      post :upload_social_security_earnings
+      get :view_social_security_earnings
+
       # Duplicate and account management
       get :manage_duplicates
       delete :remove_duplicates

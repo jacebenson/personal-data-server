@@ -1,0 +1,188 @@
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Lifetime Social Security Earnings</h1>
+      <p class="mt-2 text-gray-600 dark:text-gray-400">Your complete earnings history as reported to Social Security</p>
+    </div>
+
+    <% if @earnings.any? %>
+      <!-- Summary Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+          <div class="p-5">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <svg class="h-8 w-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                </svg>
+              </div>
+              <div class="ml-5 w-0 flex-1">
+                <dl>
+                  <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Total FICA Earnings</dt>
+                  <dd class="text-lg font-medium text-gray-900 dark:text-white">$<%= number_with_delimiter(@total_fica.to_i) %></dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+          <div class="p-5">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                </svg>
+              </div>
+              <div class="ml-5 w-0 flex-1">
+                <dl>
+                  <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Years Covered</dt>
+                  <dd class="text-lg font-medium text-gray-900 dark:text-white"><%= @years_covered %></dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+          <div class="p-5">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                </svg>
+              </div>
+              <div class="ml-5 w-0 flex-1">
+                <dl>
+                  <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Peak Year</dt>
+                  <dd class="text-lg font-medium text-gray-900 dark:text-white">
+                    <%= @peak_year.year %> ($<%= number_with_delimiter(@peak_year.fica_earnings.to_i) %>)
+                  </dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+          <div class="p-5">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <svg class="h-8 w-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2zM10 8.5a.5.5 0 11-1 0 .5.5 0 011 0zm5 5a.5.5 0 11-1 0 .5.5 0 011 0z"></path>
+                </svg>
+              </div>
+              <div class="ml-5 w-0 flex-1">
+                <dl>
+                  <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Recent 5-Yr Avg</dt>
+                  <dd class="text-lg font-medium text-gray-900 dark:text-white">$<%= number_with_delimiter(@recent_avg.to_i) %></dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Earnings Table -->
+      <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-md">
+        <div class="px-4 py-5 sm:px-6 border-b border-gray-200 dark:border-gray-700">
+          <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">Year-by-Year Earnings</h3>
+          <p class="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-400">
+            Complete breakdown of your reported earnings by year
+          </p>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead class="bg-gray-50 dark:bg-gray-700">
+              <tr>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  Year
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  FICA Earnings
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  Medicare Earnings
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  Growth
+                </th>
+              </tr>
+            </thead>
+            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+              <% @earnings.each_with_index do |earning, index| %>
+                <% next_earning = index < @earnings.length - 1 ? @earnings[index + 1] : nil %>
+                <% growth_rate = next_earning ? ((earning.fica_earnings - next_earning.fica_earnings) / next_earning.fica_earnings * 100) : 0 %>
+                <tr class="<%= 'bg-yellow-50 dark:bg-yellow-900/20' if earning == @peak_year %>">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                    <%= earning.year %>
+                    <% if earning == @peak_year %>
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 ml-2">
+                        Peak
+                      </span>
+                    <% end %>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                    $<%= number_with_delimiter(earning.fica_earnings.to_i) %>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                    $<%= number_with_delimiter(earning.medicare_earnings.to_i) %>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm">
+                    <% if next_earning %>
+                      <% if growth_rate > 0 %>
+                        <span class="text-green-600 dark:text-green-400">+<%= number_with_precision(growth_rate, precision: 1) %>%</span>
+                      <% elsif growth_rate < 0 %>
+                        <span class="text-red-600 dark:text-red-400"><%= number_with_precision(growth_rate, precision: 1) %>%</span>
+                      <% else %>
+                        <span class="text-gray-500 dark:text-gray-400">0%</span>
+                      <% end %>
+                    <% else %>
+                      <span class="text-gray-400 dark:text-gray-500">-</span>
+                    <% end %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+            <tfoot class="bg-gray-50 dark:bg-gray-700">
+              <tr>
+                <td class="px-6 py-3 text-left text-sm font-medium text-gray-900 dark:text-white">
+                  Total (<%= @earnings.count %> years)
+                </td>
+                <td class="px-6 py-3 text-left text-sm font-bold text-gray-900 dark:text-white">
+                  $<%= number_with_delimiter(@total_fica.to_i) %>
+                </td>
+                <td class="px-6 py-3 text-left text-sm font-bold text-gray-900 dark:text-white">
+                  $<%= number_with_delimiter(@total_medicare.to_i) %>
+                </td>
+                <td class="px-6 py-3 text-left text-sm text-gray-500 dark:text-gray-400">
+                  <%= number_with_precision(((@peak_year.fica_earnings / @earnings.last.fica_earnings) - 1) * 100, precision: 0) %>% lifetime growth
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+
+      <!-- Back to Uploads -->
+      <div class="mt-8 text-center">
+        <%= link_to "← Back to Data Uploads", data_uploads_path,
+            class: "inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500" %>
+      </div>
+
+    <% else %>
+      <!-- No Data State -->
+      <div class="text-center">
+        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+        </svg>
+        <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No earnings data</h3>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Get started by uploading your Social Security statement.</p>
+        <div class="mt-6">
+          <%= link_to "Upload Social Security Data", social_security_earnings_data_uploads_path,
+              class: "inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500" %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

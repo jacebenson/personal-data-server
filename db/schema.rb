@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_07_062955) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_08_153050) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -73,6 +73,17 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_07_062955) do
     t.index ["user_id"], name: "index_investments_on_user_id"
   end
 
+  create_table "social_security_earnings", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "year", null: false
+    t.decimal "fica_earnings", precision: 10, scale: 2, null: false
+    t.decimal "medicare_earnings", precision: 10, scale: 2, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "year"], name: "index_social_security_earnings_on_user_id_and_year", unique: true
+    t.index ["user_id"], name: "index_social_security_earnings_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
@@ -89,4 +100,5 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_07_062955) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "bank_statements", "users"
   add_foreign_key "investments", "users"
+  add_foreign_key "social_security_earnings", "users"
 end
