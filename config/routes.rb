@@ -28,6 +28,16 @@ Rails.application.routes.draw do
       post :upload_social_security_earnings
       get :view_social_security_earnings
 
+      # Amazon shopping routes
+      get :amazon_orders
+      post :upload_amazon_orders
+      get :amazon_digital_orders
+      post :upload_amazon_digital_orders
+      get :amazon_retail_orders
+      post :upload_amazon_retail_orders
+      get :view_amazon_orders
+      delete :clear_amazon_orders
+
       # Duplicate and account management
       get :manage_duplicates
       delete :remove_duplicates

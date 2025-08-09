@@ -82,7 +82,7 @@
           <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Direct access to upload forms</p>
         </div>
         <div class="p-6">
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <%= link_to ally_bank_statements_data_uploads_path, class: "flex items-center p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-300 dark:hover:border-blue-600 transition-colors" do %>
               <svg class="h-6 w-6 text-blue-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
@@ -112,6 +112,16 @@
                 <p class="text-sm text-gray-500 dark:text-gray-400">Upload Social Security XML</p>
               </div>
             <% end %>
+
+            <%= link_to amazon_orders_data_uploads_path, class: "flex items-center p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-yellow-50 dark:hover:bg-yellow-900/20 hover:border-yellow-300 dark:hover:border-yellow-600 transition-colors" do %>
+              <svg class="h-6 w-6 text-yellow-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+              </svg>
+              <div>
+                <p class="font-medium text-gray-900 dark:text-white">Amazon Orders</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Upload Digital & Retail CSV</p>
+              </div>
+            <% end %>
           </div>
         </div>
       </div>
@@ -124,7 +134,7 @@
           <h3 class="text-lg font-medium text-gray-900 dark:text-white">Recent Data</h3>
         </div>
         <div class="p-6">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div>
               <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Ally Bank Statements</h4>
               <p class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">
@@ -173,6 +183,22 @@
                 <div class="mt-2">
                   <%= link_to view_social_security_earnings_data_uploads_path, class: "text-orange-600 hover:text-orange-500 text-sm font-medium" do %>
                     View lifetime earnings →
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+            <div>
+              <h4 class="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Amazon Orders</h4>
+              <p class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">
+                <%= current_user.amazon_orders.count %>
+              </p>
+              <p class="text-sm text-gray-500 dark:text-gray-400">
+                Last upload: <%= current_user.amazon_orders.maximum(:created_at)&.strftime("%B %d, %Y") || "Never" %>
+              </p>
+              <% if current_user.amazon_orders.any? %>
+                <div class="mt-2">
+                  <%= link_to view_amazon_orders_data_uploads_path, class: "text-yellow-600 hover:text-yellow-500 text-sm font-medium" do %>
+                    View all orders →
                   <% end %>
                 </div>
               <% end %>

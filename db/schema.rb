@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_08_153050) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_09_060612) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -37,6 +37,53 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_08_153050) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "amazon_orders", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.string "order_type", null: false
+    t.string "order_id", null: false
+    t.datetime "order_date", null: false
+    t.string "asin"
+    t.string "product_name"
+    t.integer "quantity"
+    t.string "currency_code"
+    t.string "digital_order_item_id"
+    t.decimal "our_price", precision: 10, scale: 2
+    t.string "our_price_currency_code"
+    t.decimal "list_price_amount", precision: 10, scale: 2
+    t.string "list_price_currency_code"
+    t.boolean "is_fulfilled"
+    t.datetime "fulfilled_date"
+    t.string "marketplace"
+    t.string "publisher"
+    t.string "ship_from"
+    t.string "ship_to"
+    t.boolean "is_prime_eligible"
+    t.decimal "unit_price", precision: 10, scale: 2
+    t.decimal "unit_price_tax", precision: 10, scale: 2
+    t.decimal "shipping_charge", precision: 10, scale: 2
+    t.decimal "total_discounts", precision: 10, scale: 2
+    t.decimal "total_owed", precision: 10, scale: 2
+    t.string "product_condition"
+    t.string "payment_instrument_type"
+    t.string "order_status"
+    t.string "shipment_status"
+    t.datetime "ship_date"
+    t.string "shipping_option"
+    t.text "shipping_address"
+    t.text "billing_address"
+    t.string "tracking_number"
+    t.text "gift_message"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "website"
+    t.text "subscription_info"
+    t.index ["order_type"], name: "index_amazon_orders_on_order_type"
+    t.index ["user_id", "digital_order_item_id"], name: "index_amazon_orders_digital_unique", unique: true, where: "order_type = 'digital' AND digital_order_item_id IS NOT NULL"
+    t.index ["user_id", "order_date"], name: "index_amazon_orders_on_user_id_and_order_date"
+    t.index ["user_id", "order_id", "asin"], name: "index_amazon_orders_retail_unique", unique: true, where: "order_type = 'retail'"
+    t.index ["user_id"], name: "index_amazon_orders_on_user_id"
   end
 
   create_table "bank_statements", force: :cascade do |t|
@@ -98,6 +145,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_08_153050) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "amazon_orders", "users"
   add_foreign_key "bank_statements", "users"
   add_foreign_key "investments", "users"
   add_foreign_key "social_security_earnings", "users"

@@ -1,0 +1,444 @@
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="mb-8">
+      <div class="flex justify-between items-center">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-white">🛒 Amazon Orders</h1>
+          <p class="mt-2 text-gray-600 dark:text-gray-400">View your imported Amazon order history</p>
+        </div>
+        <% if @total_count > 0 %>
+          <div class="flex space-x-3">
+            <%= link_to amazon_orders_data_uploads_path,
+                class: "inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500" do %>
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+              </svg>
+              Upload More
+            <% end %>
+            <%= button_to clear_amazon_orders_data_uploads_path, method: :delete, 
+                confirm: "Are you sure you want to delete all #{@total_count} Amazon orders? This cannot be undone.", 
+                class: "inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700" do %>
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+              </svg>
+              Clear All Orders
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Summary Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg class="h-6 w-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+              </svg>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Total Orders</dt>
+                <dd class="text-lg font-medium text-gray-900 dark:text-white"><%= @total_count %></dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Digital Orders</dt>
+                <dd class="text-lg font-medium text-gray-900 dark:text-white"><%= @digital_count %></dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+              </svg>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Retail Orders</dt>
+                <dd class="text-lg font-medium text-gray-900 dark:text-white"><%= @retail_count %></dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg class="h-6 w-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+              </svg>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Subscriptions</dt>
+                <dd class="text-lg font-medium text-gray-900 dark:text-white"><%= @subscription_count %></dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg class="h-6 w-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+              </svg>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Total Spent</dt>
+                <dd class="text-lg font-medium text-gray-900 dark:text-white">$<%= number_with_delimiter((@total_spent_digital + @total_spent_retail).round(2)) %></dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg mb-6">
+      <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Filters</h3>
+      </div>
+      <div class="p-6">
+        <%= form_with url: view_amazon_orders_data_uploads_path, method: :get, local: true, class: "flex flex-wrap items-end gap-4" do |form| %>
+          <div>
+            <%= form.label :filter_type, "Order Type", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+            <%= form.select :filter_type, 
+                options_for_select([
+                  ["All Orders", "all"],
+                  ["Digital Only", "digital"],
+                  ["Retail Only", "retail"]
+                ], @filter_type),
+                {},
+                { class: "mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white" } %>
+          </div>
+
+          <div>
+            <%= form.label :filter_year, "Year", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+            <%= form.select :filter_year, 
+                options_for_select([["All Years", ""]] + @years_available.map { |year| [year, year] }, @filter_year),
+                {},
+                { class: "mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white" } %>
+          </div>
+
+          <div>
+            <%= form.submit "Apply Filters", class: "inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Orders Table -->
+    <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-md">
+      <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+          Orders 
+          <span class="text-sm font-normal text-gray-500 dark:text-gray-400">
+            (Showing <%= [@orders.count, 50].min %> of <%= @total_count %> orders)
+          </span>
+        </h3>
+      </div>
+
+      <% if @orders.any? %>
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead class="bg-gray-50 dark:bg-gray-700">
+              <tr>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  Type
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  What
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  When
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  How Much
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  Status
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  Order ID
+                </th>
+              </tr>
+            </thead>
+            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+              <% @orders.each do |order| %>
+                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                  <!-- Type Column -->
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <% if order.digital_order? %>
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                        📱 Digital
+                      </span>
+                    <% else %>
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                        📦 Retail
+                      </span>
+                    <% end %>
+                  </td>
+
+                  <!-- What Column -->
+                  <td class="px-6 py-4">
+                    <div class="text-sm font-medium">
+                      <% if order.asin.present? %>
+                        <% 
+                          # Determine the appropriate product URL based on publisher and subscription status
+                          product_url = if order.publisher == "Audible" && !order.subscription_order?
+                            "https://www.audible.com/pd/#{order.asin}"
+                          else
+                            "https://www.amazon.com/dp/#{order.asin}"
+                          end
+                        %>
+                        <a href="<%= product_url %>" 
+                           target="_blank" 
+                           class="text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 hover:underline">
+                          <%= truncate(order.product_name, length: 60) %>
+                          <svg class="inline-block w-3 h-3 ml-1 opacity-50" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"></path>
+                            <path d="M5 5a2 2 0 00-2 2v6a2 2 0 002 2h6a2 2 0 002-2v-2a1 1 0 10-2 0v2H5V7h2a1 1 0 000-2H5z"></path>
+                          </svg>
+                        </a>
+                      <% else %>
+                        <span class="text-gray-900 dark:text-white">
+                          <%= truncate(order.product_name, length: 60) %>
+                        </span>
+                      <% end %>
+                    </div>
+                    <% if order.asin.present? %>
+                      <div class="text-xs text-gray-500 dark:text-gray-400 font-mono">
+                        ASIN: <%= order.asin %>
+                      </div>
+                    <% end %>
+                    <% if order.retail_order? && order.quantity && order.quantity > 1 %>
+                      <div class="text-sm text-gray-500 dark:text-gray-400">
+                        Quantity: <%= order.quantity %>
+                      </div>
+                    <% end %>
+                    <% if order.digital_order? %>
+                      <div class="text-xs text-gray-500 dark:text-gray-400">
+                        <% 
+                          # Determine the service source based on publisher
+                          service_source = if order.publisher == "Audible"
+                            "Audible"
+                          elsif order.publisher&.include?("Amazon.com Services")
+                            "Amazon"
+                          else
+                            "Amazon" # Default to Amazon for digital purchases
+                          end
+                        %>
+                        📡 <%= service_source %>
+                        <% if order.subscription_order? %>
+                          <% if order.subscription_id.present? %>
+                            <a href="https://www.amazon.com/yourmembershipsandsubscriptions/paymenthistory?subscriptionId=<%= order.subscription_id %>" 
+                               target="_blank"
+                               class="ml-1 inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 hover:bg-purple-200 dark:hover:bg-purple-800 transition-colors">
+                              🔄 <%= order.subscription_service %>
+                              <svg class="inline-block w-2 h-2 ml-1 opacity-50" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"></path>
+                                <path d="M5 5a2 2 0 00-2 2v6a2 2 0 002 2h6a2 2 0 002-2v-2a1 1 0 10-2 0v2H5V7h2a1 1 0 000-2H5z"></path>
+                              </svg>
+                            </a>
+                          <% else %>
+                            <span class="ml-1 inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+                              🔄 <%= order.subscription_service %>
+                            </span>
+                          <% end %>
+                        <% end %>
+                      </div>
+                      <% if order.publisher.present? && order.publisher != "Amazon.com Services, Inc" %>
+                        <div class="text-sm text-gray-500 dark:text-gray-400">
+                          Publisher: <%= order.publisher %>
+                        </div>
+                      <% end %>
+                    <% end %>
+                  </td>
+
+                  <!-- When Column -->
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900 dark:text-white">
+                      <%= order.formatted_order_date %>
+                    </div>
+                    <% if order.retail_order? && order.ship_date.present? %>
+                      <div class="text-xs text-gray-500 dark:text-gray-400">
+                        Shipped: <%= order.ship_date.strftime("%b %d, %Y") %>
+                      </div>
+                    <% elsif order.digital_order? && order.fulfilled_date.present? %>
+                      <div class="text-xs text-gray-500 dark:text-gray-400">
+                        Fulfilled: <%= order.fulfilled_date.strftime("%b %d, %Y") %>
+                      </div>
+                    <% end %>
+                  </td>
+
+                  <!-- How Much Column -->
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm font-medium text-gray-900 dark:text-white">
+                      <%= order.formatted_price %>
+                    </div>
+                    <% if order.retail_order? %>
+                      <% if order.unit_price_tax && order.unit_price_tax > 0 %>
+                        <div class="text-xs text-gray-500 dark:text-gray-400">
+                          +$<%= '%.2f' % order.unit_price_tax %> tax
+                        </div>
+                      <% end %>
+                      <% if order.shipping_charge && order.shipping_charge > 0 %>
+                        <div class="text-xs text-gray-500 dark:text-gray-400">
+                          +$<%= '%.2f' % order.shipping_charge %> shipping
+                        </div>
+                      <% end %>
+                    <% end %>
+                  </td>
+
+                  <!-- Status Column -->
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <% if order.retail_order? %>
+                      <div class="text-sm text-gray-900 dark:text-white">
+                        <%= order.order_status %>
+                      </div>
+                      <% if order.shipment_status.present? %>
+                        <div class="text-xs text-gray-500 dark:text-gray-400">
+                          <%= order.shipment_status %>
+                        </div>
+                      <% end %>
+                    <% elsif order.digital_order? %>
+                      <% if order.is_fulfilled? %>
+                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                          ✅ Fulfilled
+                        </span>
+                      <% else %>
+                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                          ⏳ Pending
+                        </span>
+                      <% end %>
+                    <% end %>
+                  </td>
+
+                  <!-- Order ID Column -->
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm font-mono">
+                      <a href="https://www.amazon.com/gp/your-account/order-details?orderID=<%= order.order_id %>" 
+                         target="_blank" 
+                         class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline">
+                        <%= order.order_id %>
+                        <svg class="inline-block w-3 h-3 ml-1" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"></path>
+                          <path d="M5 5a2 2 0 00-2 2v6a2 2 0 002 2h6a2 2 0 002-2v-2a1 1 0 10-2 0v2H5V7h2a1 1 0 000-2H5z"></path>
+                        </svg>
+                      </a>
+                    </div>
+                    <% if order.retail_order? && order.tracking_number.present? && !order.tracking_number.include?("Not Available") %>
+                      <div class="text-xs text-blue-600 dark:text-blue-400">
+                        📦 <%= truncate(order.tracking_number, length: 20) %>
+                      </div>
+                    <% end %>
+                    <% if order.is_prime_eligible %>
+                      <div class="text-xs text-blue-600 dark:text-blue-400">
+                        Prime
+                      </div>
+                    <% end %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <% if @total_pages > 1 %>
+          <div class="bg-white dark:bg-gray-800 px-4 py-3 border-t border-gray-200 dark:border-gray-700 sm:px-6">
+            <div class="flex items-center justify-between">
+              <div class="flex-1 flex justify-between sm:hidden">
+                <% if @has_prev %>
+                  <%= link_to "Previous", view_amazon_orders_data_uploads_path(page: @current_page - 1, filter_type: @filter_type, filter_year: @filter_year), 
+                      class: "relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50" %>
+                <% end %>
+                <% if @has_next %>
+                  <%= link_to "Next", view_amazon_orders_data_uploads_path(page: @current_page + 1, filter_type: @filter_type, filter_year: @filter_year), 
+                      class: "ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50" %>
+                <% end %>
+              </div>
+              <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                <div>
+                  <p class="text-sm text-gray-700 dark:text-gray-300">
+                    Showing page <span class="font-medium"><%= @current_page %></span> of <span class="font-medium"><%= @total_pages %></span>
+                  </p>
+                </div>
+                <div>
+                  <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                    <% if @has_prev %>
+                      <%= link_to view_amazon_orders_data_uploads_path(page: @current_page - 1, filter_type: @filter_type, filter_year: @filter_year), 
+                          class: "relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600" do %>
+                        <span class="sr-only">Previous</span>
+                        <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                        </svg>
+                      <% end %>
+                    <% end %>
+                    <% if @has_next %>
+                      <%= link_to view_amazon_orders_data_uploads_path(page: @current_page + 1, filter_type: @filter_type, filter_year: @filter_year), 
+                          class: "relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600" do %>
+                        <span class="sr-only">Next</span>
+                        <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                        </svg>
+                      <% end %>
+                    <% end %>
+                  </nav>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      <% else %>
+        <div class="text-center py-12">
+          <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+          </svg>
+          <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No orders found</h3>
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            <% if @filter_type != 'all' || @filter_year.present? %>
+              Try adjusting your filters or upload more data.
+            <% else %>
+              Get started by uploading your Amazon order data.
+            <% end %>
+          </p>
+          <div class="mt-6 space-x-3">
+            <%= link_to "Upload Digital Orders", amazon_digital_orders_data_uploads_path,
+                class: "inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500" %>
+            <%= link_to "Upload Retail Orders", amazon_retail_orders_data_uploads_path,
+                class: "inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-yellow-500 hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

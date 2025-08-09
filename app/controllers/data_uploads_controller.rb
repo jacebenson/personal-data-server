@@ -353,4 +353,171 @@ class DataUploadsController < ApplicationController
       @recent_avg = current_user.social_security_earnings.order(:year).last(5).sum(&:fica_earnings) / [ current_user.social_security_earnings.order(:year).last(5).count, 1 ].max
     end
   end
+
+  # Amazon shopping methods
+  def amazon_orders
+    # Combined Amazon upload page for both digital and retail orders
+  end
+
+  def upload_amazon_orders
+    # Process uploaded Amazon CSV (either digital or retail)
+    if params[:file].present?
+      begin
+        # Detect file type based on content or filename
+        file_type = detect_amazon_file_type(params[:file])
+        
+        result = AmazonDataProcessor.new(params[:file].path, current_user, file_type).process
+
+        message = "Successfully imported #{result[:count]} Amazon #{file_type} orders."
+        if result[:skipped] && result[:skipped] > 0
+          message += " Skipped #{result[:skipped]} records"
+          if result[:duplicates] && result[:duplicates] > 0
+            message += " (#{result[:duplicates]} duplicates)"
+          end
+          message += "."
+        end
+
+        redirect_to amazon_orders_data_uploads_path, notice: message
+      rescue => e
+        redirect_to amazon_orders_data_uploads_path, alert: "Error processing file: #{e.message}"
+      end
+    else
+      redirect_to amazon_orders_data_uploads_path, alert: "Please select a file to upload."
+    end
+  end
+
+  def amazon_digital_orders
+    # Show Amazon digital orders upload form
+  end
+
+  def upload_amazon_digital_orders
+    # Process uploaded Amazon digital items CSV
+    if params[:file].present?
+      begin
+        result = AmazonDataProcessor.new(params[:file].path, current_user, 'digital').process
+
+        message = "Successfully imported #{result[:count]} Amazon digital orders."
+        if result[:skipped] && result[:skipped] > 0
+          message += " Skipped #{result[:skipped]} records"
+          if result[:duplicates] && result[:duplicates] > 0
+            message += " (#{result[:duplicates]} duplicates)"
+          end
+          message += "."
+        end
+
+        redirect_to data_uploads_path, notice: message
+      rescue => e
+        redirect_to amazon_digital_orders_data_uploads_path, alert: "Error processing file: #{e.message}"
+      end
+    else
+      redirect_to amazon_digital_orders_data_uploads_path, alert: "Please select a file to upload."
+    end
+  end
+
+  def amazon_retail_orders
+    # Show Amazon retail orders upload form
+  end
+
+  def upload_amazon_retail_orders
+    # Process uploaded Amazon retail order history CSV
+    if params[:file].present?
+      begin
+        result = AmazonDataProcessor.new(params[:file].path, current_user, 'retail').process
+
+        message = "Successfully imported #{result[:count]} Amazon retail orders."
+        if result[:skipped] && result[:skipped] > 0
+          message += " Skipped #{result[:skipped]} records"
+          if result[:duplicates] && result[:duplicates] > 0
+            message += " (#{result[:duplicates]} duplicates)"
+          end
+          message += "."
+        end
+
+        redirect_to data_uploads_path, notice: message
+      rescue => e
+        redirect_to amazon_retail_orders_data_uploads_path, alert: "Error processing file: #{e.message}"
+      end
+    else
+      redirect_to amazon_retail_orders_data_uploads_path, alert: "Please select a file to upload."
+    end
+  end
+
+  def view_amazon_orders
+    # Show imported Amazon orders
+    page = params[:page].to_i
+    page = 1 if page < 1
+    per_page = 50
+    offset = (page - 1) * per_page
+
+    @filter_type = params[:filter_type] || 'all'
+    @filter_year = params[:filter_year]
+
+    # Base query
+    orders = current_user.amazon_orders
+
+    # Apply filters
+    case @filter_type
+    when 'digital'
+      orders = orders.digital
+    when 'retail'
+      orders = orders.retail
+    end
+
+    if @filter_year.present?
+      orders = orders.by_year(@filter_year)
+    end
+
+    @total_count = orders.count
+    @orders = orders.recent.limit(per_page).offset(offset)
+    
+    # Pagination info
+    @current_page = page
+    @total_pages = (@total_count.to_f / per_page).ceil
+    @has_prev = page > 1
+    @has_next = page < @total_pages
+
+    # Summary stats
+    @digital_count = current_user.amazon_orders.digital.count
+    @retail_count = current_user.amazon_orders.retail.count
+    @subscription_count = current_user.amazon_orders.unique_subscriptions_count
+    @one_time_count = current_user.amazon_orders.one_time_purchases.count
+    @total_spent_digital = current_user.amazon_orders.digital.sum(:our_price) || 0
+    @total_spent_retail = current_user.amazon_orders.retail.sum(:total_owed) || 0
+    @years_available = current_user.amazon_orders.pluck(:order_date).map { |d| d.year }.uniq.sort.reverse
+  end
+
+  def clear_amazon_orders
+    # Clear all Amazon orders for the current user
+    count = current_user.amazon_orders.count
+    current_user.amazon_orders.destroy_all
+    redirect_to data_uploads_path, notice: "Successfully deleted #{count} Amazon orders."
+  end
+
+  private
+
+  def detect_amazon_file_type(file)
+    # Check filename first
+    filename = file.original_filename.downcase
+    return 'digital' if filename.include?('digital')
+    return 'retail' if filename.include?('retail')
+    
+    # If filename doesn't give us a clue, read first few lines to detect headers
+    begin
+      first_line = File.open(file.path, 'r') { |f| f.readline }.strip
+      headers = first_line.split(',').map(&:strip).map(&:downcase)
+      
+      # Digital files typically have these headers
+      digital_indicators = ['title', 'asin', 'website', 'order date']
+      # Retail files typically have these headers  
+      retail_indicators = ['order date', 'order id', 'product name', 'category']
+      
+      digital_score = digital_indicators.count { |indicator| headers.any? { |h| h.include?(indicator) } }
+      retail_score = retail_indicators.count { |indicator| headers.any? { |h| h.include?(indicator) } }
+      
+      return digital_score > retail_score ? 'digital' : 'retail'
+    rescue
+      # Default to digital if we can't detect
+      return 'digital'
+    end
+  end
 end

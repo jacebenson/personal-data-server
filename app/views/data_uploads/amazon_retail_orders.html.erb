@@ -1,0 +1,81 @@
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-900 dark:text-white">🛍️ Upload Amazon Retail Orders</h1>
+      <p class="mt-2 text-gray-600 dark:text-gray-400">Upload your Retail Order History CSV file from Amazon's "Your Orders" export</p>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+      <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Upload Retail Order History CSV</h3>
+      </div>
+      <div class="p-6">
+        <div class="mb-6 p-4 bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 rounded-md">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+              </svg>
+            </div>
+            <div class="ml-3">
+              <h3 class="text-sm font-medium text-blue-800 dark:text-blue-200">How to get your Retail Order History data:</h3>
+              <div class="mt-2 text-sm text-blue-700 dark:text-blue-300">
+                <ol class="list-decimal list-inside space-y-1">
+                  <li>Go to <a href="https://www.amazon.com/hz/privacy-central/data-requests/preview.html" target="_blank" class="underline">Amazon Privacy Central</a></li>
+                  <li>Request "Your Orders" export</li>
+                  <li>Wait for the export to be ready (usually takes a few hours)</li>
+                  <li>Download and extract the ZIP file</li>
+                  <li>Upload the "Retail.OrderHistory.1.csv" file below</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <%= form_with url: upload_amazon_retail_orders_data_uploads_path, method: :post, multipart: true, local: true, class: "space-y-6" do |form| %>
+          <div>
+            <%= form.label :file, "Select Retail Order History CSV File", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+            <div class="mt-1">
+              <%= form.file_field :file, 
+                  accept: ".csv", 
+                  required: true,
+                  class: "block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900 dark:file:text-blue-300" %>
+            </div>
+            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+              Upload the "Retail.OrderHistory.1.csv" file from your Amazon data export. This contains your physical product orders.
+            </p>
+          </div>
+
+          <div class="flex items-center justify-between">
+            <div class="flex space-x-3">
+              <%= form.submit "Upload Retail Orders", 
+                  class: "inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500" %>
+              <%= link_to "Cancel", data_uploads_path, 
+                  class: "inline-flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
+            </div>
+          </div>
+        <% end %>
+
+        <% if current_user.amazon_orders.retail.any? %>
+          <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+            <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-4">Current Retail Orders Summary</h4>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-md">
+                <p class="text-sm text-gray-500 dark:text-gray-400">Total Retail Orders</p>
+                <p class="text-lg font-semibold text-gray-900 dark:text-white"><%= current_user.amazon_orders.retail.count %></p>
+              </div>
+              <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-md">
+                <p class="text-sm text-gray-500 dark:text-gray-400">Total Spent</p>
+                <p class="text-lg font-semibold text-gray-900 dark:text-white">$<%= (current_user.amazon_orders.retail.sum(:total_owed) || 0).round(2) %></p>
+              </div>
+              <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-md">
+                <p class="text-sm text-gray-500 dark:text-gray-400">Latest Order</p>
+                <p class="text-lg font-semibold text-gray-900 dark:text-white"><%= current_user.amazon_orders.retail.maximum(:order_date)&.strftime("%b %Y") || "None" %></p>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
