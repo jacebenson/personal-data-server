@@ -46,15 +46,38 @@
 <div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="mb-8">
-      <%= link_to financial_path, class: "inline-flex items-center text-green-600 hover:text-green-500" do %>
-        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-        </svg>
-        Back to Financial Data
-      <% end %>
+      <div class="flex justify-between items-center">
+        <div>
+          <%= link_to financial_path, class: "inline-flex items-center text-green-600 hover:text-green-500" do %>
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+            Back to Financial Data
+          <% end %>
 
-      <h1 class="mt-4 text-3xl font-bold text-gray-900 dark:text-white">Investment Transactions</h1>
-      <p class="mt-2 text-gray-600 dark:text-gray-400">View and manage your imported investment transaction data</p>
+          <h1 class="mt-4 text-3xl font-bold text-gray-900 dark:text-white">Investment Transactions</h1>
+          <p class="mt-2 text-gray-600 dark:text-gray-400">View and manage your imported investment transaction data</p>
+        </div>
+        <% if @total_count > 0 %>
+          <div class="flex space-x-3">
+            <%= link_to fidelity_data_data_uploads_path,
+                class: "inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500" do %>
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+              </svg>
+              Upload More
+            <% end %>
+            <%= button_to clear_investments_data_uploads_path, method: :delete, 
+                confirm: "Are you sure you want to delete all #{@total_count} investment records? This cannot be undone.", 
+                class: "inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700" do %>
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+              </svg>
+              Clear All Records
+            <% end %>
+          </div>
+        <% end %>
+      </div>
     </div>
 
     <!-- Summary Stats -->

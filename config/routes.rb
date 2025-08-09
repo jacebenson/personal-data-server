@@ -15,13 +15,12 @@ Rails.application.routes.draw do
       get :view_ally_bank_statements
 
       # Investment routes
-      get :fidelity_investments
-      post :upload_fidelity_investments
-      get :fidelity_portfolio
-      post :upload_fidelity_portfolio
+      get :fidelity_data
+      post :upload_fidelity_data
       get :principal_investments
       post :upload_principal_investments
       get :view_investments
+      delete :clear_investments
 
       # Social Security routes
       get :social_security_earnings
@@ -31,10 +30,6 @@ Rails.application.routes.draw do
       # Amazon shopping routes
       get :amazon_orders
       post :upload_amazon_orders
-      get :amazon_digital_orders
-      post :upload_amazon_digital_orders
-      get :amazon_retail_orders
-      post :upload_amazon_retail_orders
       get :view_amazon_orders
       delete :clear_amazon_orders
 

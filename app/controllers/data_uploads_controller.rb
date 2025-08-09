@@ -154,23 +154,28 @@ class DataUploadsController < ApplicationController
   end
 
   # Investment upload methods
-  def fidelity_investments
-    # Show Fidelity investment upload form
+  def fidelity_data
+    # Combined Fidelity upload page for both transactions and positions
   end
 
-  def upload_fidelity_investments
-    puts "DEBUGGING: upload_fidelity_investments called"
-    Rails.logger.info "DEBUGGING: upload_fidelity_investments called with params: #{params.inspect}"
-
-    # Process uploaded Fidelity investment CSV
+  def upload_fidelity_data
+    # Process uploaded Fidelity CSV (either transactions or positions)
     if params[:file].present?
-      puts "DEBUGGING: File present: #{params[:file].original_filename}"
-      Rails.logger.info "DEBUGGING: File present: #{params[:file].original_filename}"
-
       begin
-        result = FidelityInvestmentProcessor.new(params[:file], current_user).process
+        # Detect file type based on content or filename
+        file_type = detect_fidelity_file_type(params[:file])
+        
+        if file_type == 'transactions'
+          result = FidelityInvestmentProcessor.new(params[:file], current_user).process
+          message = "Successfully imported #{result[:count]} Fidelity investment transactions."
+        else # positions
+          result = FidelityPortfolioProcessor.process(params[:file].path, current_user)
+          message = "Successfully imported #{result[:imported]} Fidelity portfolio positions."
+          if result[:replaced_accounts] && result[:replaced_accounts].any?
+            message += " Replaced positions for: #{result[:replaced_accounts].join(', ')}."
+          end
+        end
 
-        message = "Successfully imported #{result[:count]} Fidelity investment records."
         if result[:skipped] && result[:skipped] > 0
           message += " Skipped #{result[:skipped]} records"
           if result[:duplicates] && result[:duplicates] > 0
@@ -179,40 +184,12 @@ class DataUploadsController < ApplicationController
           message += "."
         end
 
-        redirect_to data_uploads_path, notice: message
+        redirect_to fidelity_data_data_uploads_path, notice: message
       rescue => e
-        puts "DEBUGGING: Error processing file: #{e.message}"
-        Rails.logger.error "DEBUGGING: Error processing file: #{e.message}"
-        Rails.logger.error "DEBUGGING: Backtrace: #{e.backtrace.join("\n")}"
-        redirect_to fidelity_investments_data_uploads_path, alert: "Error processing file: #{e.message}"
+        redirect_to fidelity_data_data_uploads_path, alert: "Error processing file: #{e.message}"
       end
     else
-      redirect_to fidelity_investments_data_uploads_path, alert: "Please select a file to upload."
-    end
-  end
-
-  def fidelity_portfolio
-    # Show Fidelity portfolio upload form
-  end
-
-  def upload_fidelity_portfolio
-    # Process uploaded Fidelity portfolio positions CSV
-    if params[:file].present?
-      begin
-        result = FidelityPortfolioProcessor.process(params[:file].path, current_user)
-
-        message = "Successfully imported #{result[:imported]} Fidelity portfolio positions."
-        if result[:skipped] && result[:skipped] > 0
-          message += " Skipped #{result[:skipped]} records."
-        end
-
-        redirect_to data_uploads_path, notice: message
-      rescue => e
-        Rails.logger.error "Error processing Fidelity portfolio: #{e.message}"
-        redirect_to fidelity_portfolio_data_uploads_path, alert: "Error processing file: #{e.message}"
-      end
-    else
-      redirect_to fidelity_portfolio_data_uploads_path, alert: "Please select a file to upload."
+      redirect_to fidelity_data_data_uploads_path, alert: "Please select a file to upload."
     end
   end
 
@@ -296,6 +273,13 @@ class DataUploadsController < ApplicationController
     @account_summaries = @account_summaries.sort_by do |account, data|
       -(data[:purchases] + data[:sales])
     end.to_h
+  end
+
+  def clear_investments
+    # Clear all investment records for the current user
+    count = current_user.investments.count
+    current_user.investments.destroy_all
+    redirect_to data_uploads_path, notice: "Successfully deleted #{count} investment records."
   end
 
   # Social Security earnings methods
@@ -386,62 +370,6 @@ class DataUploadsController < ApplicationController
     end
   end
 
-  def amazon_digital_orders
-    # Show Amazon digital orders upload form
-  end
-
-  def upload_amazon_digital_orders
-    # Process uploaded Amazon digital items CSV
-    if params[:file].present?
-      begin
-        result = AmazonDataProcessor.new(params[:file].path, current_user, 'digital').process
-
-        message = "Successfully imported #{result[:count]} Amazon digital orders."
-        if result[:skipped] && result[:skipped] > 0
-          message += " Skipped #{result[:skipped]} records"
-          if result[:duplicates] && result[:duplicates] > 0
-            message += " (#{result[:duplicates]} duplicates)"
-          end
-          message += "."
-        end
-
-        redirect_to data_uploads_path, notice: message
-      rescue => e
-        redirect_to amazon_digital_orders_data_uploads_path, alert: "Error processing file: #{e.message}"
-      end
-    else
-      redirect_to amazon_digital_orders_data_uploads_path, alert: "Please select a file to upload."
-    end
-  end
-
-  def amazon_retail_orders
-    # Show Amazon retail orders upload form
-  end
-
-  def upload_amazon_retail_orders
-    # Process uploaded Amazon retail order history CSV
-    if params[:file].present?
-      begin
-        result = AmazonDataProcessor.new(params[:file].path, current_user, 'retail').process
-
-        message = "Successfully imported #{result[:count]} Amazon retail orders."
-        if result[:skipped] && result[:skipped] > 0
-          message += " Skipped #{result[:skipped]} records"
-          if result[:duplicates] && result[:duplicates] > 0
-            message += " (#{result[:duplicates]} duplicates)"
-          end
-          message += "."
-        end
-
-        redirect_to data_uploads_path, notice: message
-      rescue => e
-        redirect_to amazon_retail_orders_data_uploads_path, alert: "Error processing file: #{e.message}"
-      end
-    else
-      redirect_to amazon_retail_orders_data_uploads_path, alert: "Please select a file to upload."
-    end
-  end
-
   def view_amazon_orders
     # Show imported Amazon orders
     page = params[:page].to_i
@@ -518,6 +446,32 @@ class DataUploadsController < ApplicationController
     rescue
       # Default to digital if we can't detect
       return 'digital'
+    end
+  end
+
+  def detect_fidelity_file_type(file)
+    # Check filename first
+    filename = file.original_filename.downcase
+    return 'positions' if filename.include?('position') || filename.include?('portfolio')
+    return 'transactions' if filename.include?('transaction') || filename.include?('history')
+    
+    # If filename doesn't give us a clue, read first few lines to detect headers
+    begin
+      first_line = File.open(file.path, 'r') { |f| f.readline }.strip
+      headers = first_line.split(',').map(&:strip).map(&:downcase)
+      
+      # Portfolio/Positions files typically have these headers
+      position_indicators = ['current value', 'quantity', 'last price', 'market value']
+      # Transaction files typically have these headers  
+      transaction_indicators = ['run date', 'transaction type', 'action', 'settlement date']
+      
+      position_score = position_indicators.count { |indicator| headers.any? { |h| h.include?(indicator) } }
+      transaction_score = transaction_indicators.count { |indicator| headers.any? { |h| h.include?(indicator) } }
+      
+      return position_score > transaction_score ? 'positions' : 'transactions'
+    rescue
+      # Default to transactions if we can't detect
+      return 'transactions'
     end
   end
 end
