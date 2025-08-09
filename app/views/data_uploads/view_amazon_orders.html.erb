@@ -15,8 +15,8 @@
               </svg>
               Upload More
             <% end %>
-            <%= button_to clear_amazon_orders_data_uploads_path, method: :delete, 
-                confirm: "Are you sure you want to delete all #{@total_count} Amazon orders? This cannot be undone.", 
+            <%= button_to clear_amazon_orders_data_uploads_path, method: :delete,
+                confirm: "Are you sure you want to delete all #{@total_count} Amazon orders? This cannot be undone.",
                 class: "inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700" do %>
               <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
@@ -130,7 +130,7 @@
         <%= form_with url: view_amazon_orders_data_uploads_path, method: :get, local: true, class: "flex flex-wrap items-end gap-4" do |form| %>
           <div>
             <%= form.label :filter_type, "Order Type", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
-            <%= form.select :filter_type, 
+            <%= form.select :filter_type,
                 options_for_select([
                   ["All Orders", "all"],
                   ["Digital Only", "digital"],
@@ -142,7 +142,7 @@
 
           <div>
             <%= form.label :filter_year, "Year", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
-            <%= form.select :filter_year, 
+            <%= form.select :filter_year,
                 options_for_select([["All Years", ""]] + @years_available.map { |year| [year, year] }, @filter_year),
                 {},
                 { class: "mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white" } %>
@@ -159,7 +159,7 @@
     <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-md">
       <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
         <h3 class="text-lg font-medium text-gray-900 dark:text-white">
-          Orders 
+          Orders
           <span class="text-sm font-normal text-gray-500 dark:text-gray-400">
             (Showing <%= [@orders.count, 50].min %> of <%= @total_count %> orders)
           </span>
@@ -211,7 +211,7 @@
                   <td class="px-6 py-4">
                     <div class="text-sm font-medium">
                       <% if order.asin.present? %>
-                        <% 
+                        <%
                           # Determine the appropriate product URL based on publisher and subscription status
                           product_url = if order.publisher == "Audible" && !order.subscription_order?
                             "https://www.audible.com/pd/#{order.asin}"
@@ -219,8 +219,8 @@
                             "https://www.amazon.com/dp/#{order.asin}"
                           end
                         %>
-                        <a href="<%= product_url %>" 
-                           target="_blank" 
+                        <a href="<%= product_url %>"
+                           target="_blank"
                            class="text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 hover:underline">
                           <%= truncate(order.product_name, length: 60) %>
                           <svg class="inline-block w-3 h-3 ml-1 opacity-50" fill="currentColor" viewBox="0 0 20 20">
@@ -246,7 +246,7 @@
                     <% end %>
                     <% if order.digital_order? %>
                       <div class="text-xs text-gray-500 dark:text-gray-400">
-                        <% 
+                        <%
                           # Determine the service source based on publisher
                           service_source = if order.publisher == "Audible"
                             "Audible"
@@ -259,7 +259,7 @@
                         📡 <%= service_source %>
                         <% if order.subscription_order? %>
                           <% if order.subscription_id.present? %>
-                            <a href="https://www.amazon.com/yourmembershipsandsubscriptions/paymenthistory?subscriptionId=<%= order.subscription_id %>" 
+                            <a href="https://www.amazon.com/yourmembershipsandsubscriptions/paymenthistory?subscriptionId=<%= order.subscription_id %>"
                                target="_blank"
                                class="ml-1 inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 hover:bg-purple-200 dark:hover:bg-purple-800 transition-colors">
                               🔄 <%= order.subscription_service %>
@@ -345,8 +345,8 @@
                   <!-- Order ID Column -->
                   <td class="px-6 py-4 whitespace-nowrap">
                     <div class="text-sm font-mono">
-                      <a href="https://www.amazon.com/gp/your-account/order-details?orderID=<%= order.order_id %>" 
-                         target="_blank" 
+                      <a href="https://www.amazon.com/gp/your-account/order-details?orderID=<%= order.order_id %>"
+                         target="_blank"
                          class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline">
                         <%= order.order_id %>
                         <svg class="inline-block w-3 h-3 ml-1" fill="currentColor" viewBox="0 0 20 20">
@@ -378,11 +378,11 @@
             <div class="flex items-center justify-between">
               <div class="flex-1 flex justify-between sm:hidden">
                 <% if @has_prev %>
-                  <%= link_to "Previous", view_amazon_orders_data_uploads_path(page: @current_page - 1, filter_type: @filter_type, filter_year: @filter_year), 
+                  <%= link_to "Previous", view_amazon_orders_data_uploads_path(page: @current_page - 1, filter_type: @filter_type, filter_year: @filter_year),
                       class: "relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50" %>
                 <% end %>
                 <% if @has_next %>
-                  <%= link_to "Next", view_amazon_orders_data_uploads_path(page: @current_page + 1, filter_type: @filter_type, filter_year: @filter_year), 
+                  <%= link_to "Next", view_amazon_orders_data_uploads_path(page: @current_page + 1, filter_type: @filter_type, filter_year: @filter_year),
                       class: "ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50" %>
                 <% end %>
               </div>
@@ -395,7 +395,7 @@
                 <div>
                   <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
                     <% if @has_prev %>
-                      <%= link_to view_amazon_orders_data_uploads_path(page: @current_page - 1, filter_type: @filter_type, filter_year: @filter_year), 
+                      <%= link_to view_amazon_orders_data_uploads_path(page: @current_page - 1, filter_type: @filter_type, filter_year: @filter_year),
                           class: "relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600" do %>
                         <span class="sr-only">Previous</span>
                         <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
@@ -404,7 +404,7 @@
                       <% end %>
                     <% end %>
                     <% if @has_next %>
-                      <%= link_to view_amazon_orders_data_uploads_path(page: @current_page + 1, filter_type: @filter_type, filter_year: @filter_year), 
+                      <%= link_to view_amazon_orders_data_uploads_path(page: @current_page + 1, filter_type: @filter_type, filter_year: @filter_year),
                           class: "relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-sm font-medium text-gray-500 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600" do %>
                         <span class="sr-only">Next</span>
                         <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">

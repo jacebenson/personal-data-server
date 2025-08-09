@@ -1,4 +1,4 @@
-require 'csv'
+require "csv"
 
 class AmazonDataProcessor
   def initialize(file_path, user, file_type)
@@ -9,9 +9,9 @@ class AmazonDataProcessor
 
   def process
     case @file_type
-    when 'digital'
+    when "digital"
       process_digital_orders
-    when 'retail'
+    when "retail"
       process_retail_orders
     else
       raise ArgumentError, "Invalid file type: #{@file_type}. Must be 'digital' or 'retail'"
@@ -22,13 +22,13 @@ class AmazonDataProcessor
 
   def process_digital_orders
     result = { count: 0, skipped: 0, duplicates: 0 }
-    
+
     CSV.foreach(@file_path, headers: true, header_converters: :symbol) do |row|
       begin
         # Parse the digital order data
         order_data = {
           user: @user,
-          order_type: 'digital',
+          order_type: "digital",
           order_id: row[:orderid],
           order_date: parse_date(row[:orderdate]),
           asin: row[:asin],
@@ -55,7 +55,7 @@ class AmazonDataProcessor
         order = AmazonOrder.find_or_initialize_by(
           user: @user,
           digital_order_item_id: order_data[:digital_order_item_id],
-          order_type: 'digital'
+          order_type: "digital"
         )
 
         if order.persisted?
@@ -90,34 +90,34 @@ class AmazonDataProcessor
 
   def process_retail_orders
     result = { count: 0, skipped: 0, duplicates: 0 }
-    
+
     CSV.foreach(@file_path, headers: true) do |row|
       begin
         # Parse the retail order data
         order_data = {
           user: @user,
-          order_type: 'retail',
-          order_id: row['Order ID'],
-          order_date: parse_date(row['Order Date']),
-          asin: row['ASIN'],
-          product_name: row['Product Name'],
-          unit_price: parse_decimal(row['Unit Price']),
-          unit_price_tax: parse_decimal(row['Unit Price Tax']),
-          shipping_charge: parse_decimal(row['Shipping Charge']),
-          total_discounts: parse_decimal(row['Total Discounts']),
-          total_owed: parse_decimal(row['Total Owed']),
-          product_condition: row['Product Condition'],
-          quantity: parse_integer(row['Quantity']),
-          payment_instrument_type: row['Payment Instrument Type'],
-          order_status: row['Order Status'],
-          shipment_status: row['Shipment Status'],
-          ship_date: parse_date(row['Ship Date']),
-          shipping_option: row['Shipping Option'],
-          shipping_address: row['Shipping Address'],
-          billing_address: row['Billing Address'],
-          tracking_number: row['Carrier Name & Tracking Number'],
-          gift_message: row['Gift Message'],
-          currency_code: row['Currency']
+          order_type: "retail",
+          order_id: row["Order ID"],
+          order_date: parse_date(row["Order Date"]),
+          asin: row["ASIN"],
+          product_name: row["Product Name"],
+          unit_price: parse_decimal(row["Unit Price"]),
+          unit_price_tax: parse_decimal(row["Unit Price Tax"]),
+          shipping_charge: parse_decimal(row["Shipping Charge"]),
+          total_discounts: parse_decimal(row["Total Discounts"]),
+          total_owed: parse_decimal(row["Total Owed"]),
+          product_condition: row["Product Condition"],
+          quantity: parse_integer(row["Quantity"]),
+          payment_instrument_type: row["Payment Instrument Type"],
+          order_status: row["Order Status"],
+          shipment_status: row["Shipment Status"],
+          ship_date: parse_date(row["Ship Date"]),
+          shipping_option: row["Shipping Option"],
+          shipping_address: row["Shipping Address"],
+          billing_address: row["Billing Address"],
+          tracking_number: row["Carrier Name & Tracking Number"],
+          gift_message: row["Gift Message"],
+          currency_code: row["Currency"]
         }
 
         # Try to create the order (using ASIN as additional uniqueness for retail since same order can have multiple items)
@@ -125,7 +125,7 @@ class AmazonDataProcessor
           user: @user,
           order_id: order_data[:order_id],
           asin: order_data[:asin],
-          order_type: 'retail'
+          order_type: "retail"
         )
 
         if order.persisted?
@@ -151,10 +151,10 @@ class AmazonDataProcessor
   end
 
   def parse_date(date_string)
-    return nil if date_string.blank? || date_string == 'Not Applicable'
-    
+    return nil if date_string.blank? || date_string == "Not Applicable"
+
     # Handle different date formats
-    if date_string.include?('T')
+    if date_string.include?("T")
       DateTime.parse(date_string)
     else
       Date.parse(date_string)
@@ -164,17 +164,17 @@ class AmazonDataProcessor
   end
 
   def parse_decimal(value)
-    return nil if value.blank? || value == 'Not Applicable'
+    return nil if value.blank? || value == "Not Applicable"
     value.to_f
   end
 
   def parse_integer(value)
-    return nil if value.blank? || value == 'Not Applicable'
+    return nil if value.blank? || value == "Not Applicable"
     value.to_i
   end
 
   def parse_boolean(value)
-    return false if value.blank? || value == 'Not Applicable'
-    value.to_s.downcase == 'yes' || value.to_s.downcase == 'true'
+    return false if value.blank? || value == "Not Applicable"
+    value.to_s.downcase == "yes" || value.to_s.downcase == "true"
   end
 end

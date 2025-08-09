@@ -9,13 +9,13 @@ class AmazonOrder < ApplicationRecord
   scope :recent, -> { order(order_date: :desc) }
   scope :by_year, ->(year) { where("strftime('%Y', order_date) = ?", year.to_s) }
   scope :by_status, ->(status) { where(order_status: status) }
-  scope :digital, -> { where(order_type: 'digital') }
-  scope :retail, -> { where(order_type: 'retail') }
-  scope :subscriptions, -> { where.not(subscription_info: [nil, '', 'Not Applicable']) }
-  scope :one_time_purchases, -> { where(subscription_info: [nil, '', 'Not Applicable']) }
+  scope :digital, -> { where(order_type: "digital") }
+  scope :retail, -> { where(order_type: "retail") }
+  scope :subscriptions, -> { where.not(subscription_info: [ nil, "", "Not Applicable" ]) }
+  scope :one_time_purchases, -> { where(subscription_info: [ nil, "", "Not Applicable" ]) }
 
   def self.unique_subscriptions
-    subscriptions.where.not(subscription_info: [nil, '', 'Not Applicable'])
+    subscriptions.where.not(subscription_info: [ nil, "", "Not Applicable" ])
                .group(:subscription_info)
                .count
                .keys
@@ -44,19 +44,19 @@ class AmazonOrder < ApplicationRecord
   end
 
   def digital_order?
-    order_type == 'digital'
+    order_type == "digital"
   end
 
   def retail_order?
-    order_type == 'retail'
+    order_type == "retail"
   end
 
   def is_fulfilled?
-    is_fulfilled == true || order_status == 'Closed'
+    is_fulfilled == true || order_status == "Closed"
   end
 
   def subscription_order?
-    subscription_info.present? && subscription_info != 'Not Applicable'
+    subscription_info.present? && subscription_info != "Not Applicable"
   end
 
   def one_time_purchase?
@@ -72,7 +72,7 @@ class AmazonOrder < ApplicationRecord
 
   def subscription_service
     return nil unless subscription_order?
-    
+
     case subscription_info
     when /subscriptionId:1JNA33GYNFD6MV95DDJ0/
       "Amazon Music Unlimited"

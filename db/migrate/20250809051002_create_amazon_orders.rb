@@ -2,7 +2,7 @@ class CreateAmazonOrders < ActiveRecord::Migration[8.0]
   def change
     create_table :amazon_orders do |t|
       t.references :user, null: false, foreign_key: true
-      
+
       # Common fields for both digital and retail orders
       t.string :order_type, null: false # 'digital' or 'retail'
       t.string :order_id, null: false
@@ -11,7 +11,7 @@ class CreateAmazonOrders < ActiveRecord::Migration[8.0]
       t.string :product_name
       t.integer :quantity
       t.string :currency_code
-      
+
       # Digital order specific fields
       t.string :digital_order_item_id
       t.decimal :our_price, precision: 10, scale: 2
@@ -25,7 +25,7 @@ class CreateAmazonOrders < ActiveRecord::Migration[8.0]
       t.string :ship_from
       t.string :ship_to
       t.boolean :is_prime_eligible
-      
+
       # Retail order specific fields
       t.decimal :unit_price, precision: 10, scale: 2
       t.decimal :unit_price_tax, precision: 10, scale: 2
@@ -42,13 +42,13 @@ class CreateAmazonOrders < ActiveRecord::Migration[8.0]
       t.text :billing_address
       t.string :tracking_number
       t.text :gift_message
-      
+
       t.timestamps
-      
+
       # Add indexes for better performance
-      t.index [:user_id, :order_id, :order_type], unique: true, name: 'index_amazon_orders_unique'
-      t.index [:user_id, :order_date]
-      t.index [:order_type]
+      t.index [ :user_id, :order_id, :order_type ], unique: true, name: 'index_amazon_orders_unique'
+      t.index [ :user_id, :order_date ]
+      t.index [ :order_type ]
     end
   end
 end

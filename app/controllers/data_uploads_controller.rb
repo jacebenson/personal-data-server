@@ -164,8 +164,8 @@ class DataUploadsController < ApplicationController
       begin
         # Detect file type based on content or filename
         file_type = detect_fidelity_file_type(params[:file])
-        
-        if file_type == 'transactions'
+
+        if file_type == "transactions"
           result = FidelityInvestmentProcessor.new(params[:file], current_user).process
           message = "Successfully imported #{result[:count]} Fidelity investment transactions."
         else # positions
@@ -349,7 +349,7 @@ class DataUploadsController < ApplicationController
       begin
         # Detect file type based on content or filename
         file_type = detect_amazon_file_type(params[:file])
-        
+
         result = AmazonDataProcessor.new(params[:file].path, current_user, file_type).process
 
         message = "Successfully imported #{result[:count]} Amazon #{file_type} orders."
@@ -377,7 +377,7 @@ class DataUploadsController < ApplicationController
     per_page = 50
     offset = (page - 1) * per_page
 
-    @filter_type = params[:filter_type] || 'all'
+    @filter_type = params[:filter_type] || "all"
     @filter_year = params[:filter_year]
 
     # Base query
@@ -385,9 +385,9 @@ class DataUploadsController < ApplicationController
 
     # Apply filters
     case @filter_type
-    when 'digital'
+    when "digital"
       orders = orders.digital
-    when 'retail'
+    when "retail"
       orders = orders.retail
     end
 
@@ -397,7 +397,7 @@ class DataUploadsController < ApplicationController
 
     @total_count = orders.count
     @orders = orders.recent.limit(per_page).offset(offset)
-    
+
     # Pagination info
     @current_page = page
     @total_pages = (@total_count.to_f / per_page).ceil
@@ -426,52 +426,52 @@ class DataUploadsController < ApplicationController
   def detect_amazon_file_type(file)
     # Check filename first
     filename = file.original_filename.downcase
-    return 'digital' if filename.include?('digital')
-    return 'retail' if filename.include?('retail')
-    
+    return "digital" if filename.include?("digital")
+    return "retail" if filename.include?("retail")
+
     # If filename doesn't give us a clue, read first few lines to detect headers
     begin
-      first_line = File.open(file.path, 'r') { |f| f.readline }.strip
-      headers = first_line.split(',').map(&:strip).map(&:downcase)
-      
+      first_line = File.open(file.path, "r") { |f| f.readline }.strip
+      headers = first_line.split(",").map(&:strip).map(&:downcase)
+
       # Digital files typically have these headers
-      digital_indicators = ['title', 'asin', 'website', 'order date']
-      # Retail files typically have these headers  
-      retail_indicators = ['order date', 'order id', 'product name', 'category']
-      
+      digital_indicators = [ "title", "asin", "website", "order date" ]
+      # Retail files typically have these headers
+      retail_indicators = [ "order date", "order id", "product name", "category" ]
+
       digital_score = digital_indicators.count { |indicator| headers.any? { |h| h.include?(indicator) } }
       retail_score = retail_indicators.count { |indicator| headers.any? { |h| h.include?(indicator) } }
-      
-      return digital_score > retail_score ? 'digital' : 'retail'
+
+      digital_score > retail_score ? "digital" : "retail"
     rescue
       # Default to digital if we can't detect
-      return 'digital'
+      "digital"
     end
   end
 
   def detect_fidelity_file_type(file)
     # Check filename first
     filename = file.original_filename.downcase
-    return 'positions' if filename.include?('position') || filename.include?('portfolio')
-    return 'transactions' if filename.include?('transaction') || filename.include?('history')
-    
+    return "positions" if filename.include?("position") || filename.include?("portfolio")
+    return "transactions" if filename.include?("transaction") || filename.include?("history")
+
     # If filename doesn't give us a clue, read first few lines to detect headers
     begin
-      first_line = File.open(file.path, 'r') { |f| f.readline }.strip
-      headers = first_line.split(',').map(&:strip).map(&:downcase)
-      
+      first_line = File.open(file.path, "r") { |f| f.readline }.strip
+      headers = first_line.split(",").map(&:strip).map(&:downcase)
+
       # Portfolio/Positions files typically have these headers
-      position_indicators = ['current value', 'quantity', 'last price', 'market value']
-      # Transaction files typically have these headers  
-      transaction_indicators = ['run date', 'transaction type', 'action', 'settlement date']
-      
+      position_indicators = [ "current value", "quantity", "last price", "market value" ]
+      # Transaction files typically have these headers
+      transaction_indicators = [ "run date", "transaction type", "action", "settlement date" ]
+
       position_score = position_indicators.count { |indicator| headers.any? { |h| h.include?(indicator) } }
       transaction_score = transaction_indicators.count { |indicator| headers.any? { |h| h.include?(indicator) } }
-      
-      return position_score > transaction_score ? 'positions' : 'transactions'
+
+      position_score > transaction_score ? "positions" : "transactions"
     rescue
       # Default to transactions if we can't detect
-      return 'transactions'
+      "transactions"
     end
   end
 end

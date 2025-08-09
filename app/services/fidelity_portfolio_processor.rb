@@ -11,28 +11,28 @@ class FidelityPortfolioProcessor
       # First pass: identify all accounts in the file
       CSV.foreach(file_path, headers: true, encoding: "UTF-8") do |row|
         next if row.to_h.values.all?(&:blank?) # Skip empty rows
-        
+
         account_number = row["Account Number"] || row["﻿Account Number"]
         account_name = row["Account Name"]
-        
+
         # Skip if no valid account number or account name
         next if account_number.blank? || account_name.blank?
-        
+
         # Skip disclaimer/footer rows that start with quotes or contain long text
         next if account_number.to_s.start_with?('"') || account_name.to_s.start_with?('"')
         next if account_number.to_s.length > 50 || account_name.to_s.length > 100
-        
+
         # Skip rows that look like disclaimers (contain common disclaimer keywords)
-        disclaimer_keywords = ['fidelity', 'brokerage', 'services', 'provided', 'llc', 'data', 'information', 'spreadsheet', 'downloaded', 'sipc', 'nyse']
+        disclaimer_keywords = [ "fidelity", "brokerage", "services", "provided", "llc", "data", "information", "spreadsheet", "downloaded", "sipc", "nyse" ]
         next if disclaimer_keywords.any? { |keyword| account_number.to_s.downcase.include?(keyword) || account_name.to_s.downcase.include?(keyword) }
-        
+
         full_account_name = "#{account_number} - #{account_name}"
         accounts_to_replace.add(full_account_name)
       end
 
       # Delete existing positions for these accounts
       accounts_to_replace.each do |account_name|
-        deleted_count = user.investments.where(account: account_name, action: ['POSITION', 'CASH_POSITION']).delete_all
+        deleted_count = user.investments.where(account: account_name, action: [ "POSITION", "CASH_POSITION" ]).delete_all
         results[:replaced_accounts] << "#{account_name} (#{deleted_count} old positions removed)"
       end
 
@@ -42,16 +42,16 @@ class FidelityPortfolioProcessor
 
         account_number = row["Account Number"] || row["﻿Account Number"]  # Handle BOM character
         account_name = row["Account Name"]
-        
+
         # Skip if no valid account number or account name
         next if account_number.blank? || account_name.blank?
-        
+
         # Skip disclaimer/footer rows that start with quotes or contain long text
         next if account_number.to_s.start_with?('"') || account_name.to_s.start_with?('"')
         next if account_number.to_s.length > 50 || account_name.to_s.length > 100
-        
+
         # Skip rows that look like disclaimers (contain common disclaimer keywords)
-        disclaimer_keywords = ['fidelity', 'brokerage', 'services', 'provided', 'llc', 'data', 'information', 'spreadsheet', 'downloaded', 'sipc', 'nyse']
+        disclaimer_keywords = [ "fidelity", "brokerage", "services", "provided", "llc", "data", "information", "spreadsheet", "downloaded", "sipc", "nyse" ]
         next if disclaimer_keywords.any? { |keyword| account_number.to_s.downcase.include?(keyword) || account_name.to_s.downcase.include?(keyword) }
 
         # Convert position to a transaction-like record for consistency
