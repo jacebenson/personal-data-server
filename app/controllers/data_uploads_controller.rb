@@ -521,7 +521,7 @@ class DataUploadsController < ApplicationController
     @folders = current_user.email_messages.group(:folder).count.sort_by { |folder, count| -count }
     @top_senders = current_user.email_messages
                                .group(:sender_email)
-                               .order("COUNT(*) DESC")
+                               .order(Arel.sql("COUNT(*) DESC"))
                                .limit(10)
                                .count
     @date_range = {

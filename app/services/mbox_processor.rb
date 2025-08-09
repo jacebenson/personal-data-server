@@ -1,4 +1,5 @@
 require "mail"
+# require "reverse_markdown"
 
 class MboxProcessor
   def initialize(file, user)
@@ -286,6 +287,7 @@ class MboxProcessor
   end
 
   def extract_content(message)
+    # TODO Convert to markdown
     content_type = "text/plain"
     content = ""
 
@@ -318,6 +320,7 @@ class MboxProcessor
         content = content.encode("UTF-8", invalid: :replace, undef: :replace, replace: "?")
       end
     end
+    # content = reverse_markdown.convert(content)
 
     # Limit content size to prevent database issues
     content = content[0, 50000] if content.length > 50000
