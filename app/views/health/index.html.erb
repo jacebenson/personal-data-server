@@ -1,0 +1,138 @@
+<% content_for :title, "Health Dashboard" %>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <div class="py-8">
+    <div class="md:flex md:items-center md:justify-between">
+      <div class="flex-1 min-w-0">
+        <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
+          Health Dashboard
+        </h2>
+      </div>
+      <div class="mt-4 flex md:mt-0 md:ml-4">
+        <%= link_to "Import Health Data", import_health_index_path,
+            class: "bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200" %>
+      </div>
+    </div>
+
+    <% if @patients.any? %>
+      <div class="mt-8">
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+          <div class="px-4 py-5 sm:p-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
+              Health Records Summary
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div class="bg-blue-50 p-4 rounded-lg">
+                <div class="flex items-center">
+                  <div class="flex-shrink-0">
+                    <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                      <span class="text-blue-600 font-semibold">🚫</span>
+                    </div>
+                  </div>
+                  <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-500">Allergies</p>
+                    <p class="text-2xl font-semibold text-gray-900"><%= @total_records[:allergies] %></p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bg-green-50 p-4 rounded-lg">
+                <div class="flex items-center">
+                  <div class="flex-shrink-0">
+                    <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                      <span class="text-green-600 font-semibold">💊</span>
+                    </div>
+                  </div>
+                  <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-500">Medications</p>
+                    <p class="text-2xl font-semibold text-gray-900"><%= @total_records[:medications] %></p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bg-yellow-50 p-4 rounded-lg">
+                <div class="flex items-center">
+                  <div class="flex-shrink-0">
+                    <div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
+                      <span class="text-yellow-600 font-semibold">🏥</span>
+                    </div>
+                  </div>
+                  <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-500">Problems</p>
+                    <p class="text-2xl font-semibold text-gray-900"><%= @total_records[:problems] %></p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bg-purple-50 p-4 rounded-lg">
+                <div class="flex items-center">
+                  <div class="flex-shrink-0">
+                    <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                      <span class="text-purple-600 font-semibold">💉</span>
+                    </div>
+                  </div>
+                  <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-500">Immunizations</p>
+                    <p class="text-2xl font-semibold text-gray-900"><%= @total_records[:immunizations] %></p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bg-red-50 p-4 rounded-lg">
+                <div class="flex items-center">
+                  <div class="flex-shrink-0">
+                    <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+                      <span class="text-red-600 font-semibold">📊</span>
+                    </div>
+                  </div>
+                  <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-500">Vital Signs</p>
+                    <p class="text-2xl font-semibold text-gray-900"><%= @total_records[:vital_signs] %></p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bg-indigo-50 p-4 rounded-lg">
+                <div class="flex items-center">
+                  <div class="flex-shrink-0">
+                    <div class="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
+                      <span class="text-indigo-600 font-semibold">👥</span>
+                    </div>
+                  </div>
+                  <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-500">Encounters</p>
+                    <p class="text-2xl font-semibold text-gray-900"><%= @total_records[:encounters] %></p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-6">
+              <%= link_to "View Detailed Health Records", health_path(@patients.first),
+                  class: "bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200" %>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% else %>
+      <div class="mt-8">
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+          <div class="px-4 py-5 sm:p-6 text-center">
+            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100">
+              <span class="text-blue-600 text-xl">🏥</span>
+            </div>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">No health data</h3>
+            <p class="mt-1 text-sm text-gray-500">
+              Get started by importing your health records.
+            </p>
+            <div class="mt-6">
+              <%= link_to "Import Health Data", health_import_path,
+                  class: "bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200" %>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

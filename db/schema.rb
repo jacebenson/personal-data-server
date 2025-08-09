@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_09_205627) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_09_213139) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -185,6 +185,107 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_09_205627) do
     t.index ["user_id"], name: "index_email_messages_on_user_id"
   end
 
+  create_table "health_allergies", force: :cascade do |t|
+    t.integer "health_patient_id", null: false
+    t.string "allergen"
+    t.string "reaction"
+    t.string "severity"
+    t.string "status"
+    t.string "onset_date"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["health_patient_id", "allergen"], name: "index_health_allergies_on_health_patient_id_and_allergen", unique: true
+    t.index ["health_patient_id"], name: "index_health_allergies_on_health_patient_id"
+  end
+
+  create_table "health_encounters", force: :cascade do |t|
+    t.integer "health_patient_id", null: false
+    t.string "encounter_date"
+    t.string "encounter_type"
+    t.text "reason_for_visit"
+    t.string "provider_name"
+    t.string "provider_specialty"
+    t.string "facility_name"
+    t.string "encounter_status"
+    t.text "diagnosis"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["health_patient_id"], name: "index_health_encounters_on_health_patient_id"
+  end
+
+  create_table "health_immunizations", force: :cascade do |t|
+    t.integer "health_patient_id", null: false
+    t.string "vaccine_name"
+    t.string "vaccine_code"
+    t.string "administration_date"
+    t.string "administrator"
+    t.string "lot_number"
+    t.string "site"
+    t.string "route"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["health_patient_id"], name: "index_health_immunizations_on_health_patient_id"
+  end
+
+  create_table "health_medications", force: :cascade do |t|
+    t.integer "health_patient_id", null: false
+    t.string "medication_name"
+    t.string "dosage"
+    t.string "frequency"
+    t.string "route"
+    t.string "start_date"
+    t.string "end_date"
+    t.string "status"
+    t.string "prescriber"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["health_patient_id", "medication_name", "dosage", "start_date"], name: "index_health_medications_unique", unique: true
+    t.index ["health_patient_id"], name: "index_health_medications_on_health_patient_id"
+  end
+
+  create_table "health_patients", force: :cascade do |t|
+    t.string "first_name"
+    t.string "last_name"
+    t.string "birth_date"
+    t.string "gender"
+    t.text "address"
+    t.string "phone"
+    t.string "email"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "health_problems", force: :cascade do |t|
+    t.integer "health_patient_id", null: false
+    t.string "problem_name"
+    t.string "code"
+    t.string "code_system"
+    t.string "status"
+    t.string "onset_date"
+    t.string "resolved_date"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["health_patient_id", "problem_name", "code", "onset_date"], name: "index_health_problems_unique", unique: true
+    t.index ["health_patient_id"], name: "index_health_problems_on_health_patient_id"
+  end
+
+  create_table "health_vital_signs", force: :cascade do |t|
+    t.integer "health_patient_id", null: false
+    t.string "measurement_date"
+    t.decimal "height"
+    t.decimal "weight"
+    t.decimal "bmi"
+    t.integer "systolic_bp"
+    t.integer "diastolic_bp"
+    t.integer "heart_rate"
+    t.decimal "temperature"
+    t.integer "respiratory_rate"
+    t.decimal "oxygen_saturation"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["health_patient_id"], name: "index_health_vital_signs_on_health_patient_id"
+  end
+
   create_table "investments", force: :cascade do |t|
     t.integer "user_id", null: false
     t.datetime "date"
@@ -255,6 +356,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_09_205627) do
   add_foreign_key "calendar_events", "users"
   add_foreign_key "contacts", "users"
   add_foreign_key "email_messages", "users"
+  add_foreign_key "health_allergies", "health_patients"
+  add_foreign_key "health_encounters", "health_patients"
+  add_foreign_key "health_immunizations", "health_patients"
+  add_foreign_key "health_medications", "health_patients"
+  add_foreign_key "health_problems", "health_patients"
+  add_foreign_key "health_vital_signs", "health_patients"
   add_foreign_key "investments", "users"
   add_foreign_key "linkedin_messages", "users"
   add_foreign_key "social_security_earnings", "users"

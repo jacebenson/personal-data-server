@@ -1,0 +1,248 @@
+<% content_for :title, "Health Records - #{@patient.full_name}" %>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <div class="py-8">
+    <!-- Header -->
+    <div class="md:flex md:items-center md:justify-between mb-8">
+      <div class="flex-1 min-w-0">
+        <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
+          Health Records
+        </h2>
+        <p class="mt-1 text-sm text-gray-500">
+          <strong><%= @patient.full_name %></strong>
+          <% if @patient.formatted_birth_date %>
+            • Born <%= @patient.formatted_birth_date %>
+          <% end %>
+          <% if @patient.age %>
+            • <%= @patient.age %> years old
+          <% end %>
+        </p>
+      </div>
+      <div class="mt-4 flex md:mt-0 md:ml-4 space-x-3">
+        <%= link_to "← Back to Dashboard", health_index_path,
+            class: "bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200" %>
+        <%= link_to "Import More Data", import_health_index_path,
+            class: "bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200" %>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="border-b border-gray-200 mb-8">
+      <nav class="-mb-px flex space-x-8">
+        <a href="#overview" class="border-blue-500 text-blue-600 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm">
+          Overview
+        </a>
+        <%= link_to "Allergies (#{@allergies.count})", allergies_health_path(@patient),
+            class: "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm" %>
+        <%= link_to "Medications (#{@current_medications.count})", medications_health_path(@patient),
+            class: "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm" %>
+        <%= link_to "Problems (#{@active_problems.count})", problems_health_path(@patient),
+            class: "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm" %>
+        <%= link_to "Immunizations (#{@recent_immunizations.count})", immunizations_health_path(@patient),
+            class: "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm" %>
+        <%= link_to "Vital Signs", vital_signs_health_path(@patient),
+            class: "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm" %>
+        <%= link_to "Encounters", encounters_health_path(@patient),
+            class: "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm" %>
+      </nav>
+    </div>
+
+    <!-- Overview Content -->
+    <div id="overview" class="space-y-8">
+      <!-- Patient Info Card -->
+      <div class="bg-white shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+          <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
+            Patient Information
+          </h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div>
+              <dt class="text-sm font-medium text-gray-500">Full Name</dt>
+              <dd class="mt-1 text-sm text-gray-900"><%= @patient.full_name %></dd>
+            </div>
+            <% if @patient.birth_date.present? %>
+              <div>
+                <dt class="text-sm font-medium text-gray-500">Date of Birth</dt>
+                <dd class="mt-1 text-sm text-gray-900"><%= @patient.formatted_birth_date %></dd>
+              </div>
+            <% end %>
+            <% if @patient.age %>
+              <div>
+                <dt class="text-sm font-medium text-gray-500">Age</dt>
+                <dd class="mt-1 text-sm text-gray-900"><%= @patient.age %> years old</dd>
+              </div>
+            <% end %>
+            <% if @patient.gender.present? %>
+              <div>
+                <dt class="text-sm font-medium text-gray-500">Gender</dt>
+                <dd class="mt-1 text-sm text-gray-900"><%= @patient.gender == 'M' ? 'Male' : 'Female' %></dd>
+              </div>
+            <% end %>
+            <% if @patient.phone.present? %>
+              <div>
+                <dt class="text-sm font-medium text-gray-500">Phone</dt>
+                <dd class="mt-1 text-sm text-gray-900"><%= @patient.phone %></dd>
+              </div>
+            <% end %>
+            <% if @patient.email.present? %>
+              <div>
+                <dt class="text-sm font-medium text-gray-500">Email</dt>
+                <dd class="mt-1 text-sm text-gray-900"><%= @patient.email %></dd>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Summary Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Allergies -->
+        <div class="bg-white shadow rounded-lg">
+          <div class="px-4 py-5 sm:p-6">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+                  <span class="text-red-600 font-semibold">🚫</span>
+                </div>
+              </div>
+              <div class="ml-4 flex-1">
+                <h3 class="text-lg font-medium text-gray-900">Allergies</h3>
+                <p class="text-sm text-gray-500"><%= @allergies.count %> active allergies</p>
+              </div>
+            </div>
+            <% if @allergies.any? %>
+              <div class="mt-4 space-y-2">
+                <% @allergies.limit(3).each do |allergy| %>
+                  <div class="text-sm text-gray-900">
+                    <span class="font-medium"><%= allergy.allergen %></span>
+                    <% if allergy.reaction.present? %>
+                      <span class="text-gray-500"> - <%= allergy.reaction %></span>
+                    <% end %>
+                  </div>
+                <% end %>
+                <% if @allergies.count > 3 %>
+                  <p class="text-sm text-gray-500">... and <%= @allergies.count - 3 %> more</p>
+                <% end %>
+              </div>
+            <% else %>
+              <p class="mt-4 text-sm text-gray-500">No known allergies</p>
+            <% end %>
+          </div>
+        </div>
+
+        <!-- Current Medications -->
+        <div class="bg-white shadow rounded-lg">
+          <div class="px-4 py-5 sm:p-6">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                  <span class="text-green-600 font-semibold">💊</span>
+                </div>
+              </div>
+              <div class="ml-4 flex-1">
+                <h3 class="text-lg font-medium text-gray-900">Current Medications</h3>
+                <p class="text-sm text-gray-500"><%= @current_medications.count %> active medications</p>
+              </div>
+            </div>
+            <% if @current_medications.any? %>
+              <div class="mt-4 space-y-2">
+                <% @current_medications.limit(3).each do |medication| %>
+                  <div class="text-sm">
+                    <div class="font-medium text-gray-900"><%= medication.medication_name %></div>
+                    <% if medication.dosage.present? %>
+                      <div class="text-gray-500"><%= medication.dosage %></div>
+                    <% end %>
+                  </div>
+                <% end %>
+                <% if @current_medications.count > 3 %>
+                  <p class="text-sm text-gray-500">... and <%= @current_medications.count - 3 %> more</p>
+                <% end %>
+              </div>
+            <% else %>
+              <p class="mt-4 text-sm text-gray-500">No current medications</p>
+            <% end %>
+          </div>
+        </div>
+
+        <!-- Active Problems -->
+        <div class="bg-white shadow rounded-lg">
+          <div class="px-4 py-5 sm:p-6">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
+                  <span class="text-yellow-600 font-semibold">🏥</span>
+                </div>
+              </div>
+              <div class="ml-4 flex-1">
+                <h3 class="text-lg font-medium text-gray-900">Active Problems</h3>
+                <p class="text-sm text-gray-500"><%= @active_problems.count %> active problems</p>
+              </div>
+            </div>
+            <% if @active_problems.any? %>
+              <div class="mt-4 space-y-2">
+                <% @active_problems.limit(3).each do |problem| %>
+                  <div class="text-sm">
+                    <div class="font-medium text-gray-900"><%= problem.problem_name %></div>
+                    <% if problem.onset_date.present? %>
+                      <div class="text-gray-500">Since <%= problem.onset_date %></div>
+                    <% end %>
+                  </div>
+                <% end %>
+                <% if @active_problems.count > 3 %>
+                  <p class="text-sm text-gray-500">... and <%= @active_problems.count - 3 %> more</p>
+                <% end %>
+              </div>
+            <% else %>
+              <p class="mt-4 text-sm text-gray-500">No active problems</p>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Vital Signs -->
+      <% if @recent_vitals.any? %>
+        <div class="bg-white shadow rounded-lg">
+          <div class="px-4 py-5 sm:p-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
+              Recent Vital Signs
+            </h3>
+            <div class="overflow-hidden">
+              <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Blood Pressure</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Heart Rate</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Weight</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">BMI</th>
+                  </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                  <% @recent_vitals.each do |vital| %>
+                    <tr>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <%= vital.formatted_date %>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <%= vital.blood_pressure || '-' %>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <%= vital.heart_rate ? "#{vital.heart_rate} bpm" : '-' %>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <%= vital.weight ? "#{vital.weight} lbs" : '-' %>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <%= vital.bmi || '-' %>
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
