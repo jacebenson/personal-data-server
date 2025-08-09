@@ -16,14 +16,14 @@ class CreateEmailMessages < ActiveRecord::Migration[8.0]
 
       t.timestamps
     end
-    
+
     # Indexes for efficient querying
     add_index :email_messages, :message_id
-    add_index :email_messages, [:user_id, :received_date]
-    add_index :email_messages, [:user_id, :sender_email]
+    add_index :email_messages, [ :user_id, :received_date ]
+    add_index :email_messages, [ :user_id, :sender_email ]
     add_index :email_messages, :folder
-    
+
     # Unique constraint on message_id per user to prevent duplicates
-    add_index :email_messages, [:user_id, :message_id], unique: true
+    add_index :email_messages, [ :user_id, :message_id ], unique: true
   end
 end

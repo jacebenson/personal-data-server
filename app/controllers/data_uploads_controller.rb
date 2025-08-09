@@ -432,25 +432,25 @@ class DataUploadsController < ApplicationController
       begin
         uploaded_file = params[:file]
         file_size = uploaded_file.size
-        
+
         # For files larger than 50MB, process in background
         if file_size > 50.megabytes
           # Save the uploaded file to a temporary location
-          temp_dir = Rails.root.join('tmp', 'mbox_uploads')
+          temp_dir = Rails.root.join("tmp", "mbox_uploads")
           FileUtils.mkdir_p(temp_dir)
-          
+
           temp_filename = "#{current_user.id}_#{Time.current.to_i}_#{uploaded_file.original_filename}"
           temp_path = temp_dir.join(temp_filename)
-          
+
           # Copy uploaded file to temp location
-          File.open(temp_path, 'wb') do |file|
+          File.open(temp_path, "wb") do |file|
             file.write(uploaded_file.read)
           end
-          
+
           # Queue background job
           MboxProcessingJob.perform_later(temp_path.to_s, current_user.id, uploaded_file.original_filename)
-          
-          redirect_to communications_data_uploads_path, 
+
+          redirect_to communications_data_uploads_path,
                       notice: "Large MBOX file (#{file_size / 1.megabyte}MB) queued for background processing. You'll be notified when complete."
         else
           # Process smaller files immediately
@@ -485,7 +485,7 @@ class DataUploadsController < ApplicationController
       begin
         # TODO: Implement LinkedIn messages processor
         # result = LinkedinMessagesProcessor.new(params[:file], current_user).process
-        
+
         # Placeholder response
         redirect_to communications_data_uploads_path, alert: "LinkedIn messages processing not yet implemented."
       rescue => e
@@ -521,7 +521,7 @@ class DataUploadsController < ApplicationController
     @folders = current_user.email_messages.group(:folder).count.sort_by { |folder, count| -count }
     @top_senders = current_user.email_messages
                                .group(:sender_email)
-                               .order('COUNT(*) DESC')
+                               .order("COUNT(*) DESC")
                                .limit(10)
                                .count
     @date_range = {
