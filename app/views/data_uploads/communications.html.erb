@@ -157,7 +157,7 @@
     </div>
 
     <!-- Current Communication Data -->
-    <% if current_user.email_messages.any? %>
+    <% if current_user.email_messages.any? || current_user.linkedin_messages.any? %>
       <div class="mt-12">
         <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
           <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
@@ -173,9 +173,15 @@
                 </div>
               </div>
               <div class="text-center">
-                <div class="text-2xl font-bold text-green-600">0</div>
+                <div class="text-2xl font-bold text-green-600"><%= number_with_delimiter(current_user.linkedin_messages.count) %></div>
                 <div class="text-sm text-gray-500 dark:text-gray-400">LinkedIn Messages</div>
-                <div class="text-xs text-gray-400 dark:text-gray-500 mt-1">Not implemented yet</div>
+                <div class="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                  <% if current_user.linkedin_messages.any? %>
+                    <%= pluralize(current_user.linkedin_messages.pluck(:conversation_id).uniq.count, 'conversation') %>
+                  <% else %>
+                    No messages imported yet
+                  <% end %>
+                </div>
               </div>
               <div class="text-center">
                 <div class="text-2xl font-bold text-purple-600">0</div>

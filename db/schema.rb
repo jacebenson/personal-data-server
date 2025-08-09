@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_09_193807) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_09_205627) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -206,6 +206,25 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_09_193807) do
     t.index ["user_id"], name: "index_investments_on_user_id"
   end
 
+  create_table "linkedin_messages", force: :cascade do |t|
+    t.string "conversation_id"
+    t.string "conversation_title"
+    t.string "from_name"
+    t.string "from_profile_url"
+    t.string "to_name"
+    t.string "to_profile_url"
+    t.datetime "sent_at"
+    t.string "subject"
+    t.text "content"
+    t.string "folder"
+    t.text "attachments"
+    t.boolean "is_draft"
+    t.integer "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_linkedin_messages_on_user_id"
+  end
+
   create_table "social_security_earnings", force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "year", null: false
@@ -237,5 +256,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_09_193807) do
   add_foreign_key "contacts", "users"
   add_foreign_key "email_messages", "users"
   add_foreign_key "investments", "users"
+  add_foreign_key "linkedin_messages", "users"
   add_foreign_key "social_security_earnings", "users"
 end

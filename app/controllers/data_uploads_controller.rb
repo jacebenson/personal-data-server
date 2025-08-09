@@ -483,11 +483,22 @@ class DataUploadsController < ApplicationController
     # Process uploaded LinkedIn messages CSV
     if params[:file].present?
       begin
-        # TODO: Implement LinkedIn messages processor
-        # result = LinkedinMessagesProcessor.new(params[:file], current_user).process
+        result = LinkedinMessagesProcessor.new(params[:file], current_user).process
 
-        # Placeholder response
-        redirect_to communications_data_uploads_path, alert: "LinkedIn messages processing not yet implemented."
+        if result[:errors].any?
+          error_message = "Errors occurred during import: #{result[:errors].join(', ')}"
+          redirect_to communications_data_uploads_path, alert: error_message
+        else
+          message = "Successfully imported #{result[:imported]} LinkedIn messages."
+          if result[:skipped] > 0
+            message += " Skipped #{result[:skipped]} records"
+            if result[:duplicates] > 0
+              message += " (#{result[:duplicates]} duplicates)"
+            end
+            message += "."
+          end
+          redirect_to communications_data_uploads_path, notice: message
+        end
       rescue => e
         redirect_to communications_data_uploads_path, alert: "Error processing LinkedIn messages file: #{e.message}"
       end
@@ -503,31 +514,62 @@ class DataUploadsController < ApplicationController
     per_page = 50
     offset = (page - 1) * per_page
 
-    # Filter by folder if specified
-    messages_scope = current_user.email_messages
-    messages_scope = messages_scope.by_folder(params[:folder]) if params[:folder].present?
+    # Determine which type of messages to show
+    @message_type = params[:type] || 'email'
 
-    @email_messages = messages_scope.recent.limit(per_page).offset(offset)
-    @total_count = messages_scope.count
+    if @message_type == 'linkedin'
+      # LinkedIn messages
+      linkedin_scope = current_user.linkedin_messages
+      linkedin_scope = linkedin_scope.by_folder(params[:folder]) if params[:folder].present?
+
+      @linkedin_messages = linkedin_scope.recent.limit(per_page).offset(offset)
+      @total_count = linkedin_scope.count
+    else
+      # Email messages (default)
+      @message_type = 'email'
+      messages_scope = current_user.email_messages
+      messages_scope = messages_scope.by_folder(params[:folder]) if params[:folder].present?
+
+      @email_messages = messages_scope.recent.limit(per_page).offset(offset)
+      @total_count = messages_scope.count
+    end
+
     @current_page = page
     @total_pages = (@total_count.to_f / per_page).ceil
     @has_next = page < @total_pages
     @has_prev = page > 1
     @filtered_folder = params[:folder]
 
-    # Statistics
-    @total_messages = current_user.email_messages.count
+    # Statistics for both message types
+    @total_email_messages = current_user.email_messages.count
+    @total_linkedin_messages = current_user.linkedin_messages.count
     @total_size = current_user.email_messages.sum(:message_size)
-    @folders = current_user.email_messages.group(:folder).count.sort_by { |folder, count| -count }
-    @top_senders = current_user.email_messages
-                               .group(:sender_email)
-                               .order(Arel.sql("COUNT(*) DESC"))
-                               .limit(10)
-                               .count
-    @date_range = {
-      earliest: current_user.email_messages.minimum(:received_date),
-      latest: current_user.email_messages.maximum(:received_date)
-    }
+    @total_messages = @message_type == 'linkedin' ? @total_linkedin_messages : @total_email_messages
+
+    # Folders for current message type
+    if @message_type == 'linkedin'
+      @folders = current_user.linkedin_messages.group(:folder).count.sort_by { |folder, count| -count }
+      @top_participants = current_user.linkedin_messages
+                                     .group(:from_name)
+                                     .order(Arel.sql("COUNT(*) DESC"))
+                                     .limit(10)
+                                     .count
+      @date_range = {
+        earliest: current_user.linkedin_messages.minimum(:sent_at),
+        latest: current_user.linkedin_messages.maximum(:sent_at)
+      }
+    else
+      @folders = current_user.email_messages.group(:folder).count.sort_by { |folder, count| -count }
+      @top_senders = current_user.email_messages
+                                 .group(:sender_email)
+                                 .order(Arel.sql("COUNT(*) DESC"))
+                                 .limit(10)
+                                 .count
+      @date_range = {
+        earliest: current_user.email_messages.minimum(:received_date),
+        latest: current_user.email_messages.maximum(:received_date)
+      }
+    end
   end
 
   def show_communication
