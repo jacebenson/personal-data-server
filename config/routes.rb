@@ -50,6 +50,20 @@ Rails.application.routes.draw do
       delete :clear_calendars
       delete "remove_calendar/:calendar_name", to: "data_uploads#remove_calendar", as: :remove_calendar
 
+      # Contact routes
+      get :contacts
+      post :upload_vcard
+      post :upload_linkedin_connections
+      get :view_contacts
+      get "view_contacts/:id", to: "data_uploads#show_contact", as: :show_contact
+      delete :clear_contacts
+
+      # Contact merge routes
+      get :contact_duplicates
+      post :merge_contacts
+      get :auto_merge_contacts
+      post :auto_merge_contacts
+
       # Duplicate and account management
       get :manage_duplicates
       delete :remove_duplicates

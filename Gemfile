@@ -29,6 +29,8 @@ gem "mail"
 gem "reverse_markdown"
 # iCalendar parsing for calendar files
 gem "icalendar"
+# ZIP file handling for compressed vCard files
+gem "rubyzip"
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 # gem "bcrypt", "~> 3.1.7"

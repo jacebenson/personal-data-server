@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_09_192012) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_09_193807) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -124,6 +124,44 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_09_192012) do
     t.index ["user_id"], name: "index_calendar_events_on_user_id"
   end
 
+  create_table "contacts", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.string "uid", null: false
+    t.string "source"
+    t.string "source_file"
+    t.string "given_name"
+    t.string "family_name"
+    t.string "middle_name"
+    t.string "display_name"
+    t.string "nickname"
+    t.string "name_prefix"
+    t.string "name_suffix"
+    t.string "organization"
+    t.string "job_title"
+    t.string "department"
+    t.text "emails"
+    t.text "phones"
+    t.text "urls"
+    t.text "address"
+    t.date "birthday"
+    t.text "notes"
+    t.text "categories"
+    t.string "photo_url"
+    t.binary "photo_data"
+    t.string "social_profiles"
+    t.datetime "last_modified"
+    t.datetime "imported_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "display_name"], name: "index_contacts_on_user_id_and_display_name"
+    t.index ["user_id", "family_name"], name: "index_contacts_on_user_id_and_family_name"
+    t.index ["user_id", "given_name"], name: "index_contacts_on_user_id_and_given_name"
+    t.index ["user_id", "organization"], name: "index_contacts_on_user_id_and_organization"
+    t.index ["user_id", "source"], name: "index_contacts_on_user_id_and_source"
+    t.index ["user_id", "uid"], name: "index_contacts_on_user_id_and_uid", unique: true
+    t.index ["user_id"], name: "index_contacts_on_user_id"
+  end
+
   create_table "email_messages", force: :cascade do |t|
     t.integer "user_id", null: false
     t.string "message_id", null: false
@@ -196,6 +234,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_09_192012) do
   add_foreign_key "amazon_orders", "users"
   add_foreign_key "bank_statements", "users"
   add_foreign_key "calendar_events", "users"
+  add_foreign_key "contacts", "users"
   add_foreign_key "email_messages", "users"
   add_foreign_key "investments", "users"
   add_foreign_key "social_security_earnings", "users"
