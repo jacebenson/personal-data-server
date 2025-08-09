@@ -2,6 +2,10 @@ Rails.application.routes.draw do
   devise_for :users
   get "pages/home"
 
+  # Category pages
+  get "financial", to: "categories#financial"
+  get "personal", to: "categories#personal"
+
   # Data uploads routes
   resources :data_uploads, only: [ :index ] do
     collection do
