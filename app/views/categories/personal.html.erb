@@ -20,14 +20,25 @@
               <p class="text-sm text-gray-500 dark:text-gray-400">MBOX emails, LinkedIn, Discord messages</p>
               <div class="mt-2">
                 <p class="text-2xl font-semibold text-gray-400"><%= @communications_count %></p>
-                <p class="text-xs text-gray-500 dark:text-gray-400">Coming Soon</p>
               </div>
             </div>
           </div>
-          <div class="mt-6">
-            <button disabled class="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-400 bg-gray-100 cursor-not-allowed">
-              Coming Soon
-            </button>
+          <div class="mt-6 flex flex-col gap-2">
+
+            <% if @communications_count > 0 %>
+              <div>
+                <%= link_to "View All Records", view_communications_data_uploads_path,
+                    class: "w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600" %>
+              </div>
+            <% end %>
+            <div>
+              <%= link_to "Upload New Communications", communications_data_uploads_path,
+                  class: "w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
+            </div>
+            <!-- link to records is http://localhost:3000/data_uploads/view_communications -->
+            <!-- hre's how i did it on finances page -->
+            <!--
+            -->
           </div>
         </div>
       </div>

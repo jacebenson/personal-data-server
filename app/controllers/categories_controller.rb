@@ -15,7 +15,7 @@ class CategoriesController < ApplicationController
 
   def personal
     # Placeholder for future personal data counts
-    @communications_count = 0
+    @communications_count = current_user.email_messages.count
     @health_records_count = 0
     @contacts_count = 0
     @calendar_events_count = 0
