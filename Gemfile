@@ -23,6 +23,8 @@ gem "jbuilder"
 gem "nokogiri"
 # CSV parsing library [https://github.com/ruby/csv]
 gem "csv"
+# Email parsing for MBOX files
+gem "mail"
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 # gem "bcrypt", "~> 3.1.7"

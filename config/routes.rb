@@ -33,6 +33,13 @@ Rails.application.routes.draw do
       get :view_amazon_orders
       delete :clear_amazon_orders
 
+      # Communication routes
+      get :communications
+      post :upload_mbox
+      post :upload_linkedin_messages
+      get :view_communications
+      delete :clear_communications
+
       # Duplicate and account management
       get :manage_duplicates
       delete :remove_duplicates

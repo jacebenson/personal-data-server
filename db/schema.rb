@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_09_060612) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_09_071835) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -99,6 +99,29 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_09_060612) do
     t.index ["user_id"], name: "index_bank_statements_on_user_id"
   end
 
+  create_table "email_messages", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.string "message_id", null: false
+    t.text "subject"
+    t.string "sender_email"
+    t.string "sender_name"
+    t.text "recipient_emails"
+    t.datetime "received_date"
+    t.text "content"
+    t.string "content_type", default: "text/plain"
+    t.string "folder"
+    t.integer "message_size", default: 0
+    t.integer "attachments_count", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["folder"], name: "index_email_messages_on_folder"
+    t.index ["message_id"], name: "index_email_messages_on_message_id"
+    t.index ["user_id", "message_id"], name: "index_email_messages_on_user_id_and_message_id", unique: true
+    t.index ["user_id", "received_date"], name: "index_email_messages_on_user_id_and_received_date"
+    t.index ["user_id", "sender_email"], name: "index_email_messages_on_user_id_and_sender_email"
+    t.index ["user_id"], name: "index_email_messages_on_user_id"
+  end
+
   create_table "investments", force: :cascade do |t|
     t.integer "user_id", null: false
     t.datetime "date"
@@ -147,6 +170,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_09_060612) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "amazon_orders", "users"
   add_foreign_key "bank_statements", "users"
+  add_foreign_key "email_messages", "users"
   add_foreign_key "investments", "users"
   add_foreign_key "social_security_earnings", "users"
 end

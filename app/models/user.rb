@@ -9,4 +9,5 @@ class User < ApplicationRecord
   has_many :investments, dependent: :destroy
   has_many :social_security_earnings, dependent: :destroy
   has_many :amazon_orders, dependent: :destroy
+  has_many :email_messages, dependent: :destroy
 end
