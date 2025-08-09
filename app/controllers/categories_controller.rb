@@ -18,7 +18,7 @@ class CategoriesController < ApplicationController
     @communications_count = current_user.email_messages.count
     @health_records_count = 0
     @contacts_count = 0
-    @calendar_events_count = 0
+    @calendar_events_count = current_user.calendar_events.count
     @content_items_count = 0
   end
 end

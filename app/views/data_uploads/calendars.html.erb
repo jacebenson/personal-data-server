@@ -1,0 +1,125 @@
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-900 dark:text-white">📅 Calendar Data Upload</h1>
+      <p class="mt-2 text-gray-600 dark:text-gray-400">Import calendar events from ICS files or live calendar URLs</p>
+    </div>
+
+    <div class="space-y-8">
+      <!-- ICS File Upload -->
+      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white">📁 Upload ICS File</h3>
+          <p class="text-sm text-gray-600 dark:text-gray-400">Upload .ics calendar files exported from Google Calendar, Outlook, etc.</p>
+        </div>
+        <div class="p-6">
+          <%= form_with url: upload_ics_file_data_uploads_path, method: :post, multipart: true, local: true, class: "space-y-6" do |form| %>
+            <div>
+              <%= form.label :file, "Select ICS File", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+              <div class="mt-1">
+                <%= form.file_field :file,
+                    accept: ".ics,.ical",
+                    required: true,
+                    class: "block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 dark:file:bg-purple-900 dark:file:text-purple-300" %>
+              </div>
+              <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                Upload .ics or .ical files exported from your calendar application.
+              </p>
+            </div>
+
+            <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+              <h4 class="font-medium text-blue-900 dark:text-blue-200 mb-2">How to export calendar files:</h4>
+              <ul class="text-sm text-blue-800 dark:text-blue-300 space-y-1">
+                <li>• <strong>Google Calendar:</strong> Settings → Import & Export → Export</li>
+                <li>• <strong>Outlook:</strong> File → Open & Export → Import/Export → Export to file</li>
+                <li>• <strong>Apple Calendar:</strong> File → Export → Export Calendar Archive</li>
+                <li>• <strong>Others:</strong> Look for "Export" or "Export to ICS" options</li>
+              </ul>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <div class="flex space-x-3">
+                <%= link_to "Back to Data Uploads", data_uploads_path, class: "inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600" %>
+              </div>
+              <%= form.submit "Upload ICS File", class: "inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Live ICS URL -->
+      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white">🔗 Live Calendar URL</h3>
+          <p class="text-sm text-gray-600 dark:text-gray-400">Import from public calendar URLs (ICS format)</p>
+        </div>
+        <div class="p-6">
+          <%= form_with url: add_ics_url_data_uploads_path, method: :post, local: true, class: "space-y-6" do |form| %>
+            <div>
+              <%= form.label :ics_url, "Calendar URL", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+              <div class="mt-1">
+                <%= form.url_field :ics_url,
+                    placeholder: "https://calendar.google.com/calendar/ical/...",
+                    required: true,
+                    class: "block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400" %>
+              </div>
+              <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                Paste the public ICS URL from your calendar service. This will download and import events immediately.
+              </p>
+            </div>
+
+            <div class="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-4">
+              <h4 class="font-medium text-yellow-900 dark:text-yellow-200 mb-2">How to get calendar URLs:</h4>
+              <ul class="text-sm text-yellow-800 dark:text-yellow-300 space-y-1">
+                <li>• <strong>Google Calendar:</strong> Settings → Calendar → Integrate Calendar → Public URL to this calendar</li>
+                <li>• <strong>Outlook:</strong> Calendar settings → Shared calendars → Publish calendar</li>
+                <li>• <strong>Apple iCloud:</strong> Calendar app → Calendar settings → Public Calendar</li>
+                <li>• <strong>Note:</strong> Only public calendars can be imported via URL</li>
+              </ul>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <div class="flex space-x-3">
+                <%= link_to "View Imported Events", view_calendars_data_uploads_path, class: "inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600" %>
+              </div>
+              <%= form.submit "Import from URL", class: "inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Quick Stats (if any calendars exist) -->
+      <% if current_user.calendar_events.any? %>
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+          <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white">📊 Current Calendar Data</h3>
+          </div>
+          <div class="p-6">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div class="text-center">
+                <p class="text-2xl font-bold text-purple-600 dark:text-purple-400"><%= number_with_delimiter(current_user.calendar_events.count) %></p>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Total Events</p>
+              </div>
+              <div class="text-center">
+                <p class="text-2xl font-bold text-green-600 dark:text-green-400"><%= number_with_delimiter(current_user.calendar_events.upcoming_count) %></p>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Upcoming</p>
+              </div>
+              <div class="text-center">
+                <p class="text-2xl font-bold text-blue-600 dark:text-blue-400"><%= current_user.calendar_events.calendars_list.count %></p>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Calendars</p>
+              </div>
+              <div class="text-center">
+                <p class="text-2xl font-bold text-orange-600 dark:text-orange-400"><%= current_user.calendar_events.events_this_month_count %></p>
+                <p class="text-sm text-gray-500 dark:text-gray-400">This Month</p>
+              </div>
+            </div>
+
+            <div class="mt-6">
+              <%= link_to "View All Calendar Events", view_calendars_data_uploads_path, class: "w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500" %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

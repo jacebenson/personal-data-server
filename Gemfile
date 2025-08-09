@@ -25,6 +25,10 @@ gem "nokogiri"
 gem "csv"
 # Email parsing for MBOX files
 gem "mail"
+# Convert HTML to Markdown
+gem "reverse_markdown"
+# iCalendar parsing for calendar files
+gem "icalendar"
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 # gem "bcrypt", "~> 3.1.7"

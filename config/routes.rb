@@ -38,7 +38,17 @@ Rails.application.routes.draw do
       post :upload_mbox
       post :upload_linkedin_messages
       get :view_communications
+      get "view_communications/:id", to: "data_uploads#show_communication", as: :show_communication
       delete :clear_communications
+
+      # Calendar routes
+      get :calendars
+      post :upload_ics_file
+      post :add_ics_url
+      get :view_calendars
+      get "view_calendars/:id", to: "data_uploads#show_calendar_event", as: :show_calendar_event
+      delete :clear_calendars
+      delete "remove_calendar/:calendar_name", to: "data_uploads#remove_calendar", as: :remove_calendar
 
       # Duplicate and account management
       get :manage_duplicates

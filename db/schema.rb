@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_09_071835) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_09_192012) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -99,6 +99,31 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_09_071835) do
     t.index ["user_id"], name: "index_bank_statements_on_user_id"
   end
 
+  create_table "calendar_events", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.string "uid", null: false
+    t.string "summary", null: false
+    t.text "description"
+    t.string "location"
+    t.datetime "start_time", null: false
+    t.datetime "end_time"
+    t.boolean "all_day_event", default: false
+    t.string "calendar_name"
+    t.text "recurrence_rule"
+    t.string "categories"
+    t.string "status"
+    t.string "organizer_email"
+    t.string "organizer_name"
+    t.text "attendee_emails"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["calendar_name"], name: "index_calendar_events_on_calendar_name"
+    t.index ["start_time"], name: "index_calendar_events_on_start_time"
+    t.index ["user_id", "start_time"], name: "index_calendar_events_on_user_id_and_start_time"
+    t.index ["user_id", "uid", "calendar_name"], name: "index_calendar_events_unique", unique: true
+    t.index ["user_id"], name: "index_calendar_events_on_user_id"
+  end
+
   create_table "email_messages", force: :cascade do |t|
     t.integer "user_id", null: false
     t.string "message_id", null: false
@@ -170,6 +195,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_09_071835) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "amazon_orders", "users"
   add_foreign_key "bank_statements", "users"
+  add_foreign_key "calendar_events", "users"
   add_foreign_key "email_messages", "users"
   add_foreign_key "investments", "users"
   add_foreign_key "social_security_earnings", "users"

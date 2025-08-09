@@ -123,6 +123,12 @@ GEM
       activesupport (>= 6.1)
     i18n (1.14.7)
       concurrent-ruby (~> 1.0)
+    icalendar (2.11.2)
+      base64
+      ice_cube (~> 0.16)
+      logger
+      ostruct
+    ice_cube (0.17.0)
     importmap-rails (2.2.2)
       actionpack (>= 6.0.0)
       activesupport (>= 6.0.0)
@@ -260,6 +266,8 @@ GEM
     responders (3.1.1)
       actionpack (>= 5.2)
       railties (>= 5.2)
+    reverse_markdown (3.0.0)
+      nokogiri
     rexml (3.4.1)
     rubocop (1.79.2)
       json (~> 2.3)
@@ -388,6 +396,7 @@ DEPENDENCIES
   csv
   debug
   devise (~> 4.9)
+  icalendar
   importmap-rails
   jbuilder
   kamal
@@ -396,6 +405,7 @@ DEPENDENCIES
   propshaft
   puma (>= 5.0)
   rails (~> 8.0.2)
+  reverse_markdown
   rubocop-rails-omakase
   selenium-webdriver
   solid_cable

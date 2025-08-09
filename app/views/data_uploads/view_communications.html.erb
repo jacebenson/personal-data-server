@@ -123,53 +123,55 @@
       <% if @email_messages.any? %>
         <ul class="divide-y divide-gray-200 dark:divide-gray-700">
           <% @email_messages.each do |message| %>
-            <li class="px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-700">
-              <div class="flex items-center justify-between">
-                <div class="flex-1 min-w-0">
-                  <div class="flex items-center space-x-3">
-                    <div class="flex-shrink-0">
-                      <div class="h-10 w-10 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
-                        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                          <%= message.sender_display_name.first.upcase if message.sender_display_name.present? %>
-                        </span>
+            <%= link_to show_communication_data_uploads_path(message), class: "block" do %>
+              <li class="px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                <div class="flex items-center justify-between">
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center space-x-3">
+                      <div class="flex-shrink-0">
+                        <div class="h-10 w-10 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
+                          <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                            <%= message.sender_display_name.first.upcase if message.sender_display_name.present? %>
+                          </span>
+                        </div>
+                      </div>
+                      <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
+                          <%= message.sender_display_name %>
+                          <span class="text-gray-500 dark:text-gray-400">
+                            &lt;<%= message.sender_email %>&gt;
+                          </span>
+                        </p>
+                        <p class="text-sm text-gray-900 dark:text-white font-medium truncate">
+                          <%= message.short_subject(60) %>
+                        </p>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 truncate">
+                          <%= message.content_preview(100) %>
+                        </p>
                       </div>
                     </div>
-                    <div class="flex-1 min-w-0">
-                      <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
-                        <%= message.sender_display_name %>
-                        <span class="text-gray-500 dark:text-gray-400">
-                          &lt;<%= message.sender_email %>&gt;
+                  </div>
+                  <div class="flex-shrink-0 text-right">
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                      <%= message.received_date.strftime("%b %d, %Y") %>
+                    </p>
+                    <p class="text-xs text-gray-400 dark:text-gray-500">
+                      <%= message.received_date.strftime("%I:%M %p") %>
+                    </p>
+                    <div class="flex items-center justify-end space-x-2 mt-1">
+                      <% if message.attachments_count > 0 %>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                          📎 <%= message.attachments_count %>
                         </span>
-                      </p>
-                      <p class="text-sm text-gray-900 dark:text-white font-medium truncate">
-                        <%= message.short_subject(60) %>
-                      </p>
-                      <p class="text-sm text-gray-500 dark:text-gray-400 truncate">
-                        <%= message.content_preview(100) %>
-                      </p>
+                      <% end %>
+                      <span class="text-xs text-gray-400 dark:text-gray-500">
+                        <%= message.formatted_size %>
+                      </span>
                     </div>
                   </div>
                 </div>
-                <div class="flex-shrink-0 text-right">
-                  <p class="text-sm text-gray-500 dark:text-gray-400">
-                    <%= message.received_date.strftime("%b %d, %Y") %>
-                  </p>
-                  <p class="text-xs text-gray-400 dark:text-gray-500">
-                    <%= message.received_date.strftime("%I:%M %p") %>
-                  </p>
-                  <div class="flex items-center justify-end space-x-2 mt-1">
-                    <% if message.attachments_count > 0 %>
-                      <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                        📎 <%= message.attachments_count %>
-                      </span>
-                    <% end %>
-                    <span class="text-xs text-gray-400 dark:text-gray-500">
-                      <%= message.formatted_size %>
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </li>
+              </li>
+            <% end %>
           <% end %>
         </ul>
       <% else %>

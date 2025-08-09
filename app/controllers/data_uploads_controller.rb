@@ -530,11 +530,166 @@ class DataUploadsController < ApplicationController
     }
   end
 
+  def show_communication
+    # Show individual email message
+    @email_message = current_user.email_messages.find(params[:id])
+  rescue ActiveRecord::RecordNotFound
+    redirect_to view_communications_data_uploads_path, alert: "Email message not found."
+  end
+
   def clear_communications
     # Clear all communication records for the current user
     count = current_user.email_messages.count
     current_user.email_messages.destroy_all
     redirect_to communications_data_uploads_path, notice: "Successfully deleted #{count} email messages."
+  end
+
+  # Calendar methods
+  def calendars
+    # Combined calendar upload page for ICS files and URLs
+  end
+
+  def upload_ics_file
+    # Process uploaded ICS file
+    if params[:file].present?
+      begin
+        result = IcsProcessor.new(params[:file], current_user).process
+
+        message = "Successfully imported #{result[:count]} calendar events"
+        message += " from #{result[:calendar_name]}" if result[:calendar_name]
+        message += "."
+
+        if result[:skipped] && result[:skipped] > 0
+          message += " Skipped #{result[:skipped]} records"
+          if result[:duplicates] && result[:duplicates] > 0
+            message += " (#{result[:duplicates]} duplicates)"
+          end
+          message += "."
+        end
+
+        if result[:errors] && result[:errors].any?
+          message += " Note: #{result[:errors].length} events had processing errors."
+        end
+
+        redirect_to calendars_data_uploads_path, notice: message
+      rescue => e
+        redirect_to calendars_data_uploads_path, alert: "Error processing ICS file: #{e.message}"
+      end
+    else
+      redirect_to calendars_data_uploads_path, alert: "Please select an ICS file to upload."
+    end
+  end
+
+  def add_ics_url
+    # Process ICS URL for live sync
+    if params[:ics_url].present?
+      begin
+        url = params[:ics_url].strip
+
+        # Validate URL format
+        uri = URI.parse(url)
+        unless %w[http https].include?(uri.scheme)
+          redirect_to calendars_data_uploads_path, alert: "Please provide a valid HTTP/HTTPS URL."
+          return
+        end
+
+        result = IcsProcessor.new(url, current_user).process
+
+        message = "Successfully imported #{result[:count]} calendar events from URL"
+        message += " (#{result[:calendar_name]})" if result[:calendar_name]
+        message += "."
+
+        if result[:skipped] && result[:skipped] > 0
+          message += " Skipped #{result[:skipped]} records"
+          if result[:duplicates] && result[:duplicates] > 0
+            message += " (#{result[:duplicates]} duplicates)"
+          end
+          message += "."
+        end
+
+        if result[:errors] && result[:errors].any?
+          message += " Note: #{result[:errors].length} events had processing errors."
+        end
+
+        redirect_to calendars_data_uploads_path, notice: message
+      rescue => e
+        redirect_to calendars_data_uploads_path, alert: "Error processing ICS URL: #{e.message}"
+      end
+    else
+      redirect_to calendars_data_uploads_path, alert: "Please provide an ICS URL."
+    end
+  end
+
+  def view_calendars
+    # Show imported calendar events
+    page = params[:page].to_i
+    page = 1 if page < 1
+    per_page = 50
+    offset = (page - 1) * per_page
+
+    # Filter by calendar if specified
+    events_scope = current_user.calendar_events
+    events_scope = events_scope.by_calendar(params[:calendar]) if params[:calendar].present?
+
+    # Time filter
+    case params[:time_filter]
+    when "upcoming"
+      events_scope = events_scope.upcoming
+    when "past"
+      events_scope = events_scope.past
+    when "today"
+      events_scope = events_scope.today
+    when "this_week"
+      events_scope = events_scope.this_week
+    when "this_month"
+      events_scope = events_scope.this_month
+    end
+
+    @calendar_events = events_scope.chronological.limit(per_page).offset(offset)
+    @total_count = events_scope.count
+    @current_page = page
+    @total_pages = (@total_count.to_f / per_page).ceil
+    @has_next = page < @total_pages
+    @has_prev = page > 1
+    @filtered_calendar = params[:calendar]
+    @time_filter = params[:time_filter]
+
+    # Statistics
+    @total_events = current_user.calendar_events.count
+    @upcoming_events = current_user.calendar_events.upcoming_count
+    @calendars = current_user.calendar_events.events_by_calendar.sort_by { |calendar, count| -count }
+    @date_range = current_user.calendar_events.date_range
+    @events_this_month = current_user.calendar_events.events_this_month_count
+    @busiest_day = current_user.calendar_events.busiest_day_this_month
+  end
+
+  def show_calendar_event
+    # Show individual calendar event
+    @calendar_event = current_user.calendar_events.find(params[:id])
+  rescue ActiveRecord::RecordNotFound
+    redirect_to view_calendars_data_uploads_path, alert: "Calendar event not found."
+  end
+
+  def clear_calendars
+    # Clear all calendar events for the current user
+    count = current_user.calendar_events.count
+    current_user.calendar_events.destroy_all
+    redirect_to calendars_data_uploads_path, notice: "Successfully deleted #{count} calendar events."
+  end
+
+  def remove_calendar
+    # Remove all events from a specific calendar
+    calendar_name = params[:calendar_name]
+
+    if calendar_name.blank?
+      redirect_to view_calendars_data_uploads_path, alert: "No calendar specified."
+      return
+    end
+
+    deleted_count = current_user.calendar_events.where(calendar_name: calendar_name).delete_all
+
+    redirect_to view_calendars_data_uploads_path,
+                notice: "Removed #{deleted_count} events from '#{calendar_name}' calendar."
   end
 
   private
