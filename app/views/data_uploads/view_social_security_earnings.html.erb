@@ -1,7 +1,14 @@
 <div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="mb-8">
-      <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Lifetime Social Security Earnings</h1>
+      <%= link_to financial_path, class: "inline-flex items-center text-orange-600 hover:text-orange-500" do %>
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+        Back to Financial Data
+      <% end %>
+
+      <h1 class="mt-4 text-3xl font-bold text-gray-900 dark:text-white">Lifetime Social Security Earnings</h1>
       <p class="mt-2 text-gray-600 dark:text-gray-400">Your complete earnings history as reported to Social Security</p>
     </div>
 
@@ -162,12 +169,6 @@
             </tfoot>
           </table>
         </div>
-      </div>
-
-      <!-- Back to Uploads -->
-      <div class="mt-8 text-center">
-        <%= link_to "← Back to Data Uploads", data_uploads_path,
-            class: "inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500" %>
       </div>
 
     <% else %>
