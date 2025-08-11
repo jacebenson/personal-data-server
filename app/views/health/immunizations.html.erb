@@ -1,0 +1,106 @@
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <!-- H                  <% if immunization.lot_number.present? %>
+                    <div class="mt-2">
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        Lot: <%= immunization.lot_number %>
+                      </span>
+                    </div>
+                  <% end %>lass="md:flex md:items-center md:justify-between">
+    <div class="flex-1 min-w-0">
+      <h1 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
+        Immunizations - <%= @patient.full_name %>
+      </h1>
+      <p class="mt-1 text-sm text-gray-500">
+        Patient DOB: <%= @patient.formatted_birth_date || 'Not specified' %>
+        <span class="mx-2">•</span>
+        Gender: <%= @patient.gender&.capitalize || 'Not specified' %>
+      </p>
+    </div>
+    <div class="mt-4 flex md:mt-0 md:ml-4 space-x-3">
+      <%= link_to "← Back to Overview", health_path(@patient),
+          class: "bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200" %>
+    </div>
+  </div>
+
+  <!-- Immunizations Content -->
+  <div class="mt-8">
+    <% if @immunizations.any? %>
+      <div class="bg-white shadow overflow-hidden sm:rounded-md">
+        <ul class="divide-y divide-gray-200">
+          <% @immunizations.each do |immunization| %>
+            <li class="px-6 py-4">
+              <div class="flex items-center justify-between">
+                <div class="flex-1">
+                  <p class="text-lg font-medium text-gray-900">
+                    <%= immunization.vaccine_name %>
+                  </p>
+                  <div class="mt-2 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-500">
+                    <% if immunization.administration_date.present? %>
+                      <span class="flex items-center">
+                        <svg class="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
+                        </svg>
+                        Date: <span class="ml-1 font-medium"><%= Date.parse(immunization.administration_date).strftime("%B %d, %Y") rescue immunization.administration_date %></span>
+                      </span>
+                    <% end %>
+                    <% if immunization.administrator.present? %>
+                      <span class="flex items-center">
+                        <svg class="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path>
+                          <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"></path>
+                        </svg>
+                        Administrator: <span class="ml-1 font-medium"><%= immunization.administrator %></span>
+                      </span>
+                    <% end %>
+                    <% if immunization.route.present? %>
+                      <span class="flex items-center">
+                        <svg class="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                        </svg>
+                        Route: <span class="ml-1 font-medium"><%= immunization.route %></span>
+                      </span>
+                    <% end %>
+                    <% if immunization.site.present? %>
+                      <span class="flex items-center">
+                        <svg class="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 0v12h8V4H6z" clip-rule="evenodd"></path>
+                        </svg>
+                        Site: <span class="ml-1 font-medium"><%= immunization.site %></span>
+                      </span>
+                    <% end %>
+                  </div>
+                  <% if immunization.status.present? %>
+                    <div class="mt-2">
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%=
+                        case immunization.status&.downcase
+                        when 'completed'
+                          'bg-green-100 text-green-800'
+                        when 'refused'
+                          'bg-red-100 text-red-800'
+                        when 'partially_completed'
+                          'bg-yellow-100 text-yellow-800'
+                        else
+                          'bg-blue-100 text-blue-800'
+                        end
+                      %>">
+                        <%= immunization.status.humanize %>
+                      </span>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+    <% else %>
+      <div class="text-center py-12">
+        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+        </svg>
+        <h3 class="mt-2 text-sm font-medium text-gray-900">No immunizations found</h3>
+        <p class="mt-1 text-sm text-gray-500">No immunization records are available for this patient.</p>
+      </div>
+    <% end %>
+  </div>
+</div>

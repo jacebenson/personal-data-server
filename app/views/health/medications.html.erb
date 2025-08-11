@@ -6,9 +6,9 @@
         Medications - <%= @patient.full_name %>
       </h1>
       <p class="mt-1 text-sm text-gray-500">
-        Patient DOB: <%= @patient.date_of_birth&.strftime("%B %d, %Y") %>
+        Patient DOB: <%= @patient.formatted_birth_date || 'Not specified' %>
         <span class="mx-2">•</span>
-        Gender: <%= @patient.gender&.capitalize %>
+        Gender: <%= @patient.gender&.capitalize || 'Not specified' %>
       </p>
     </div>
     <div class="mt-4 flex md:mt-0 md:ml-4 space-x-3">
@@ -72,9 +72,9 @@
                       </span>
                     </div>
                   <% end %>
-                  <% if medication.instructions.present? %>
+                  <% if medication.prescriber.present? %>
                     <div class="mt-3 text-sm text-gray-600">
-                      <p><strong>Instructions:</strong> <%= medication.instructions %></p>
+                      <p><strong>Prescriber:</strong> <%= medication.prescriber %></p>
                     </div>
                   <% end %>
                 </div>

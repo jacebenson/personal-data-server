@@ -1,25 +1,61 @@
 class HealthController < ApplicationController
-  before_action :set_patient, only: [:show, :import]
-
   def index
-    @patients = HealthPatient.all
-    @total_records = {
-      allergies: HealthAllergy.count,
-      medications: HealthMedication.count,
-      problems: HealthProblem.count,
-      immunizations: HealthImmunization.count,
-      vital_signs: HealthVitalSign.count,
-      encounters: HealthEncounter.count
-    }
-  end
+    # Comprehensive health data view (formerly view_all)
+    @patient = HealthPatient.first # For now, show first patient
 
-  def show
-    @allergies = @patient.health_allergies.active
-    @current_medications = @patient.health_medications.current
-    @active_problems = @patient.health_problems.active
-    @recent_immunizations = @patient.health_immunizations.recent
-    @recent_vitals = @patient.health_vital_signs.recent.order(measurement_date: :desc).limit(5)
-    @recent_encounters = @patient.health_encounters.recent.order(encounter_date: :desc).limit(10)
+    unless @patient
+      # Show empty state for no health data
+      @patients = []
+      @total_records = {
+        allergies: 0,
+        medications: 0,
+        problems: 0,
+        immunizations: 0,
+        vital_signs: 0,
+        encounters: 0
+      }
+      render "empty_state"
+      return
+    end
+
+    # Summary statistics
+    @summary_stats = {
+      total_allergies: @patient.health_allergies.count,
+      active_allergies: @patient.health_allergies.where(status: "active").count,
+      total_medications: @patient.health_medications.count,
+      active_medications: @patient.health_medications.where(status: "active").count,
+      total_problems: @patient.health_problems.count,
+      active_problems: @patient.health_problems.where(status: "active").count,
+      total_immunizations: @patient.health_immunizations.count,
+      total_vital_signs: @patient.health_vital_signs.count,
+      total_encounters: @patient.health_encounters.count
+    }
+
+    # Get all data for comprehensive view
+    @allergies = @patient.health_allergies.order(:allergen)
+    @medications = @patient.health_medications.order(:medication_name)
+    @problems = @patient.health_problems.order(:problem_name)
+    @immunizations = @patient.health_immunizations.order(:administration_date)
+    @vital_signs = @patient.health_vital_signs.order(:measurement_date)
+    @encounters = @patient.health_encounters.order(:encounter_date)
+
+    # Date ranges
+    @date_ranges = {
+      medications: {
+        earliest: @patient.health_medications.where.not(start_date: [ nil, "" ]).minimum(:start_date),
+        latest: @patient.health_medications.where.not(start_date: [ nil, "" ]).maximum(:start_date)
+      },
+      problems: {
+        earliest: @patient.health_problems.where.not(onset_date: [ nil, "" ]).minimum(:onset_date),
+        latest: @patient.health_problems.where.not(onset_date: [ nil, "" ]).maximum(:onset_date)
+      },
+      vital_signs: {
+        earliest: @patient.health_vital_signs.where.not(measurement_date: [ nil, "" ]).minimum(:measurement_date),
+        latest: @patient.health_vital_signs.where.not(measurement_date: [ nil, "" ]).maximum(:measurement_date)
+      }
+    }
+
+    render "view_all"
   end
 
   def import
@@ -28,19 +64,19 @@ class HealthController < ApplicationController
 
   def process_import
     if params[:xml_file].blank?
-      redirect_to import_health_index_path, alert: 'Please select an XML file to import'
+      redirect_to import_health_index_path, alert: "Please select an XML file to import"
       return
     end
 
     uploaded_file = params[:xml_file]
 
     # Create temp directory if it doesn't exist
-    temp_dir = Rails.root.join('tmp', 'health_uploads')
+    temp_dir = Rails.root.join("tmp", "health_uploads")
     FileUtils.mkdir_p(temp_dir)
 
     # Save uploaded file
     temp_file_path = temp_dir.join("#{Time.current.to_i}_#{uploaded_file.original_filename}")
-    File.open(temp_file_path, 'wb') do |file|
+    File.open(temp_file_path, "wb") do |file|
       file.write(uploaded_file.read)
     end
 
@@ -50,7 +86,7 @@ class HealthController < ApplicationController
       success = import_service.import_from_xml(temp_file_path.to_s)
 
       if success
-        redirect_to health_path(1), notice: build_success_message(import_service.summary)
+        redirect_to health_index_path, notice: build_success_message(import_service.summary)
       else
         redirect_to import_health_index_path, alert: "Import failed: #{import_service.errors.join(', ')}"
       end
@@ -96,14 +132,6 @@ class HealthController < ApplicationController
   end
 
   private
-
-  def set_patient
-    @patient = HealthPatient.find_by(id: params[:id]) || HealthPatient.find_by(id: 1)
-
-    unless @patient
-      redirect_to health_index_path, alert: 'No health data found. Please import health records first.'
-    end
-  end
 
   def build_success_message(summary)
     parts = []

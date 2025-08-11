@@ -73,16 +73,7 @@ Rails.application.routes.draw do
   end
 
   # Health data routes
-  resources :health, only: [:index, :show] do
-    member do
-      get :allergies
-      get :medications
-      get :problems
-      get :immunizations
-      get :vital_signs
-      get :encounters
-    end
-
+  resources :health, only: [ :index ] do
     collection do
       get :import
       post :process_import

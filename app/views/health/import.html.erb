@@ -1,103 +1,111 @@
-<% content_for :title, "Import Health Data" %>
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="mb-8">
+      <%= link_to health_index_path, class: "inline-flex items-center text-blue-600 hover:text-blue-500" do %>
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+        Back to Health Records
+      <% end %>
 
-<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-  <div class="py-8">
-    <div class="md:flex md:items-center md:justify-between mb-8">
-      <div class="flex-1 min-w-0">
-        <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
-          Import Health Data
-        </h2>
-        <p class="mt-1 text-sm text-gray-500">
-          Upload a CCD or CCDA XML file to import your health records
-        </p>
-      </div>
-      <div class="mt-4 flex md:mt-0 md:ml-4">
-        <%= link_to "← Back to Health Dashboard", health_index_path,
-            class: "bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200" %>
-      </div>
+      <h1 class="mt-4 text-3xl font-bold text-gray-900 dark:text-white">Upload Health Data</h1>
+      <p class="mt-2 text-gray-600 dark:text-gray-400">Upload CCD or CCDA XML files exported from your healthcare provider</p>
     </div>
 
-    <div class="bg-white shadow rounded-lg">
-      <div class="px-4 py-5 sm:p-6">
-        <%= form_with url: process_import_health_index_path, method: :post, multipart: true, local: true,
-            class: "space-y-6" do |form| %>
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Upload XML File</h3>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          Select the XML file exported from your healthcare provider's portal
+        </p>
+      </div>
 
+      <div class="p-6">
+        <%= form_with url: process_import_health_index_path, method: :post, multipart: true, local: true, class: "space-y-6" do |form| %>
+          <!-- File Upload -->
           <div>
-            <label for="xml_file" class="block text-sm font-medium text-gray-700">
-              Health Data XML File
-            </label>
-            <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md hover:border-gray-400 transition duration-200">
-              <div class="space-y-1 text-center">
-                <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                  <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-                <div class="flex text-sm text-gray-600">
-                  <label for="xml_file" class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
-                    <span>Upload a file</span>
-                    <%= form.file_field :xml_file,
-                        accept: ".xml,.XML",
-                        required: true,
-                        class: "sr-only" %>
-                  </label>
-                  <p class="pl-1">or drag and drop</p>
-                </div>
-                <p class="text-xs text-gray-500">
-                  XML files only (CCD/CCDA format)
-                </p>
-              </div>
+            <%= form.label :xml_file, "Health Data XML File", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+            <div class="mt-1">
+              <%= form.file_field :xml_file,
+                  accept: ".xml,.XML",
+                  required: true,
+                  class: "block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900 dark:file:text-blue-300" %>
             </div>
+            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              Upload the XML file downloaded from your healthcare provider's patient portal
+            </p>
           </div>
 
-          <div class="bg-blue-50 border border-blue-200 rounded-md p-4">
+          <!-- Expected Format Info -->
+          <div class="bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 rounded-md p-4">
             <div class="flex">
               <div class="flex-shrink-0">
-                <svg class="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
                 </svg>
               </div>
               <div class="ml-3">
-                <h3 class="text-sm font-medium text-blue-800">
-                  Supported Formats
-                </h3>
-                <div class="mt-2 text-sm text-blue-700">
-                  <ul class="list-disc list-inside space-y-1">
-                    <li>HL7 CCD (Continuity of Care Document)</li>
-                    <li>HL7 CCDA (Consolidated Clinical Document Architecture)</li>
-                    <li>Patient Health Summary documents</li>
-                    <li>Documents exported from EHR systems like Epic, Cerner, etc.</li>
+                <h3 class="text-sm font-medium text-blue-800 dark:text-blue-200">Supported Health Data Formats</h3>
+                <div class="mt-2 text-sm text-blue-700 dark:text-blue-300">
+                  <p>Your XML file should contain structured health data including:</p>
+                  <ul class="list-disc list-inside mt-1 space-y-1">
+                    <li>Patient demographic information</li>
+                    <li>Allergies and adverse reactions</li>
+                    <li>Current and past medications</li>
+                    <li>Medical problems and diagnoses</li>
+                    <li>Immunization records</li>
+                    <li>Vital signs and measurements</li>
+                    <li>Healthcare encounters and visits</li>
                   </ul>
+                  <p class="mt-2"><strong>Supported formats:</strong> HL7 CCD, HL7 CCDA, Patient Health Summary documents</p>
                 </div>
               </div>
             </div>
           </div>
 
-          <div class="bg-yellow-50 border border-yellow-200 rounded-md p-4">
+          <!-- Healthcare Provider Info -->
+          <div class="bg-yellow-50 dark:bg-yellow-900 border border-yellow-200 dark:border-yellow-700 rounded-md p-4">
             <div class="flex">
               <div class="flex-shrink-0">
-                <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                <svg class="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
                 </svg>
               </div>
               <div class="ml-3">
-                <h3 class="text-sm font-medium text-yellow-800">
-                  Import Notes
-                </h3>
-                <div class="mt-2 text-sm text-yellow-700">
+                <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-200">How to Export Health Data</h3>
+                <div class="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
+                  <p>Most healthcare providers offer health data exports through their patient portals. Look for options like "Download My Data", "Export Health Records", or "Continuity of Care Document (CCD)". Common providers include Epic MyChart, Cerner HealtheLife, and other EHR systems.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Privacy Notice -->
+          <div class="bg-green-50 dark:bg-green-900 border border-green-200 dark:border-green-700 rounded-md p-4">
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path>
+                </svg>
+              </div>
+              <div class="ml-3">
+                <h3 class="text-sm font-medium text-green-800 dark:text-green-200">Privacy & Security</h3>
+                <div class="mt-2 text-sm text-green-700 dark:text-green-300">
                   <ul class="list-disc list-inside space-y-1">
-                    <li>Existing data will be preserved and deduplicated</li>
+                    <li>Your health data is stored securely and privately</li>
+                    <li>Data is processed locally and not shared with third parties</li>
+                    <li>Existing records are preserved and deduplicated automatically</li>
                     <li>Large files may take several minutes to process</li>
-                    <li>Protected health information (PHI) remains secure</li>
                   </ul>
                 </div>
               </div>
             </div>
           </div>
 
-          <div class="flex justify-end space-x-3">
-            <%= link_to "Cancel", health_index_path,
-                class: "bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
-            <%= form.submit "Import Health Data",
-                class: "bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
+          <!-- Submit Button -->
+          <div class="flex justify-end">
+            <%= form.submit "Upload Health Data",
+                class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
           </div>
         <% end %>
       </div>
