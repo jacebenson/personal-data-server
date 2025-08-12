@@ -80,6 +80,26 @@ Rails.application.routes.draw do
     end
   end
 
+  # API routes for AI model context providers
+  namespace :api do
+    namespace :v1 do
+      # API Documentation endpoint (no auth required)
+      get :docs, to: 'docs#index'
+      
+      # Overview endpoint - returns recent/active data from all categories
+      get :overview, to: 'overview#index'
+      
+      # Health data API - single endpoint with search
+      get :health, to: 'health#index'
+      
+      # Communications API - emails and linkedin with search
+      get :communications, to: 'communications#index'
+      
+      # Transactions API - amazon orders and bank statements with search
+      get :transactions, to: 'transactions#index'
+    end
+  end
+
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
