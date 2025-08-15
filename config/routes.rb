@@ -38,7 +38,7 @@ Rails.application.routes.draw do
       post :upload_mbox, to: 'communications#upload_mbox'
       post :upload_linkedin_messages, to: 'communications#upload_linkedin_messages'
       get :view_communications, to: redirect('/communications/view')
-      get "view_communications/:id", to: redirect { |params, _| "/communications/#{params[:id]}" }
+            get "view_communications/:id", to: redirect { |params, _| "/communications/#{params[:id]}" }
       delete :clear_communications, to: 'communications#clear'
 
       # Calendar routes (legacy - redirect to new calendar routes)
