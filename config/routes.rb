@@ -41,19 +41,18 @@ Rails.application.routes.draw do
       get "view_communications/:id", to: "data_uploads#show_communication", as: :show_communication
       delete :clear_communications
 
-      # Calendar routes
-      get :calendars
-      post :upload_ics_file
-      post :add_ics_url
-      get :view_calendars
-      get "view_calendars/:id", to: "data_uploads#show_calendar_event", as: :show_calendar_event
-      get :new_calendar
-      post :create_calendar
-      get "edit_calendar/:id", to: "data_uploads#edit_calendar", as: :edit_calendar
-      patch "update_calendar/:id", to: "data_uploads#update_calendar", as: :update_calendar
-      post :sync_calendar
-      delete :clear_calendars
-      delete "remove_calendar/:id", to: "data_uploads#remove_calendar", as: :remove_calendar
+      # Calendar routes (legacy - redirect to new calendar routes)
+      get :calendars, to: redirect('/calendars')
+      post :upload_ics_file, to: 'calendars#upload_ics_file'
+      get :view_calendars, to: redirect('/calendars')
+      get "view_calendars/:id", to: "calendars#show_event", as: :show_calendar_event
+      get :new_calendar, to: redirect('/calendars/new')
+      post :create_calendar, to: 'calendars#create'
+      get "edit_calendar/:id", to: redirect { |params, _| "/calendars/#{params[:id]}/edit" }
+      patch "update_calendar/:id", to: 'calendars#update'
+      post :sync_calendar, to: 'calendars#sync'
+      delete :clear_calendars, to: 'calendars#clear_all'
+      delete "remove_calendar/:id", to: 'calendars#destroy'
 
       # Contact routes
       get :contacts
@@ -76,6 +75,22 @@ Rails.application.routes.draw do
       delete :remove_all_transactions
     end
   end
+
+  # Calendar management routes
+  resources :calendars do
+    member do
+      post :sync
+    end
+    
+    collection do
+      get :import
+      post :upload_ics_file
+      delete :clear_all
+    end
+  end
+  
+  # Event detail view
+  get 'calendars/events/:id', to: 'calendars#show_event', as: 'calendar_event'
 
   # Health data routes
   resources :health, only: [ :index ] do
