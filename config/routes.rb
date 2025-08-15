@@ -33,13 +33,13 @@ Rails.application.routes.draw do
       get :view_amazon_orders
       delete :clear_amazon_orders
 
-      # Communication routes
-      get :communications
-      post :upload_mbox
-      post :upload_linkedin_messages
-      get :view_communications
-      get "view_communications/:id", to: "data_uploads#show_communication", as: :show_communication
-      delete :clear_communications
+      # Communication routes - redirected to dedicated controller
+      get :communications, to: redirect('/communications')
+      post :upload_mbox, to: 'communications#upload_mbox'
+      post :upload_linkedin_messages, to: 'communications#upload_linkedin_messages'
+      get :view_communications, to: redirect('/communications/view')
+      get "view_communications/:id", to: redirect { |params, _| "/communications/#{params[:id]}" }
+      delete :clear_communications, to: 'communications#clear'
 
       # Calendar routes (legacy - redirect to new calendar routes)
       get :calendars, to: redirect('/calendars')
@@ -59,6 +59,16 @@ Rails.application.routes.draw do
       delete :remove_duplicates
       delete :remove_account_transactions
       delete :remove_all_transactions
+    end
+  end
+
+  # Communication management routes
+  resources :communications, only: [:index, :show] do
+    collection do
+      post :upload_mbox
+      post :upload_linkedin_messages
+      get :view
+      delete :clear
     end
   end
 

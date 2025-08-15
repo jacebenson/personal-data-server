@@ -1,0 +1,200 @@
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-900 dark:text-white">💬 Upload Communications</h1>
+      <p class="mt-2 text-gray-600 dark:text-gray-400">Upload your email archives, LinkedIn messages, and other communication data</p>
+    </div>
+
+    <!-- Instructions -->
+    <div class="mb-8 p-4 bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 rounded-md">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+          </svg>
+        </div>
+        <div class="ml-3">
+          <h3 class="text-sm font-medium text-blue-800 dark:text-blue-200">Communication data sources:</h3>
+          <div class="mt-2 text-sm text-blue-700 dark:text-blue-300">
+            <ul class="list-disc list-inside space-y-1">
+              <li><strong>MBOX files:</strong> Export email archives from Gmail, Outlook, Thunderbird, or other email clients</li>
+              <li><strong>LinkedIn messages:</strong> Request your data from LinkedIn and upload the messages CSV file</li>
+              <li><strong>Discord messages:</strong> Coming soon - archive your Discord conversations</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- MBOX Email Upload -->
+      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white">📧 Email Archives (MBOX)</h3>
+          <p class="text-sm text-gray-600 dark:text-gray-400">Gmail, Outlook, Thunderbird exports</p>
+        </div>
+        <div class="p-6">
+          <%= form_with url: upload_mbox_communications_path, method: :post, multipart: true, local: true, class: "space-y-6" do |form| %>
+            <div>
+              <%= form.label :file, "Select MBOX File", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+              <div class="mt-1">
+                <%= form.file_field :file,
+                    accept: ".mbox,.mbox.gz",
+                    required: true,
+                    class: "block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900 dark:file:text-blue-300" %>
+              </div>
+              <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                Upload .mbox or .mbox.gz files from your email client export.
+                <br><strong>Large files (>50MB)</strong> will be processed in the background.
+              </p>
+            </div>
+
+            <!-- MBOX Instructions -->
+            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-md">
+              <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-2">How to export MBOX:</h4>
+              <ul class="text-xs text-gray-600 dark:text-gray-400 space-y-1">
+                <li><strong>Gmail:</strong> Google Takeout → Mail → Export as MBOX</li>
+                <li><strong>Outlook:</strong> File → Open & Export → Import/Export → Export to file</li>
+                <li><strong>Thunderbird:</strong> ImportExportTools NG add-on</li>
+              </ul>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <div class="flex space-x-3">
+                <%= link_to "Back to Data Uploads", data_uploads_path, class: "inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600" %>
+              </div>
+              <%= form.submit "Upload MBOX", class: "inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- LinkedIn Messages Upload -->
+      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white">💼 LinkedIn Messages</h3>
+          <p class="text-sm text-gray-600 dark:text-gray-400">Professional networking conversations</p>
+        </div>
+        <div class="p-6">
+          <%= form_with url: upload_linkedin_messages_communications_path, method: :post, multipart: true, local: true, class: "space-y-6" do |form| %>
+            <div>
+              <%= form.label :file, "Select LinkedIn Messages CSV", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+              <div class="mt-1">
+                <%= form.file_field :file,
+                    accept: ".csv",
+                    required: true,
+                    class: "block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100 dark:file:bg-green-900 dark:file:text-green-300" %>
+              </div>
+              <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                Upload the messages.csv file from your LinkedIn data export.
+              </p>
+            </div>
+
+            <!-- LinkedIn Instructions -->
+            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-md">
+              <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-2">How to get LinkedIn messages:</h4>
+              <ol class="text-xs text-gray-600 dark:text-gray-400 space-y-1 list-decimal list-inside">
+                <li>Go to LinkedIn Privacy Settings</li>
+                <li>Request "Download your data"</li>
+                <li>Select "Messages" data type</li>
+                <li>Wait for the export email</li>
+                <li>Upload the messages.csv file</li>
+              </ol>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <div class="flex space-x-3">
+                <%= link_to "Back to Data Uploads", data_uploads_path, class: "inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600" %>
+              </div>
+              <%= form.submit "Upload LinkedIn Messages", class: "inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Discord Messages (Coming Soon) -->
+      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg opacity-60">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white">🎮 Discord Messages</h3>
+          <p class="text-sm text-gray-600 dark:text-gray-400">Gaming and community conversations</p>
+        </div>
+        <div class="p-6">
+          <div class="space-y-6">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Discord Export (Coming Soon)</label>
+              <div class="mt-1">
+                <input type="file"
+                       disabled
+                       class="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gray-50 file:text-gray-400 cursor-not-allowed" />
+              </div>
+              <p class="mt-2 text-sm text-gray-400">
+                Discord message archiving feature is in development.
+              </p>
+            </div>
+
+            <!-- Discord Placeholder Info -->
+            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-md">
+              <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-2">Planned features:</h4>
+              <ul class="text-xs text-gray-600 dark:text-gray-400 space-y-1">
+                <li>• Server message archives</li>
+                <li>• Direct message exports</li>
+                <li>• Media attachment handling</li>
+                <li>• Channel-based organization</li>
+              </ul>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <div class="flex space-x-3">
+                <%= link_to "Back to Data Uploads", data_uploads_path, class: "inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600" %>
+              </div>
+              <button type="button" disabled class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-400 cursor-not-allowed">
+                Coming Soon
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Current Communication Data -->
+    <% if current_user.email_messages.any? || current_user.linkedin_messages.any? %>
+      <div class="mt-12">
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+          <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white">Current Communication Data</h3>
+          </div>
+          <div class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div class="text-center">
+                <div class="text-2xl font-bold text-gray-900 dark:text-white"><%= number_with_delimiter(current_user.email_messages.count) %></div>
+                <div class="text-sm text-gray-500 dark:text-gray-400">Email Messages</div>
+                <div class="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                  Total size: <%= number_to_human_size(current_user.email_messages.sum(:message_size)) %>
+                </div>
+              </div>
+              <div class="text-center">
+                <div class="text-2xl font-bold text-green-600"><%= number_with_delimiter(current_user.linkedin_messages.count) %></div>
+                <div class="text-sm text-gray-500 dark:text-gray-400">LinkedIn Messages</div>
+                <div class="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                  <% if current_user.linkedin_messages.any? %>
+                    <%= pluralize(current_user.linkedin_messages.pluck(:conversation_id).uniq.count, 'conversation') %>
+                  <% else %>
+                    No messages imported yet
+                  <% end %>
+                </div>
+              </div>
+              <div class="text-center">
+                <div class="text-2xl font-bold text-purple-600">0</div>
+                <div class="text-sm text-gray-500 dark:text-gray-400">Discord Messages</div>
+                <div class="text-xs text-gray-400 dark:text-gray-500 mt-1">Coming soon</div>
+              </div>
+            </div>
+            <div class="mt-6 text-center">
+              <%= link_to "View All Communications", view_communications_path, class: "inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500" %>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
