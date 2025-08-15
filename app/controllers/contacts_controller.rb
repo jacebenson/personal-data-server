@@ -99,11 +99,12 @@ class ContactsController < ApplicationController
     end
   end
 
-  def show_contact
+  def show
     # Show individual contact
     @contact = current_user.contacts.find(params[:id])
+    render 'contact'
   rescue ActiveRecord::RecordNotFound
-    redirect_to contacts_path, alert: "Contact not found."
+    redirect_to contacts_path(show: true), alert: "Contact not found."
   end
 
   def clear

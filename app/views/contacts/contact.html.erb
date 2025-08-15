@@ -1,0 +1,198 @@
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Header -->
+    <div class="mb-8">
+      <%= link_to contacts_path(show: true), class: "inline-flex items-center text-purple-600 hover:text-purple-500" do %>
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+        Back to Contacts
+      <% end %>
+
+      <div class="mt-4">
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white"><%= @contact.full_name %></h1>
+        <% if @contact.source.present? %>
+          <span class="mt-2 inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+            Source: <%= @contact.source.titleize %>
+          </span>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Contact Details -->
+    <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg">
+      <div class="px-4 py-5 sm:p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Avatar and Basic Info -->
+          <div class="col-span-1 md:col-span-2 flex items-center space-x-6 pb-6 border-b border-gray-200 dark:border-gray-700">
+            <div class="flex-shrink-0">
+              <div class="h-20 w-20 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center">
+                <span class="text-2xl font-medium text-purple-600 dark:text-purple-400">
+                  <%= @contact.initials %>
+                </span>
+              </div>
+            </div>
+            <div>
+              <h2 class="text-2xl font-bold text-gray-900 dark:text-white"><%= @contact.full_name %></h2>
+              <% if @contact.job_title.present? || @contact.organization.present? %>
+                <p class="text-lg text-gray-600 dark:text-gray-400">
+                  <% if @contact.job_title.present? %>
+                    <%= @contact.job_title %>
+                    <% if @contact.organization.present? %>
+                      at <%= @contact.organization %>
+                    <% end %>
+                  <% elsif @contact.organization.present? %>
+                    <%= @contact.organization %>
+                  <% end %>
+                </p>
+              <% end %>
+            </div>
+          </div>
+
+          <!-- Contact Information -->
+          <div>
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Contact Information</h3>
+            <dl class="space-y-3">
+              <% if @contact.primary_email.present? %>
+                <div>
+                  <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Email</dt>
+                  <dd class="mt-1 text-sm text-gray-900 dark:text-white">
+                    <a href="mailto:<%= @contact.primary_email %>" class="text-purple-600 hover:text-purple-500">
+                      <%= @contact.primary_email %>
+                    </a>
+                  </dd>
+                </div>
+              <% end %>
+
+              <% if @contact.primary_phone.present? %>
+                <div>
+                  <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Phone</dt>
+                  <dd class="mt-1 text-sm text-gray-900 dark:text-white">
+                    <a href="tel:<%= @contact.primary_phone %>" class="text-purple-600 hover:text-purple-500">
+                      <%= @contact.primary_phone %>
+                    </a>
+                  </dd>
+                </div>
+              <% end %>
+
+              <% if @contact.linkedin_url.present? %>
+                <div>
+                  <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">LinkedIn</dt>
+                  <dd class="mt-1 text-sm text-gray-900 dark:text-white">
+                    <a href="<%= @contact.linkedin_url %>" target="_blank" class="text-blue-600 hover:text-blue-500">
+                      View LinkedIn Profile
+                    </a>
+                  </dd>
+                </div>
+              <% end %>
+
+              <% if @contact.urls.present? %>
+                <div>
+                  <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Website</dt>
+                  <dd class="mt-1 text-sm text-gray-900 dark:text-white">
+                    <% @contact.urls.split(",").first(3).each do |url| %>
+                      <div class="mb-1">
+                        <a href="<%= url.strip %>" target="_blank" class="text-purple-600 hover:text-purple-500">
+                          <%= url.strip %>
+                        </a>
+                      </div>
+                    <% end %>
+                  </dd>
+                </div>
+              <% end %>
+            </dl>
+          </div>
+
+          <!-- Additional Details -->
+          <div>
+            <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Additional Details</h3>
+            <dl class="space-y-3">
+              <% if @contact.birthday.present? %>
+                <div>
+                  <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Birthday</dt>
+                  <dd class="mt-1 text-sm text-gray-900 dark:text-white">
+                    <%= @contact.birthday.strftime("%B %d, %Y") %>
+                  </dd>
+                </div>
+              <% end %>
+
+              <% if @contact.categories.present? %>
+                <div>
+                  <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Categories</dt>
+                  <dd class="mt-1 text-sm text-gray-900 dark:text-white">
+                    <%= @contact.categories %>
+                  </dd>
+                </div>
+              <% end %>
+
+              <div>
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Added</dt>
+                <dd class="mt-1 text-sm text-gray-900 dark:text-white">
+                  <%= (@contact.imported_at || @contact.created_at).strftime("%B %d, %Y at %I:%M %p") %>
+                </dd>
+              </div>
+
+              <div>
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Contact ID</dt>
+                <dd class="mt-1 text-sm text-gray-900 dark:text-white font-mono">
+                  <%= @contact.id %>
+                </dd>
+              </div>
+
+              <% if @contact.uid.present? %>
+                <div>
+                  <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">UID</dt>
+                  <dd class="mt-1 text-sm text-gray-900 dark:text-white font-mono text-xs">
+                    <%= @contact.uid %>
+                  </dd>
+                </div>
+              <% end %>
+            </dl>
+          </div>
+
+          <!-- Notes -->
+          <% if @contact.notes.present? %>
+            <div class="col-span-1 md:col-span-2">
+              <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Notes</h3>
+              <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                <p class="text-sm text-gray-900 dark:text-white whitespace-pre-wrap"><%= @contact.notes %></p>
+              </div>
+            </div>
+          <% end %>
+
+          <!-- All Email Addresses -->
+          <% if @contact.email_list.any? %>
+            <div>
+              <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">All Email Addresses</h3>
+              <ul class="space-y-2">
+                <% @contact.email_list.each do |email| %>
+                  <li class="text-sm">
+                    <a href="mailto:<%= email %>" class="text-purple-600 hover:text-purple-500">
+                      <%= email %>
+                    </a>
+                  </li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
+
+          <!-- All Phone Numbers -->
+          <% if @contact.phone_list.any? %>
+            <div>
+              <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">All Phone Numbers</h3>
+              <ul class="space-y-2">
+                <% @contact.phone_list.each do |phone| %>
+                  <li class="text-sm">
+                    <a href="tel:<%= phone %>" class="text-purple-600 hover:text-purple-500">
+                      <%= phone %>
+                    </a>
+                  </li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,139 @@
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="mb-8">
+      <%= link_to contacts_path(show: true), class: "inline-flex items-center text-purple-600 hover:text-purple-500" do %>
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+        Back to Contacts
+      <% end %>
+
+      <div class="flex justify-between items-center mt-4">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-white">🔍 Duplicate Contacts</h1>
+          <p class="mt-2 text-gray-600 dark:text-gray-400">
+            Found <%= @duplicate_groups.length %> groups with potential duplicates
+          </p>
+        </div>
+        <div class="space-x-3">
+          <% if @duplicate_groups.any? %>
+            <%= form_with url: auto_merge_contacts_path, method: :post, local: true, class: "inline-block" do |form| %>
+              <%= form.submit "Auto-Merge All", 
+                  data: { confirm: "This will automatically merge all duplicate contacts. This action cannot be undone. Continue?" },
+                  class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700" %>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <% if @duplicate_groups.any? %>
+      <div class="space-y-6">
+        <% @duplicate_groups.each_with_index do |group, index| %>
+          <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+              <div class="flex justify-between items-center">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                  Duplicate Group #<%= index + 1 %> 
+                  <span class="text-sm font-normal text-gray-500">(<%= group.length %> contacts)</span>
+                </h3>
+                <%= form_with url: merge_contacts_path, method: :post, local: true, class: "inline" do |form| %>
+                  <% group.each do |contact| %>
+                    <%= hidden_field_tag "contact_ids[]", contact.id %>
+                  <% end %>
+                  <%= form.submit "Merge These", 
+                      data: { confirm: "Merge these #{group.length} contacts? This cannot be undone." },
+                      class: "inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700" %>
+                <% end %>
+              </div>
+            </div>
+
+            <div class="p-6">
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <% group.each do |contact| %>
+                  <div class="border border-gray-200 dark:border-gray-600 rounded-lg p-4">
+                    <div class="flex items-center mb-3">
+                      <div class="flex-shrink-0 h-10 w-10">
+                        <div class="h-10 w-10 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center">
+                          <span class="text-sm font-medium text-purple-600 dark:text-purple-400">
+                            <%= contact.initials %>
+                          </span>
+                        </div>
+                      </div>
+                      <div class="ml-3">
+                        <%= link_to contact.full_name, contact_path(contact),
+                            class: "text-sm font-medium text-gray-900 dark:text-white hover:text-purple-600" %>
+                        <% if contact.source.present? %>
+                          <p class="text-xs text-gray-500">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
+                              <%= contact.source.titleize %>
+                            </span>
+                          </p>
+                        <% end %>
+                      </div>
+                    </div>
+
+                    <div class="space-y-1 text-xs text-gray-600 dark:text-gray-400">
+                      <% if contact.organization.present? %>
+                        <p><strong>Org:</strong> <%= contact.organization %></p>
+                      <% end %>
+                      <% if contact.job_title.present? %>
+                        <p><strong>Title:</strong> <%= contact.job_title %></p>
+                      <% end %>
+                      <% if contact.primary_email.present? %>
+                        <p><strong>Email:</strong> <%= contact.primary_email %></p>
+                      <% end %>
+                      <% if contact.primary_phone.present? %>
+                        <p><strong>Phone:</strong> <%= contact.primary_phone %></p>
+                      <% end %>
+                      <p><strong>Added:</strong> <%= time_ago_in_words(contact.imported_at || contact.created_at) %> ago</p>
+                    </div>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <!-- No Duplicates -->
+      <div class="text-center py-12">
+        <svg class="mx-auto h-12 w-12 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No duplicate contacts found</h3>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          Your contacts appear to be unique based on our duplicate detection algorithm.
+        </p>
+        <div class="mt-6">
+          <%= link_to "Back to Contacts", contacts_path(show: true),
+              class: "inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700" %>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Stats Summary -->
+    <% if @merge_results %>
+      <div class="mt-8 bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 rounded-md p-4">
+        <h4 class="font-medium text-blue-900 dark:text-blue-200 mb-2">Duplicate Detection Summary:</h4>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-blue-800 dark:text-blue-300">
+          <div>
+            <p><strong>Total Contacts:</strong> <%= @merge_results[:total_contacts] %></p>
+          </div>
+          <div>
+            <p><strong>Duplicate Groups:</strong> <%= @merge_results[:duplicate_groups] %></p>
+          </div>
+          <div>
+            <p><strong>Potential Duplicates:</strong> <%= @merge_results[:total_duplicates] %></p>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Back Button -->
+    <div class="mt-8 text-center">
+      <%= link_to "Back to Contacts", contacts_path(show: true),
+          class: "inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600" %>
+    </div>
+  </div>
+</div>

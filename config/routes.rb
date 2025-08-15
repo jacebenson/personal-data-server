@@ -89,10 +89,6 @@ Rails.application.routes.draw do
       get :auto_merge
       post :auto_merge
     end
-    
-    member do
-      get :show, as: 'contact'
-    end
   end
 
   # Health data routes
