@@ -54,20 +54,6 @@ Rails.application.routes.draw do
       delete :clear_calendars, to: 'calendars#clear_all'
       delete "remove_calendar/:id", to: 'calendars#destroy'
 
-      # Contact routes
-      get :contacts
-      post :upload_vcard
-      post :upload_linkedin_connections
-      get :view_contacts
-      get "view_contacts/:id", to: "data_uploads#show_contact", as: :show_contact
-      delete :clear_contacts
-
-      # Contact merge routes
-      get :contact_duplicates
-      post :merge_contacts
-      get :auto_merge_contacts
-      post :auto_merge_contacts
-
       # Duplicate and account management
       get :manage_duplicates
       delete :remove_duplicates
@@ -91,6 +77,23 @@ Rails.application.routes.draw do
   
   # Event detail view
   get 'calendars/events/:id', to: 'calendars#show_event', as: 'calendar_event'
+
+  # Contact management routes
+  resources :contacts, only: [:index, :show] do
+    collection do
+      post :upload_vcard
+      post :upload_linkedin_connections
+      delete :clear
+      get :duplicates
+      post :merge
+      get :auto_merge
+      post :auto_merge
+    end
+    
+    member do
+      get :show, as: 'contact'
+    end
+  end
 
   # Health data routes
   resources :health, only: [ :index ] do
