@@ -103,7 +103,7 @@
               </div>
             <% end %>
 
-            <%= link_to social_security_earnings_data_uploads_path, class: "flex items-center p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-orange-50 dark:hover:bg-orange-900/20 hover:border-orange-300 dark:hover:border-orange-600 transition-colors" do %>
+            <%= link_to social_security_index_path, class: "flex items-center p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-orange-50 dark:hover:bg-orange-900/20 hover:border-orange-300 dark:hover:border-orange-600 transition-colors" do %>
               <svg class="h-6 w-6 text-orange-600 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
               </svg>
@@ -211,7 +211,7 @@
               </p>
               <% if current_user.social_security_earnings.any? %>
                 <div class="mt-2">
-                  <%= link_to view_social_security_earnings_data_uploads_path, class: "text-orange-600 hover:text-orange-500 text-sm font-medium" do %>
+                  <%= link_to view_earnings_social_security_index_path, class: "text-orange-600 hover:text-orange-500 text-sm font-medium" do %>
                     View lifetime earnings →
                   <% end %>
                 </div>

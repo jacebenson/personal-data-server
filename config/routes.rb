@@ -22,10 +22,10 @@ Rails.application.routes.draw do
       get :view_investments
       delete :clear_investments
 
-      # Social Security routes
-      get :social_security_earnings
-      post :upload_social_security_earnings
-      get :view_social_security_earnings
+      # Social Security routes - redirected to dedicated controller
+      get :social_security_earnings, to: redirect('/social_security')
+      post :upload_social_security_earnings, to: 'social_security#upload_earnings'
+      get :view_social_security_earnings, to: redirect('/social_security/view_earnings')
 
       # Amazon shopping routes
       get :amazon_orders
@@ -38,7 +38,7 @@ Rails.application.routes.draw do
       post :upload_mbox, to: 'communications#upload_mbox'
       post :upload_linkedin_messages, to: 'communications#upload_linkedin_messages'
       get :view_communications, to: redirect('/communications/view')
-            get "view_communications/:id", to: redirect { |params, _| "/communications/#{params[:id]}" }
+      get "view_communications/:id", to: redirect { |params, _| "/communications/#{params[:id]}" }
       delete :clear_communications, to: 'communications#clear'
 
       # Calendar routes (legacy - redirect to new calendar routes)
@@ -59,6 +59,15 @@ Rails.application.routes.draw do
       delete :remove_duplicates
       delete :remove_account_transactions
       delete :remove_all_transactions
+    end
+  end
+
+  # Social Security management routes
+  resources :social_security, only: [:index] do
+    collection do
+      post :upload_earnings
+      get :view_earnings
+      delete :clear_earnings
     end
   end
 
@@ -138,7 +147,6 @@ Rails.application.routes.draw do
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
-
 
   authenticated :user do
     root "data_uploads#index", as: :authenticated_user_root
