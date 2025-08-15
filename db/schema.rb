@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_09_213139) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_15_050953) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -117,11 +117,34 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_09_213139) do
     t.text "attendee_emails"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "calendar_id"
+    t.index ["calendar_id", "start_time"], name: "index_calendar_events_on_calendar_id_and_start_time"
+    t.index ["calendar_id"], name: "index_calendar_events_on_calendar_id"
     t.index ["calendar_name"], name: "index_calendar_events_on_calendar_name"
     t.index ["start_time"], name: "index_calendar_events_on_start_time"
     t.index ["user_id", "start_time"], name: "index_calendar_events_on_user_id_and_start_time"
     t.index ["user_id", "uid", "calendar_name"], name: "index_calendar_events_unique", unique: true
     t.index ["user_id"], name: "index_calendar_events_on_user_id"
+  end
+
+  create_table "calendars", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.string "name", null: false
+    t.string "description"
+    t.string "color", default: "#3B82F6"
+    t.string "source_type", null: false
+    t.string "source_url"
+    t.datetime "last_synced_at"
+    t.text "sync_errors"
+    t.boolean "auto_sync", default: false
+    t.integer "sync_interval_minutes", default: 60
+    t.boolean "active", default: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["auto_sync"], name: "index_calendars_on_auto_sync"
+    t.index ["source_type"], name: "index_calendars_on_source_type"
+    t.index ["user_id", "name"], name: "index_calendars_on_user_id_and_name", unique: true
+    t.index ["user_id"], name: "index_calendars_on_user_id"
   end
 
   create_table "contacts", force: :cascade do |t|
@@ -353,7 +376,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_09_213139) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "amazon_orders", "users"
   add_foreign_key "bank_statements", "users"
+  add_foreign_key "calendar_events", "calendars"
   add_foreign_key "calendar_events", "users"
+  add_foreign_key "calendars", "users"
   add_foreign_key "contacts", "users"
   add_foreign_key "email_messages", "users"
   add_foreign_key "health_allergies", "health_patients"

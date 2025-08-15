@@ -88,6 +88,62 @@
         </div>
       </div>
 
+      <!--Form to add remote calendar-->
+      <div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+  <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-900 dark:text-white">📅 Add Calendar Source</h1>
+      <p class="mt-2 text-gray-600 dark:text-gray-400">Add a remote calendar that will sync automatically</p>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+      <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Calendar Details</h3>
+      </div>
+      
+      <%= form_with model: [@calendar || Calendar.new], url: create_calendar_data_uploads_path, local: true, class: "p-6 space-y-6" do |form| %>
+        <div>
+          <%= form.label :name, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+          <%= form.text_field :name, class: "mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white", placeholder: "My Calendar" %>
+        </div>
+
+        <div>
+          <%= form.label :description, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+          <%= form.text_area :description, rows: 3, class: "mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white", placeholder: "Optional description" %>
+        </div>
+
+        <div>
+          <%= form.label :source_url, "Calendar URL (ICS)", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+          <%= form.url_field :source_url, class: "mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white", placeholder: "https://calendar.google.com/calendar/ical/..." %>
+          <p class="mt-1 text-sm text-gray-500">Paste your calendar's ICS URL here</p>
+        </div>
+
+        <div>
+          <%= form.label :color, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+          <%= form.color_field :color, value: "#3B82F6", class: "mt-1 block w-full h-10 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500" %>
+        </div>
+
+        <div class="flex items-center">
+          <%= form.check_box :auto_sync, class: "h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded" %>
+          <%= form.label :auto_sync, "Enable automatic syncing", class: "ml-2 block text-sm text-gray-900 dark:text-gray-300" %>
+        </div>
+
+        <div>
+          <%= form.label :sync_interval_minutes, "Sync every (minutes)", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+          <%= form.number_field :sync_interval_minutes, value: 60, min: 5, class: "mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" %>
+        </div>
+
+        <%= form.hidden_field :source_type, value: "url" %>
+
+        <div class="flex justify-end space-x-3">
+          <%= link_to "Cancel", view_calendars_data_uploads_path, class: "px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600" %>
+          <%= form.submit "Add Calendar & Sync", class: "px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
       <!-- Quick Stats (if any calendars exist) -->
       <% if current_user.calendar_events.any? %>
         <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">

@@ -2,7 +2,9 @@ require "active_support/core_ext/integer/time"
 
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
-
+  # Add these lines to allow access from framework.local
+  config.hosts << "framework.local"
+  config.hosts << "framework"
   # Make code changes take effect immediately without server restart.
   config.enable_reloading = true
 

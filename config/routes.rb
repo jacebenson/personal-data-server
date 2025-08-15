@@ -47,8 +47,13 @@ Rails.application.routes.draw do
       post :add_ics_url
       get :view_calendars
       get "view_calendars/:id", to: "data_uploads#show_calendar_event", as: :show_calendar_event
+      get :new_calendar
+      post :create_calendar
+      get "edit_calendar/:id", to: "data_uploads#edit_calendar", as: :edit_calendar
+      patch "update_calendar/:id", to: "data_uploads#update_calendar", as: :update_calendar
+      post :sync_calendar
       delete :clear_calendars
-      delete "remove_calendar/:calendar_name", to: "data_uploads#remove_calendar", as: :remove_calendar
+      delete "remove_calendar/:id", to: "data_uploads#remove_calendar", as: :remove_calendar
 
       # Contact routes
       get :contacts

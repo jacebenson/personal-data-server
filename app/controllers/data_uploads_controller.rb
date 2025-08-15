@@ -671,7 +671,11 @@ class DataUploadsController < ApplicationController
 
     # Filter by calendar if specified
     events_scope = current_user.calendar_events
-    events_scope = events_scope.by_calendar(params[:calendar]) if params[:calendar].present?
+    if params[:calendar].present?
+      # Find the calendar by name and filter events by calendar_id
+      calendar = current_user.calendars.find_by(name: params[:calendar])
+      events_scope = events_scope.where(calendar: calendar) if calendar
+    end
 
     # Time filter
     case params[:time_filter]
@@ -700,6 +704,7 @@ class DataUploadsController < ApplicationController
     @total_events = current_user.calendar_events.count
     @upcoming_events = current_user.calendar_events.upcoming_count
     @calendars = current_user.calendar_events.events_by_calendar.sort_by { |calendar, count| -count }
+    @calendar_sources = current_user.calendars # Add this for the filter dropdown
     @date_range = current_user.calendar_events.date_range
     @events_this_month = current_user.calendar_events.events_this_month_count
     @busiest_day = current_user.calendar_events.busiest_day_this_month
@@ -720,18 +725,64 @@ class DataUploadsController < ApplicationController
   end
 
   def remove_calendar
-    # Remove all events from a specific calendar
-    calendar_name = params[:calendar_name]
+    # Find and remove the calendar and all its events
+    calendar = current_user.calendars.find_by(id: params[:id])
 
-    if calendar_name.blank?
-      redirect_to view_calendars_data_uploads_path, alert: "No calendar specified."
+    if calendar.nil?
+      redirect_to view_calendars_data_uploads_path, alert: "Calendar not found."
       return
     end
 
-    deleted_count = current_user.calendar_events.where(calendar_name: calendar_name).delete_all
+    calendar_name = calendar.name
+    event_count = calendar.calendar_events.count
+
+    # This will also delete associated calendar_events due to dependent: :destroy
+    calendar.destroy
 
     redirect_to view_calendars_data_uploads_path,
-                notice: "Removed #{deleted_count} events from '#{calendar_name}' calendar."
+                notice: "Removed calendar '#{calendar_name}' and #{event_count} events."
+  end
+
+  def new_calendar
+    @calendar = Calendar.new
+  end
+
+  def create_calendar
+    @calendar = current_user.calendars.build(calendar_params)
+
+    if @calendar.save
+      # sync immediately after creation
+      if @calendar.sync_from_remote!
+        redirect_to view_calendars_data_uploads_path, notice: "Calendar created and synced successfully."
+      else
+        redirect_to view_calendars_data_uploads_path, alert: "Calendar created but initial sync failed: #{@calendar.sync_errors}"
+      end
+    else
+      render :new_calendar, status: :unprocessable_entity
+    end
+  end
+
+  def edit_calendar
+    @calendar = current_user.calendars.find(params[:id])
+  end
+
+  def update_calendar
+    @calendar = current_user.calendars.find(params[:id])
+    
+    if @calendar.update(calendar_params)
+      redirect_to view_calendars_data_uploads_path, notice: "Calendar '#{@calendar.name}' updated successfully."
+    else
+      render :edit_calendar, status: :unprocessable_entity
+    end
+  end
+
+  def sync_calendar
+    calendar = current_user.calendars.find(params[:calendar_id])
+    if calendar.sync_from_remote!
+      redirect_to view_calendars_data_uploads_path, notice: "Calendar '#{calendar.name}' synced successfully."
+    else
+      redirect_to view_calendars_data_uploads_path, alert: "Calendar sync failed: #{calendar.sync_errors}"
+    end
   end
 
   # Contact methods
@@ -960,5 +1011,9 @@ class DataUploadsController < ApplicationController
       # Default to transactions if we can't detect
       "transactions"
     end
+  end
+  
+  def calendar_params
+    params.require(:calendar).permit(:name, :description, :source_url, :color, :auto_sync, :sync_interval_minutes, :source_type)
   end
 end

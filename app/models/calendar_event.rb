@@ -1,5 +1,6 @@
 class CalendarEvent < ApplicationRecord
   belongs_to :user
+  belongs_to :calendar, optional: true
 
   validates :uid, presence: true
   validates :summary, presence: true
@@ -50,7 +51,7 @@ class CalendarEvent < ApplicationRecord
 
   # Check if event is recurring
   def recurring?
-    recurrence_rule.present?
+    recurrence_rule.present? && recurrence_rule != "[]"
   end
 
   # Class methods for statistics

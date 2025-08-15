@@ -12,5 +12,6 @@ class User < ApplicationRecord
   has_many :email_messages, dependent: :destroy
   has_many :linkedin_messages, dependent: :destroy
   has_many :calendar_events, dependent: :destroy
+  has_many :calendars, dependent: :destroy
   has_many :contacts, dependent: :destroy
 end
