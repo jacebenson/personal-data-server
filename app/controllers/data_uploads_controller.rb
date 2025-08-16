@@ -365,6 +365,88 @@ class DataUploadsController < ApplicationController
     redirect_to data_uploads_path, notice: "Successfully deleted #{count} Amazon orders."
   end
 
+  def add_balance_adjustment
+    Rails.logger.info "=== Balance Adjustment Debug ==="
+    Rails.logger.info "Params: #{params.inspect}"
+    Rails.logger.info "Account Name: #{params[:account_name]}"
+    Rails.logger.info "Balance Amount: #{params[:balance_amount]}"
+    Rails.logger.info "Adjustment Date: #{params[:adjustment_date]}"
+
+    account_name = params[:account_name]&.strip
+    balance_amount = params[:balance_amount]&.strip
+    adjustment_date = params[:adjustment_date]&.strip
+
+    Rails.logger.info "After processing - Account: #{account_name}, Amount: #{balance_amount}, Date: #{adjustment_date}"
+
+    if account_name.blank? || balance_amount.blank? || adjustment_date.blank?
+      Rails.logger.error "Missing required fields"
+      redirect_to view_ally_bank_statements_data_uploads_path, alert: "Please fill in all required fields for balance adjustment."
+      return
+    end
+
+    # Parse the balance amount
+    begin
+      target_balance = BigDecimal(balance_amount.gsub(/[\$,]/, ""))
+    rescue ArgumentError
+      redirect_to view_ally_bank_statements_data_uploads_path, alert: "Invalid balance amount format."
+      return
+    end
+
+    # Parse the adjustment date
+    begin
+      parsed_date = Date.parse(adjustment_date).beginning_of_day
+    rescue ArgumentError
+      redirect_to view_ally_bank_statements_data_uploads_path, alert: "Invalid date format."
+      return
+    end
+
+    # Calculate current balance for the account up to the adjustment date
+    current_balance = current_user.bank_statements
+                                  .where(account: account_name)
+                                  .where("date <= ?", parsed_date)
+                                  .sum(:amount)
+
+    # Calculate the adjustment needed
+    adjustment_needed = target_balance - current_balance
+
+    if adjustment_needed.abs < 0.01 # Account for floating point precision
+      redirect_to view_ally_bank_statements_data_uploads_path, 
+                  notice: "Account balance is already correct (current: $#{sprintf('%.2f', current_balance)})."
+      return
+    end
+
+    # Create the balance adjustment transaction
+    adjustment_description = "Balance adjustment to $#{sprintf('%.2f', target_balance)} (was $#{sprintf('%.2f', current_balance)})"
+    
+    Rails.logger.info "Creating bank statement with:"
+    Rails.logger.info "  Date: #{parsed_date}"
+    Rails.logger.info "  Description: #{adjustment_description}"
+    Rails.logger.info "  Amount: #{adjustment_needed}"
+    Rails.logger.info "  Account: #{account_name}"
+    Rails.logger.info "  User ID: #{current_user.id}"
+    
+    bank_statement = current_user.bank_statements.build(
+      date: parsed_date,
+      description: adjustment_description,
+      amount: adjustment_needed,
+      account: account_name,
+      category: "Balance Adjustment"
+    )
+
+    Rails.logger.info "Bank statement valid? #{bank_statement.valid?}"
+    Rails.logger.info "Bank statement errors: #{bank_statement.errors.full_messages}" unless bank_statement.valid?
+
+    if bank_statement.save
+      Rails.logger.info "Bank statement saved successfully with ID: #{bank_statement.id}"
+      redirect_to view_ally_bank_statements_data_uploads_path, 
+                  notice: "Balance adjustment added successfully. #{adjustment_needed >= 0 ? 'Added' : 'Subtracted'} $#{sprintf('%.2f', adjustment_needed.abs)} to account '#{account_name}'."
+    else
+      Rails.logger.error "Failed to save bank statement: #{bank_statement.errors.full_messages}"
+      redirect_to view_ally_bank_statements_data_uploads_path, 
+                  alert: "Failed to create balance adjustment: #{bank_statement.errors.full_messages.join(', ')}"
+    end
+  end
+
 
 
   private
@@ -419,5 +501,9 @@ class DataUploadsController < ApplicationController
       # Default to transactions if we can't detect
       "transactions"
     end
+  end
+
+  def balance_adjustment_params
+    params.permit(:account_name, :balance_amount, :adjustment_date)
   end
 end

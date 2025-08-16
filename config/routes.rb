@@ -71,6 +71,9 @@ Rails.application.routes.draw do
       delete :remove_duplicates
       delete :remove_account_transactions
       delete :remove_all_transactions
+
+      # Balance adjustment routes
+      post :add_balance_adjustment
     end
   end
 
