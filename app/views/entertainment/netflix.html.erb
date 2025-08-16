@@ -1,0 +1,119 @@
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-900 dark:text-white">📺 Upload Netflix Viewing Data</h1>
+      <p class="mt-2 text-gray-600 dark:text-gray-400">Upload your Netflix viewing activity CSV file from your account</p>
+    </div>
+
+    <!-- Instructions -->
+    <div class="mb-8 p-4 bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 rounded-md">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+          </svg>
+        </div>
+        <div class="ml-3">
+          <h3 class="text-sm font-medium text-blue-800 dark:text-blue-200">How to get your Netflix viewing data:</h3>
+          <div class="mt-2 text-sm text-blue-700 dark:text-blue-300">
+            <ol class="list-decimal list-inside space-y-1">
+              <li>Go to <a href="https://www.netflix.com/viewingactivity" target="_blank" class="underline">netflix.com/viewingactivity</a></li>
+              <li>Sign in to your Netflix account</li>
+              <li>Click "Download all" at the bottom of the page</li>
+              <li>Netflix will prepare your data (this may take a few minutes)</li>
+              <li>Download the CSV file when it's ready</li>
+              <li>Upload the CSV file below</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Upload Netflix CSV File</h3>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          Select the CSV file downloaded from your Netflix viewing activity
+        </p>
+      </div>
+
+      <div class="p-6">
+        <%= form_with url: upload_netflix_entertainment_index_path, method: :post, multipart: true, local: true, class: "space-y-6" do |form| %>
+          <!-- File Upload -->
+          <div>
+            <%= form.label :file, "Netflix CSV File", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+            <div class="mt-1">
+              <%= form.file_field :file,
+                  accept: ".csv",
+                  required: true,
+                  class: "block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100 dark:file:bg-red-900 dark:file:text-red-300" %>
+            </div>
+            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              Upload the CSV file downloaded from Netflix viewing activity
+            </p>
+          </div>
+
+          <!-- Expected Format Info -->
+          <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-md p-4">
+            <h4 class="font-medium text-green-900 dark:text-green-200 mb-2">Expected CSV format:</h4>
+            <div class="text-sm text-green-800 dark:text-green-300 space-y-1">
+              <p><strong>Required columns:</strong></p>
+              <ul class="list-disc list-inside ml-4 space-y-1">
+                <li><strong>Title</strong> - Name of the movie or TV show episode</li>
+                <li><strong>Date</strong> - Date watched in M/D/YY format (e.g., "6/7/25")</li>
+              </ul>
+              <p class="mt-2"><strong>Example:</strong></p>
+              <div class="bg-white dark:bg-gray-800 rounded p-2 mt-1 font-mono text-xs">
+                Title,Date<br>
+                "Stranger Things: Season 4: Chapter One: The Hellfire Club","3/15/24"<br>
+                "The Crown: Season 5: Episode 1","3/14/24"
+              </div>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="flex justify-between">
+            <%= link_to "Cancel", entertainment_path,
+                class: "py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" %>
+            <%= form.submit "Upload Netflix Data",
+                class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Current Stats (if any data exists) -->
+    <% if current_user.entertainment_contents.netflix.any? %>
+      <div class="mt-8 bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white">Current Netflix Data</h3>
+        </div>
+        <div class="p-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="text-center">
+              <p class="text-2xl font-semibold text-red-600"><%= current_user.entertainment_contents.netflix.count %></p>
+              <p class="text-sm text-gray-500 dark:text-gray-400">Total items watched</p>
+            </div>
+            <div class="text-center">
+              <p class="text-2xl font-semibold text-red-600">
+                <%= current_user.entertainment_contents.netflix.minimum(:date_consumed)&.strftime("%Y") || "N/A" %>
+              </p>
+              <p class="text-sm text-gray-500 dark:text-gray-400">Earliest record</p>
+            </div>
+            <div class="text-center">
+              <p class="text-2xl font-semibold text-red-600">
+                <%= current_user.entertainment_contents.netflix.maximum(:date_consumed)&.strftime("%Y") || "N/A" %>
+              </p>
+              <p class="text-sm text-gray-500 dark:text-gray-400">Latest record</p>
+            </div>
+          </div>
+          <div class="mt-6">
+            <%= link_to "View All Netflix Records", view_netflix_entertainment_index_path,
+                class: "w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700" %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+  </div>
+</div>

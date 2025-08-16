@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_15_050953) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_15_120000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -208,6 +208,23 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_15_050953) do
     t.index ["user_id"], name: "index_email_messages_on_user_id"
   end
 
+  create_table "entertainment_contents", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.string "content_type", null: false
+    t.string "title", null: false
+    t.datetime "date_consumed", null: false
+    t.text "metadata"
+    t.text "description"
+    t.string "source"
+    t.datetime "imported_at", default: -> { "CURRENT_TIMESTAMP" }
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "content_type"], name: "index_entertainment_contents_on_user_id_and_content_type"
+    t.index ["user_id", "date_consumed"], name: "index_entertainment_contents_on_user_id_and_date_consumed"
+    t.index ["user_id", "title"], name: "index_entertainment_contents_on_user_id_and_title"
+    t.index ["user_id"], name: "index_entertainment_contents_on_user_id"
+  end
+
   create_table "health_allergies", force: :cascade do |t|
     t.integer "health_patient_id", null: false
     t.string "allergen"
@@ -381,6 +398,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_15_050953) do
   add_foreign_key "calendars", "users"
   add_foreign_key "contacts", "users"
   add_foreign_key "email_messages", "users"
+  add_foreign_key "entertainment_contents", "users"
   add_foreign_key "health_allergies", "health_patients"
   add_foreign_key "health_encounters", "health_patients"
   add_foreign_key "health_immunizations", "health_patients"

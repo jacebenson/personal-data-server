@@ -5,6 +5,7 @@ Rails.application.routes.draw do
   # Category pages
   get "financial", to: "categories#financial"
   get "personal", to: "categories#personal"
+  get "entertainment", to: "categories#entertainment"
 
   # Data uploads routes
   resources :data_uploads, only: [ :index ] do
@@ -53,6 +54,13 @@ Rails.application.routes.draw do
       post :sync_calendar, to: 'calendars#sync'
       delete :clear_calendars, to: 'calendars#clear_all'
       delete "remove_calendar/:id", to: 'calendars#destroy'
+
+      # Entertainment routes - redirected to dedicated controller
+      get :entertainment, to: redirect('/entertainment')
+      get :netflix, to: redirect('/entertainment/netflix')
+      post :upload_netflix, to: 'entertainment#upload_netflix'
+      get :view_netflix, to: redirect('/entertainment/view_netflix')
+      delete :clear_netflix, to: 'entertainment#clear_netflix'
 
       # Duplicate and account management
       get :manage_duplicates
@@ -115,6 +123,16 @@ Rails.application.routes.draw do
     collection do
       get :import
       post :process_import
+    end
+  end
+
+  # Entertainment content routes
+  resources :entertainment, only: [:index] do
+    collection do
+      get :netflix
+      post :upload_netflix
+      get :view_netflix
+      delete :clear_netflix
     end
   end
 
