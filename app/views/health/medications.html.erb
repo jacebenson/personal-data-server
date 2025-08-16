@@ -17,13 +17,13 @@
     </div>
   </div>
 
-  <!-- Current Medications -->
+  <!-- Active Medications -->
   <div class="mt-8">
-    <h2 class="text-lg font-medium text-gray-900 mb-4">Current Medications (<%= @current_medications.count %>)</h2>
-    <% if @current_medications.any? %>
+    <h2 class="text-lg font-medium text-gray-900 mb-4">Active Medications (<%= @active_medications.count %>)</h2>
+    <% if @active_medications.any? %>
       <div class="bg-white shadow overflow-hidden sm:rounded-md mb-8">
         <ul class="divide-y divide-gray-200">
-          <% @current_medications.each do |medication| %>
+          <% @active_medications.each do |medication| %>
             <li class="px-6 py-4">
               <div class="flex items-center justify-between">
                 <div class="flex-1">
@@ -88,8 +88,60 @@
         <svg class="mx-auto h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
         </svg>
-        <h3 class="mt-2 text-sm font-medium text-gray-900">No current medications</h3>
-        <p class="mt-1 text-sm text-gray-500">No current medications are on file for this patient.</p>
+        <h3 class="mt-2 text-sm font-medium text-gray-900">No active medications</h3>
+        <p class="mt-1 text-sm text-gray-500">No active medications are on file for this patient.</p>
+      </div>
+    <% end %>
+
+    <!-- Shotsy Injection History -->
+    <% if @shotsy_injections.any? %>
+      <h2 class="text-lg font-medium text-gray-900 mb-4">Recent Injections (<%= @shotsy_injections.count %>)</h2>
+      <div class="bg-white shadow overflow-hidden sm:rounded-md mb-8">
+        <ul class="divide-y divide-gray-200">
+          <% @shotsy_injections.each do |medication| %>
+            <li class="px-6 py-4 <%= medication.status == 'missed' ? 'bg-red-50' : 'bg-green-50' %>">
+              <div class="flex items-center justify-between">
+                <div class="flex-1">
+                  <div class="flex items-center">
+                    <p class="text-lg font-medium text-gray-900">
+                      <%= medication.medication_name %>
+                    </p>
+                    <span class="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= medication.status == 'completed' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' %>">
+                      <%= medication.status.capitalize %>
+                    </span>
+                  </div>
+                  <div class="mt-2 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-500">
+                    <% if medication.dosage.present? %>
+                      <span class="flex items-center">
+                        <svg class="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path>
+                          <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"></path>
+                        </svg>
+                        Dosage: <span class="ml-1 font-medium"><%= medication.dosage %></span>
+                      </span>
+                    <% end %>
+                    <% if medication.route.present? %>
+                      <span class="flex items-center">
+                        <svg class="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                        </svg>
+                        Route: <span class="ml-1 font-medium"><%= medication.route %></span>
+                      </span>
+                    <% end %>
+                    <% if medication.formatted_start_date.present? %>
+                      <span class="flex items-center">
+                        <svg class="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
+                        </svg>
+                        Date: <span class="ml-1 font-medium"><%= medication.formatted_start_date %></span>
+                      </span>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+            </li>
+          <% end %>
+        </ul>
       </div>
     <% end %>
 

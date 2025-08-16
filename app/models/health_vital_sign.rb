@@ -52,6 +52,22 @@ class HealthVitalSign < ApplicationRecord
     (temperature * 9.0 / 5.0) + 32
   end
 
+  def weight_lbs
+    return nil unless weight.present?
+    # Convert kg to lbs
+    (weight * 2.20462).round(1)
+  end
+
+  def weight_display
+    return '-' unless weight.present?
+    "#{weight_lbs} lbs"
+  end
+
+  def weight_with_hover
+    return '-' unless weight.present?
+    "<span title=\"#{weight.round(1)} kg\" class=\"cursor-help\">#{weight_lbs} lbs</span>".html_safe
+  end
+
   def has_vitals?
     [height, weight, bmi, systolic_bp, diastolic_bp, heart_rate,
      temperature, respiratory_rate, oxygen_saturation].any?(&:present?)

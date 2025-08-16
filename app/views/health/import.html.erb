@@ -9,31 +9,72 @@
       <% end %>
 
       <h1 class="mt-4 text-3xl font-bold text-gray-900 dark:text-white">Upload Health Data</h1>
-      <p class="mt-2 text-gray-600 dark:text-gray-400">Upload CCD or CCDA XML files exported from your healthcare provider</p>
+      <p class="mt-2 text-gray-600 dark:text-gray-400">Upload CCD/CCDA XML files from healthcare providers or Shotsy CSV tracking data</p>
     </div>
 
     <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
       <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Upload XML File</h3>
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Upload Health File</h3>
         <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-          Select the XML file exported from your healthcare provider's portal
+          Select XML files from healthcare providers or CSV files from health tracking apps
         </p>
       </div>
 
       <div class="p-6">
         <%= form_with url: process_import_health_index_path, method: :post, multipart: true, local: true, class: "space-y-6" do |form| %>
-          <!-- File Upload -->
+          <!-- File Type Selection -->
           <div>
-            <%= form.label :xml_file, "Health Data XML File", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
-            <div class="mt-1">
-              <%= form.file_field :xml_file,
-                  accept: ".xml,.XML",
-                  required: true,
-                  class: "block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900 dark:file:text-blue-300" %>
-            </div>
-            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-              Upload the XML file downloaded from your healthcare provider's patient portal
-            </p>
+            <fieldset class="space-y-4">
+              <legend class="text-sm font-medium text-gray-700 dark:text-gray-300">Select file type:</legend>
+              
+              <div class="space-y-4">
+                <!-- XML Upload Option -->
+                <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                  <div class="flex items-start">
+                    <div class="flex items-center h-5">
+                      <input id="xml_option" name="file_type" type="radio" value="xml" checked 
+                             class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 dark:border-gray-600">
+                    </div>
+                    <div class="ml-3 flex-1">
+                      <label for="xml_option" class="font-medium text-gray-700 dark:text-gray-300">
+                        Healthcare Provider XML (CCD/CCDA)
+                      </label>
+                      <p class="text-sm text-gray-500 dark:text-gray-400">
+                        Upload XML files exported from healthcare provider portals (Epic, Cerner, etc.)
+                      </p>
+                      <div class="mt-2" id="xml_upload_area">
+                        <%= form.file_field :xml_file,
+                            accept: ".xml,.XML",
+                            class: "block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900 dark:file:text-blue-300" %>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- CSV Upload Option -->
+                <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                  <div class="flex items-start">
+                    <div class="flex items-center h-5">
+                      <input id="csv_option" name="file_type" type="radio" value="csv" 
+                             class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 dark:border-gray-600">
+                    </div>
+                    <div class="ml-3 flex-1">
+                      <label for="csv_option" class="font-medium text-gray-700 dark:text-gray-300">
+                        Shotsy CSV Export
+                      </label>
+                      <p class="text-sm text-gray-500 dark:text-gray-400">
+                        Upload CSV data exported from the Shotsy app (GLP-1 medication tracking, weight, etc.)
+                      </p>
+                      <div class="mt-2" id="csv_upload_area" style="display: none;">
+                        <%= form.file_field :csv_file,
+                            accept: ".csv,.CSV",
+                            class: "block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100 dark:file:bg-green-900 dark:file:text-green-300" %>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </fieldset>
           </div>
 
           <!-- Expected Format Info -->
@@ -47,17 +88,34 @@
               <div class="ml-3">
                 <h3 class="text-sm font-medium text-blue-800 dark:text-blue-200">Supported Health Data Formats</h3>
                 <div class="mt-2 text-sm text-blue-700 dark:text-blue-300">
-                  <p>Your XML file should contain structured health data including:</p>
-                  <ul class="list-disc list-inside mt-1 space-y-1">
-                    <li>Patient demographic information</li>
-                    <li>Allergies and adverse reactions</li>
-                    <li>Current and past medications</li>
-                    <li>Medical problems and diagnoses</li>
-                    <li>Immunization records</li>
-                    <li>Vital signs and measurements</li>
-                    <li>Healthcare encounters and visits</li>
-                  </ul>
-                  <p class="mt-2"><strong>Supported formats:</strong> HL7 CCD, HL7 CCDA, Patient Health Summary documents</p>
+                  <div class="space-y-3">
+                    <div>
+                      <p class="font-semibold">XML Files (Healthcare Providers):</p>
+                      <ul class="list-disc list-inside mt-1 space-y-1">
+                        <li>Patient demographic information</li>
+                        <li>Allergies and adverse reactions</li>
+                        <li>Current and past medications</li>
+                        <li>Medical problems and diagnoses</li>
+                        <li>Immunization records</li>
+                        <li>Vital signs and measurements</li>
+                        <li>Healthcare encounters and visits</li>
+                      </ul>
+                      <p class="mt-1"><strong>Supported formats:</strong> HL7 CCD, HL7 CCDA, Patient Health Summary documents</p>
+                    </div>
+                    
+                    <div>
+                      <p class="font-semibold">CSV Files (Shotsy App):</p>
+                      <ul class="list-disc list-inside mt-1 space-y-1">
+                        <li>GLP-1 medication tracking (Semaglutide, Ozempic, etc.)</li>
+                        <li>Weight measurements and BMI</li>
+                        <li>Injection site and pain level tracking</li>
+                        <li>Side effect monitoring (nausea, appetite, etc.)</li>
+                        <li>Nutrition data (calories, protein)</li>
+                        <li>Daily notes and medication adherence</li>
+                      </ul>
+                      <p class="mt-1"><strong>Expected columns:</strong> Date, Shot, Avg Level (mg), Weight, Site, Pain Level, Side Effects</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -72,9 +130,16 @@
                 </svg>
               </div>
               <div class="ml-3">
-                <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-200">How to Export Health Data</h3>
-                <div class="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
-                  <p>Most healthcare providers offer health data exports through their patient portals. Look for options like "Download My Data", "Export Health Records", or "Continuity of Care Document (CCD)". Common providers include Epic MyChart, Cerner HealtheLife, and other EHR systems.</p>
+                <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-200">How to Export Data</h3>
+                <div class="mt-2 text-sm text-yellow-700 dark:text-yellow-300 space-y-2">
+                  <div>
+                    <p class="font-semibold">Healthcare Provider XML:</p>
+                    <p>Most providers offer data exports through patient portals. Look for "Download My Data", "Export Health Records", or "Continuity of Care Document (CCD)". Common systems: Epic MyChart, Cerner HealtheLife.</p>
+                  </div>
+                  <div>
+                    <p class="font-semibold">Shotsy CSV:</p>
+                    <p>In the Shotsy app, go to Settings → Export Data → Download CSV. This will include all your GLP-1 medication tracking, weight data, and side effect monitoring.</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -112,3 +177,36 @@
     </div>
   </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const xmlOption = document.getElementById('xml_option');
+  const csvOption = document.getElementById('csv_option');
+  const xmlUploadArea = document.getElementById('xml_upload_area');
+  const csvUploadArea = document.getElementById('csv_upload_area');
+  const xmlFileInput = document.querySelector('#xml_file');
+  const csvFileInput = document.querySelector('#csv_file');
+
+  function toggleUploadAreas() {
+    if (xmlOption.checked) {
+      xmlUploadArea.style.display = 'block';
+      csvUploadArea.style.display = 'none';
+      csvFileInput.value = '';
+      xmlFileInput.required = true;
+      csvFileInput.required = false;
+    } else if (csvOption.checked) {
+      xmlUploadArea.style.display = 'none';
+      csvUploadArea.style.display = 'block';
+      xmlFileInput.value = '';
+      xmlFileInput.required = false;
+      csvFileInput.required = true;
+    }
+  }
+
+  xmlOption.addEventListener('change', toggleUploadAreas);
+  csvOption.addEventListener('change', toggleUploadAreas);
+  
+  // Initialize on page load
+  toggleUploadAreas();
+});
+</script>

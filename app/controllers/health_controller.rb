@@ -31,9 +31,18 @@ class HealthController < ApplicationController
       total_encounters: @patient.health_encounters.count
     }
 
-    # Get all data for comprehensive view
+    # Get all data for comprehensive view with better sorting
     @allergies = @patient.health_allergies.order(:allergen)
-    @medications = @patient.health_medications.order(:medication_name)
+    @medications = @patient.health_medications
+                          .order(Arel.sql("
+                            CASE status
+                              WHEN 'active' THEN 1
+                              WHEN 'completed' THEN 2
+                              WHEN 'missed' THEN 3
+                              ELSE 4
+                            END,
+                            start_date DESC
+                          "))
     @problems = @patient.health_problems.order(:problem_name)
     @immunizations = @patient.health_immunizations.order(:administration_date)
     @vital_signs = @patient.health_vital_signs.order(:measurement_date)
@@ -63,12 +72,14 @@ class HealthController < ApplicationController
   end
 
   def process_import
-    if params[:xml_file].blank?
-      redirect_to import_health_index_path, alert: "Please select an XML file to import"
+    # Check if we have an XML file or CSV file
+    if params[:xml_file].blank? && params[:csv_file].blank?
+      redirect_to import_health_index_path, alert: "Please select a file to import (XML or CSV)"
       return
     end
 
-    uploaded_file = params[:xml_file]
+    uploaded_file = params[:xml_file] || params[:csv_file]
+    file_type = uploaded_file.original_filename.downcase.end_with?('.csv') ? :csv : :xml
 
     # Create temp directory if it doesn't exist
     temp_dir = Rails.root.join("tmp", "health_uploads")
@@ -81,12 +92,19 @@ class HealthController < ApplicationController
     end
 
     begin
-      # Process the import
-      import_service = HealthImportService.new
-      success = import_service.import_from_xml(temp_file_path.to_s)
+      # Process the import based on file type
+      if file_type == :csv
+        # Process Shotsy CSV import
+        import_service = ShotsyImportService.new
+        success = import_service.import_from_csv(temp_file_path.to_s)
+      else
+        # Process XML import (existing functionality)
+        import_service = HealthImportService.new
+        success = import_service.import_from_xml(temp_file_path.to_s)
+      end
 
       if success
-        redirect_to health_index_path, notice: build_success_message(import_service.summary)
+        redirect_to health_index_path, notice: build_success_message(import_service.summary, file_type)
       else
         redirect_to import_health_index_path, alert: "Import failed: #{import_service.errors.join(', ')}"
       end
@@ -106,8 +124,22 @@ class HealthController < ApplicationController
 
   def medications
     @patient = HealthPatient.find(params[:id])
-    @current_medications = @patient.health_medications.current.includes(:health_patient)
-    @historical_medications = @patient.health_medications.historical.includes(:health_patient)
+    
+    # Get all medications and sort them properly
+    all_medications = @patient.health_medications.includes(:health_patient)
+    
+    # Separate active medications from completed/missed injections
+    @active_medications = all_medications.where(status: 'active')
+                                        .order(:medication_name)
+    
+    # Get Shotsy injections (completed and missed) sorted by date descending
+    @shotsy_injections = all_medications.where(status: ['completed', 'missed'])
+                                       .order('start_date DESC')
+    
+    # Get other historical medications (not Shotsy injections)
+    @historical_medications = all_medications.where.not(status: ['active', 'completed', 'missed'])
+                                           .or(all_medications.where(status: 'active', end_date: ...Date.current))
+                                           .order('start_date DESC')
   end
 
   def problems
@@ -133,20 +165,22 @@ class HealthController < ApplicationController
 
   private
 
-  def build_success_message(summary)
+  def build_success_message(summary, file_type = :xml)
     parts = []
-    parts << "#{summary[:patients]} patient record updated" if summary[:patients] > 0
-    parts << "#{summary[:allergies]} allergies" if summary[:allergies] > 0
-    parts << "#{summary[:medications]} medications" if summary[:medications] > 0
-    parts << "#{summary[:problems]} problems" if summary[:problems] > 0
-    parts << "#{summary[:immunizations]} immunizations" if summary[:immunizations] > 0
-    parts << "#{summary[:vital_signs]} vital sign records" if summary[:vital_signs] > 0
-    parts << "#{summary[:encounters]} encounters" if summary[:encounters] > 0
+    parts << "#{summary[:patients]} patient record updated" if summary[:patients] && summary[:patients] > 0
+    parts << "#{summary[:allergies]} allergies" if summary[:allergies] && summary[:allergies] > 0
+    parts << "#{summary[:medications]} medications" if summary[:medications] && summary[:medications] > 0
+    parts << "#{summary[:problems]} problems" if summary[:problems] && summary[:problems] > 0
+    parts << "#{summary[:immunizations]} immunizations" if summary[:immunizations] && summary[:immunizations] > 0
+    parts << "#{summary[:vital_signs]} vital sign records" if summary[:vital_signs] && summary[:vital_signs] > 0
+    parts << "#{summary[:encounters]} encounters" if summary[:encounters] && summary[:encounters] > 0
 
+    source = file_type == :csv ? "Shotsy CSV" : "Health XML"
+    
     if parts.any?
-      "Successfully imported: #{parts.join(', ')}"
+      "Successfully imported from #{source}: #{parts.join(', ')}"
     else
-      "Import completed, but no new records were added"
+      "#{source} import completed, but no new records were added"
     end
   end
 end
