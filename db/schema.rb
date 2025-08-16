@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_15_120000) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_15_121000) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -366,6 +366,30 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_15_120000) do
     t.index ["user_id"], name: "index_linkedin_messages_on_user_id"
   end
 
+  create_table "podcast_feeds", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.string "title", null: false
+    t.text "description"
+    t.string "feed_url", null: false
+    t.string "website_url"
+    t.string "image_url"
+    t.string "author"
+    t.string "category"
+    t.string "language"
+    t.datetime "last_synced_at"
+    t.datetime "last_episode_date"
+    t.integer "episode_count", default: 0
+    t.boolean "active", default: true
+    t.text "sync_error"
+    t.text "metadata"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["last_synced_at"], name: "index_podcast_feeds_on_last_synced_at"
+    t.index ["user_id", "active"], name: "index_podcast_feeds_on_user_id_and_active"
+    t.index ["user_id", "feed_url"], name: "index_podcast_feeds_on_user_id_and_feed_url", unique: true
+    t.index ["user_id"], name: "index_podcast_feeds_on_user_id"
+  end
+
   create_table "social_security_earnings", force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "year", null: false
@@ -407,5 +431,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_15_120000) do
   add_foreign_key "health_vital_signs", "health_patients"
   add_foreign_key "investments", "users"
   add_foreign_key "linkedin_messages", "users"
+  add_foreign_key "podcast_feeds", "users"
   add_foreign_key "social_security_earnings", "users"
 end

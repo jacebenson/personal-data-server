@@ -14,6 +14,11 @@ development:
     class: CalendarSyncJob
     queue: default
     schedule: every 5 minutes
+  
+  podcast_sync:
+    class: PodcastSyncJob
+    queue: default
+    schedule: every 30 minutes
 
 production:
   clear_solid_queue_finished_jobs:
@@ -24,3 +29,13 @@ production:
     class: CalendarSyncJob
     queue: default
     schedule: every 5 minutes
+  
+  podcast_sync:
+    class: PodcastSyncJob
+    queue: default
+    schedule: every 30 minutes
+  
+  podcast_sync:
+    class: PodcastSyncJob
+    queue: default
+    schedule: every 30 minutes

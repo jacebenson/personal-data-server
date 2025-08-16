@@ -133,8 +133,23 @@ Rails.application.routes.draw do
       post :upload_netflix
       get :view_netflix
       delete :clear_netflix
+      
+      # Podcast feed management
+      get :podcasts
+      post :upload_opml
+      post :add_podcast_feed
+      delete :clear_podcast_feeds
+    end
+    
+    member do
+      post :sync_podcast_feed
+      patch :toggle_podcast_feed
+      delete :delete_podcast_feed
     end
   end
+  
+  # Podcast feed sync route (for syncing all)
+  post 'entertainment/sync_all_podcast_feeds', to: 'entertainment#sync_all_podcast_feeds'
 
   # API routes for AI model context providers
   namespace :api do

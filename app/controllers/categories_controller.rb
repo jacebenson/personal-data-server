@@ -29,10 +29,12 @@ class CategoriesController < ApplicationController
     @netflix_count = current_user.entertainment_contents.netflix.count
     @audible_books_count = current_user.entertainment_contents.audible_books.count
     @podcasts_count = current_user.entertainment_contents.podcasts.count
+    @podcast_feeds_count = current_user.podcast_feeds.active.count
     @total_content_count = current_user.entertainment_contents.count
 
     @last_netflix_upload = current_user.entertainment_contents.netflix.maximum(:imported_at)
     @last_audible_upload = current_user.entertainment_contents.audible_books.maximum(:imported_at)
     @last_podcast_upload = current_user.entertainment_contents.podcasts.maximum(:imported_at)
+    @last_podcast_sync = current_user.podcast_feeds.maximum(:last_synced_at)
   end
 end

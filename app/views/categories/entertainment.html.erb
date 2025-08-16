@@ -72,8 +72,8 @@
         </div>
       </div>
 
-      <!-- Podcasts (Placeholder) -->
-      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg opacity-50">
+      <!-- Podcasts -->
+      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
         <div class="p-6">
           <div class="flex items-center">
             <div class="flex-shrink-0">
@@ -82,25 +82,39 @@
               </svg>
             </div>
             <div class="ml-4 flex-1">
-              <h3 class="text-lg font-medium text-gray-900 dark:text-white">Podcasts</h3>
-              <p class="text-sm text-gray-500 dark:text-gray-400">Podcast episodes listened</p>
+              <h3 class="text-lg font-medium text-gray-900 dark:text-white">Podcast Feeds</h3>
+              <p class="text-sm text-gray-500 dark:text-gray-400">RSS feeds you subscribe to</p>
               <div class="mt-2">
-                <p class="text-2xl font-semibold text-gray-900 dark:text-white"><%= @podcasts_count %></p>
-                <p class="text-xs text-gray-500 dark:text-gray-400">Coming soon</p>
+                <p class="text-2xl font-semibold text-gray-900 dark:text-white"><%= @podcast_feeds_count %></p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">
+                  <% if @podcast_feeds_count > 0 %>
+                    Last sync: <%= @last_podcast_sync&.strftime("%B %d, %Y") || "Never" %>
+                  <% else %>
+                    No feeds added
+                  <% end %>
+                </p>
               </div>
             </div>
           </div>
           <div class="mt-6 space-y-3">
-            <button disabled class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-400 cursor-not-allowed">
-              Upload Coming Soon
-            </button>
+            <% if @podcast_feeds_count > 0 %>
+              <%= link_to "Manage Feeds", podcasts_entertainment_index_path,
+                  class: "w-full flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600" %>
+            <% end %>
+            <%= link_to "Add Podcast Feeds", podcasts_entertainment_index_path,
+                class: "w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500" %>
+            <% if @podcast_feeds_count > 0 %>
+              <%= link_to "Clear All Feeds", clear_podcast_feeds_entertainment_index_path, method: :delete,
+                  confirm: "Are you sure you want to delete all podcast feeds?",
+                  class: "w-full flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600" %>
+            <% end %>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Quick Stats Summary -->
-    <% if @total_content_count > 0 %>
+    <% if @total_content_count > 0 || @podcast_feeds_count > 0 %>
       <div class="mt-8 bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
         <div class="p-6">
           <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Entertainment Summary</h3>
@@ -114,11 +128,11 @@
               <p class="text-sm text-gray-500 dark:text-gray-400">Audible Books</p>
             </div>
             <div class="text-center">
-              <p class="text-2xl font-semibold text-purple-600"><%= @podcasts_count %></p>
-              <p class="text-sm text-gray-500 dark:text-gray-400">Podcast Episodes</p>
+              <p class="text-2xl font-semibold text-purple-600"><%= @podcast_feeds_count %></p>
+              <p class="text-sm text-gray-500 dark:text-gray-400">Podcast Feeds</p>
             </div>
             <div class="text-center">
-              <p class="text-2xl font-semibold text-gray-900 dark:text-white"><%= @total_content_count %></p>
+              <p class="text-2xl font-semibold text-gray-900 dark:text-white"><%= @total_content_count + @podcast_feeds_count %></p>
               <p class="text-sm text-gray-500 dark:text-gray-400">Total Items</p>
             </div>
           </div>
