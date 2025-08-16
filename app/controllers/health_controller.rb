@@ -1,4 +1,6 @@
 class HealthController < ApplicationController
+  before_action :authenticate_user!
+
   def index
     # Comprehensive health data view (formerly view_all)
     @patient = HealthPatient.first # For now, show first patient
