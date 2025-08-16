@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_16_044051) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_16_064937) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -309,6 +309,27 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_16_044051) do
     t.index ["health_patient_id"], name: "index_health_problems_on_health_patient_id"
   end
 
+  create_table "health_sleep_data", force: :cascade do |t|
+    t.integer "health_patient_id", null: false
+    t.string "session_date"
+    t.decimal "usage_hours"
+    t.integer "sleep_score"
+    t.decimal "ahi_score"
+    t.integer "leak_score"
+    t.integer "mask_score"
+    t.integer "usage_score"
+    t.integer "mask_session_count"
+    t.decimal "ahi"
+    t.decimal "leak_50_percentile"
+    t.decimal "leak_70_percentile"
+    t.decimal "leak_95_percentile"
+    t.string "mode"
+    t.string "device_serial"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["health_patient_id"], name: "index_health_sleep_data_on_health_patient_id"
+  end
+
   create_table "health_vital_signs", force: :cascade do |t|
     t.integer "health_patient_id", null: false
     t.string "measurement_date"
@@ -450,6 +471,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_16_044051) do
   add_foreign_key "health_immunizations", "health_patients"
   add_foreign_key "health_medications", "health_patients"
   add_foreign_key "health_problems", "health_patients"
+  add_foreign_key "health_sleep_data", "health_patients"
   add_foreign_key "health_vital_signs", "health_patients"
   add_foreign_key "investments", "users"
   add_foreign_key "linkedin_messages", "users"

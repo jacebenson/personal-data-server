@@ -131,6 +131,16 @@ Rails.application.routes.draw do
       get :import
       post :process_import
     end
+    
+    member do
+      get :allergies
+      get :medications
+      get :problems
+      get :immunizations
+      get :vital_signs
+      get :encounters
+      get :sleep_data
+    end
   end
 
   # Entertainment content routes

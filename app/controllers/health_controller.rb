@@ -28,7 +28,8 @@ class HealthController < ApplicationController
       active_problems: @patient.health_problems.where(status: "active").count,
       total_immunizations: @patient.health_immunizations.count,
       total_vital_signs: @patient.health_vital_signs.count,
-      total_encounters: @patient.health_encounters.count
+      total_encounters: @patient.health_encounters.count,
+      total_sleep_sessions: @patient.health_sleep_data.count
     }
 
     # Get all data for comprehensive view with better sorting
@@ -47,6 +48,7 @@ class HealthController < ApplicationController
     @immunizations = @patient.health_immunizations.order(:administration_date)
     @vital_signs = @patient.health_vital_signs.order(:measurement_date)
     @encounters = @patient.health_encounters.order(:encounter_date)
+    @sleep_data = @patient.health_sleep_data.order(session_date: :desc)
 
     # Date ranges
     @date_ranges = {
@@ -61,6 +63,10 @@ class HealthController < ApplicationController
       vital_signs: {
         earliest: @patient.health_vital_signs.where.not(measurement_date: [ nil, "" ]).minimum(:measurement_date),
         latest: @patient.health_vital_signs.where.not(measurement_date: [ nil, "" ]).maximum(:measurement_date)
+      },
+      sleep_data: {
+        earliest: @patient.health_sleep_data.where.not(session_date: [ nil, "" ]).minimum(:session_date),
+        latest: @patient.health_sleep_data.where.not(session_date: [ nil, "" ]).maximum(:session_date)
       }
     }
 
@@ -92,11 +98,20 @@ class HealthController < ApplicationController
     end
 
     begin
-      # Process the import based on file type
+      # Process the import based on file type and content
       if file_type == :csv
-        # Process Shotsy CSV import
-        import_service = ShotsyImportService.new
-        success = import_service.import_from_csv(temp_file_path.to_s)
+        # Determine CSV type by filename or content
+        filename = uploaded_file.original_filename.downcase
+        
+        if filename.include?('sleep_record') || filename.include?('resmed') || filename.include?('cpap')
+          # Process ResMed CPAP CSV import
+          import_service = ResmedCpapImportService.new
+          success = import_service.import_from_csv(temp_file_path.to_s)
+        else
+          # Process Shotsy CSV import
+          import_service = ShotsyImportService.new
+          success = import_service.import_from_csv(temp_file_path.to_s)
+        end
       else
         # Process XML import (existing functionality)
         import_service = HealthImportService.new
@@ -104,7 +119,7 @@ class HealthController < ApplicationController
       end
 
       if success
-        redirect_to health_index_path, notice: build_success_message(import_service.summary, file_type)
+        redirect_to health_index_path, notice: build_success_message(import_service.summary, file_type, import_service.class.name)
       else
         redirect_to import_health_index_path, alert: "Import failed: #{import_service.errors.join(', ')}"
       end
@@ -163,9 +178,14 @@ class HealthController < ApplicationController
     @encounters = @patient.health_encounters.includes(:health_patient).order(encounter_date: :desc)
   end
 
+  def sleep_data
+    @patient = HealthPatient.find(params[:id])
+    @sleep_sessions = @patient.health_sleep_data.includes(:health_patient).order(session_date: :desc)
+  end
+
   private
 
-  def build_success_message(summary, file_type = :xml)
+  def build_success_message(summary, file_type = :xml, service_class = nil)
     parts = []
     parts << "#{summary[:patients]} patient record updated" if summary[:patients] && summary[:patients] > 0
     parts << "#{summary[:allergies]} allergies" if summary[:allergies] && summary[:allergies] > 0
@@ -174,8 +194,17 @@ class HealthController < ApplicationController
     parts << "#{summary[:immunizations]} immunizations" if summary[:immunizations] && summary[:immunizations] > 0
     parts << "#{summary[:vital_signs]} vital sign records" if summary[:vital_signs] && summary[:vital_signs] > 0
     parts << "#{summary[:encounters]} encounters" if summary[:encounters] && summary[:encounters] > 0
+    parts << "#{summary[:sleep_sessions]} sleep sessions" if summary[:sleep_sessions] && summary[:sleep_sessions] > 0
 
-    source = file_type == :csv ? "Shotsy CSV" : "Health XML"
+    # Determine source based on service class
+    source = case service_class
+             when 'ResmedCpapImportService'
+               "ResMed CPAP CSV"
+             when 'ShotsyImportService'
+               "Shotsy CSV"
+             else
+               file_type == :csv ? "CSV" : "Health XML"
+             end
     
     if parts.any?
       "Successfully imported from #{source}: #{parts.join(', ')}"

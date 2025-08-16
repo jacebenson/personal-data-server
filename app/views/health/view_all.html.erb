@@ -92,7 +92,7 @@
     </div>
 
     <!-- Summary Stats -->
-    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-8">
+    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-8">
       <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
         <div class="p-5">
           <div class="flex items-center">
@@ -227,6 +227,28 @@
                 </dt>
                 <dd class="text-lg font-medium text-gray-900 dark:text-white">
                   <%= @summary_stats[:total_encounters] %>
+                </dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg class="h-6 w-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+              </svg>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
+                  Sleep Sessions
+                </dt>
+                <dd class="text-lg font-medium text-gray-900 dark:text-white">
+                  <%= @summary_stats[:total_sleep_sessions] %>
                 </dd>
               </dl>
             </div>
@@ -738,6 +760,172 @@
             </h3>
             <p class="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-400">
               No healthcare encounters found in the imported data.
+            </p>
+          </div>
+        </div>
+      <% end %>
+
+      <!-- Sleep Data Section -->
+      <% if @sleep_data.any? %>
+        <details class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+          <summary class="px-4 py-5 sm:px-6 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700">
+            <div class="flex justify-between items-center">
+              <div>
+                <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white flex items-center">
+                  <svg class="h-5 w-5 text-purple-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                  </svg>
+                  Sleep Data (<%= @sleep_data.count %>)
+                </h3>
+                <p class="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-400">
+                  CPAP therapy sessions and sleep quality metrics
+                </p>
+              </div>
+              <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </div>
+          </summary>
+          <div class="border-t border-gray-200 dark:border-gray-700">
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead class="bg-gray-50 dark:bg-gray-800">
+                  <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Date</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Usage</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">AHI</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Sleep Score</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Mask Fit</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Leak</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Compliance</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Mode</th>
+                  </tr>
+                </thead>
+                <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+                  <% @sleep_data.each do |session| %>
+                    <tr class="health-record-row">
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <%= session.formatted_date %>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <div>
+                          <span class="font-medium"><%= session.usage_hours_display %></span>
+                          <div class="text-xs text-gray-400">
+                            <%= session.compliance_percentage %>% compliance
+                          </div>
+                        </div>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <% if session.ahi.present? %>
+                          <div>
+                            <span class="font-medium"><%= session.ahi %></span>
+                            <div class="text-xs">
+                              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= 
+                                case session.ahi_severity
+                                when 'Normal'
+                                  'bg-green-100 text-green-800'
+                                when 'Mild'
+                                  'bg-yellow-100 text-yellow-800'
+                                when 'Moderate'
+                                  'bg-orange-100 text-orange-800'
+                                when 'Severe'
+                                  'bg-red-100 text-red-800'
+                                else
+                                  'bg-gray-100 text-gray-800'
+                                end
+                              %>">
+                                <%= session.ahi_severity %>
+                              </span>
+                            </div>
+                          </div>
+                        <% else %>
+                          -
+                        <% end %>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <% if session.sleep_score.present? %>
+                          <div>
+                            <span class="font-medium"><%= session.sleep_score %></span>
+                            <div class="text-xs">
+                              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= 
+                                case session.sleep_quality_indicator
+                                when 'Excellent'
+                                  'bg-green-100 text-green-800'
+                                when 'Good'
+                                  'bg-blue-100 text-blue-800'
+                                when 'Fair'
+                                  'bg-yellow-100 text-yellow-800'
+                                when 'Poor'
+                                  'bg-red-100 text-red-800'
+                                else
+                                  'bg-gray-100 text-gray-800'
+                                end
+                              %>">
+                                <%= session.sleep_quality_indicator %>
+                              </span>
+                            </div>
+                          </div>
+                        <% else %>
+                          -
+                        <% end %>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <% if session.mask_score.present? %>
+                          <div>
+                            <span class="font-medium"><%= session.mask_score %></span>
+                            <div class="text-xs text-gray-400"><%= session.mask_fit_status %></div>
+                          </div>
+                        <% else %>
+                          -
+                        <% end %>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <% if session.leak_score.present? %>
+                          <div>
+                            <span class="font-medium"><%= session.leak_score %></span>
+                            <div class="text-xs text-gray-400"><%= session.leak_status %></div>
+                          </div>
+                        <% else %>
+                          -
+                        <% end %>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= 
+                          case session.compliance_status
+                          when 'Compliant'
+                            'bg-green-100 text-green-800'
+                          when 'Partial'
+                            'bg-yellow-100 text-yellow-800'
+                          when 'Non-compliant'
+                            'bg-red-100 text-red-800'
+                          else
+                            'bg-gray-100 text-gray-800'
+                          end
+                        %>">
+                          <%= session.compliance_status %>
+                        </span>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <%= session.mode.present? ? session.mode : '-' %>
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+      <% else %>
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+          <div class="px-4 py-5 sm:px-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white flex items-center">
+              <svg class="h-5 w-5 text-purple-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+              </svg>
+              Sleep Data (0)
+            </h3>
+            <p class="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-400">
+              No sleep therapy data found. Import your ResMed CPAP data to track sleep quality and compliance.
             </p>
           </div>
         </div>

@@ -5,6 +5,7 @@ class HealthPatient < ApplicationRecord
   has_many :health_immunizations, dependent: :destroy
   has_many :health_vital_signs, dependent: :destroy
   has_many :health_encounters, dependent: :destroy
+  has_many :health_sleep_data, dependent: :destroy, class_name: 'HealthSleepData'
 
   validates :first_name, presence: true
   validates :last_name, presence: true

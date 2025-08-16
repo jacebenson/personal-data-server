@@ -60,10 +60,10 @@
                     </div>
                     <div class="ml-3 flex-1">
                       <label for="csv_option" class="font-medium text-gray-700 dark:text-gray-300">
-                        Shotsy CSV Export
+                        Health Tracking CSV Files
                       </label>
                       <p class="text-sm text-gray-500 dark:text-gray-400">
-                        Upload CSV data exported from the Shotsy app (GLP-1 medication tracking, weight, etc.)
+                        Upload CSV data from Shotsy app (GLP-1 medication tracking), ResMed CPAP devices (sleep data), or other health tracking apps
                       </p>
                       <div class="mt-2" id="csv_upload_area" style="display: none;">
                         <%= form.file_field :csv_file,
@@ -115,6 +115,19 @@
                       </ul>
                       <p class="mt-1"><strong>Expected columns:</strong> Date, Shot, Avg Level (mg), Weight, Site, Pain Level, Side Effects</p>
                     </div>
+                    
+                    <div>
+                      <p class="font-semibold">CSV Files (ResMed CPAP):</p>
+                      <ul class="list-disc list-inside mt-1 space-y-1">
+                        <li>Sleep session duration and usage hours</li>
+                        <li>AHI (Apnea-Hypopnea Index) scores</li>
+                        <li>Sleep quality scores and metrics</li>
+                        <li>Mask fit and leak measurements</li>
+                        <li>CPAP compliance tracking</li>
+                        <li>Therapy mode and device settings</li>
+                      </ul>
+                      <p class="mt-1"><strong>Expected filename:</strong> SLEEP_RECORD.csv (from ResMed myAir app export)</p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -139,6 +152,10 @@
                   <div>
                     <p class="font-semibold">Shotsy CSV:</p>
                     <p>In the Shotsy app, go to Settings → Export Data → Download CSV. This will include all your GLP-1 medication tracking, weight data, and side effect monitoring.</p>
+                  </div>
+                  <div>
+                    <p class="font-semibold">ResMed CPAP CSV:</p>
+                    <p>In the ResMed myAir app, request your data export via email. ResMed will send you a ZIP file containing SLEEP_RECORD.csv with your therapy data including usage hours, AHI scores, and compliance metrics.</p>
                   </div>
                 </div>
               </div>
