@@ -15,6 +15,7 @@ class LinkedinMessage < ApplicationRecord
 
   # Search methods
   scope :search_content, ->(term) { where("content LIKE ? COLLATE NOCASE", "%#{term}%") }
+  scope :search_subject, ->(term) { where("subject LIKE ? COLLATE NOCASE", "%#{term}%") }
   scope :search_participant, ->(term) { where("from_name LIKE ? COLLATE NOCASE OR to_name LIKE ? COLLATE NOCASE", "%#{term}%", "%#{term}%") }
 
   def conversation_participants

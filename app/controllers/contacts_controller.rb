@@ -3,7 +3,7 @@ class ContactsController < ApplicationController
 
   def index
     # Check if we should show the contact list or upload form
-    if params[:show] == 'true' || request.path == '/contacts'
+    if params[:show] == 'true'
       # Show contact list (same as old view_contacts)
       page = params[:page].to_i
       page = 1 if page < 1
@@ -33,7 +33,7 @@ class ContactsController < ApplicationController
       
       render 'show'
     else
-      # Show contact upload form
+      # Show contact upload form (renders index.html.erb by default)
     end
   end
 

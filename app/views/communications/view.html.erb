@@ -20,11 +20,11 @@
     <!-- Message Type Navigation -->
     <div class="mb-8">
       <nav class="flex space-x-1 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
-        <%= link_to view_communications_path(type: 'email'),
+        <%= link_to view_communications_path({type: 'email'}.merge(@search_params)),
             class: "flex-1 text-center px-4 py-2 text-sm font-medium rounded-md transition-colors #{'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow' if @message_type != 'linkedin'} #{'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300' if @message_type == 'linkedin'}" do %>
           📧 Email Messages (<%= number_with_delimiter(current_user.email_messages.count) %>)
         <% end %>
-        <%= link_to view_communications_path(type: 'linkedin'),
+        <%= link_to view_communications_path({type: 'linkedin'}.merge(@search_params)),
             class: "flex-1 text-center px-4 py-2 text-sm font-medium rounded-md transition-colors #{'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow' if @message_type == 'linkedin'} #{'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300' if @message_type != 'linkedin'}" do %>
           💼 LinkedIn Messages (<%= number_with_delimiter(current_user.linkedin_messages.count) %>)
         <% end %>
@@ -128,19 +128,201 @@
     <div class="mb-6 bg-white dark:bg-gray-800 shadow rounded-lg p-6">
       <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Filters</h3>
       <div class="flex flex-wrap gap-4">
-        <%= link_to view_communications_path(type: @message_type),
+        <%= link_to view_communications_path({type: @message_type}.merge(@search_params)),
             class: "inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium #{'bg-blue-50 text-blue-700 border-blue-300' if @filtered_folder.blank?} #{'text-gray-700 bg-white hover:bg-gray-50' if @filtered_folder.present?} dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600" do %>
-          All Folders (<%= @total_messages %>)
+          All Folders 
+          <% if @search_params.any? %>
+            (<%= @total_count %>)
+          <% else %>
+            (<%= @total_messages %>)
+          <% end %>
         <% end %>
 
         <% @folders.each do |folder, count| %>
-          <%= link_to view_communications_path(type: @message_type, folder: folder),
+          <%= link_to view_communications_path({type: @message_type, folder: folder}.merge(@search_params)),
               class: "inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium #{'bg-blue-50 text-blue-700 border-blue-300' if @filtered_folder == folder} #{'text-gray-700 bg-white hover:bg-gray-50' if @filtered_folder != folder} dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600" do %>
             <%= folder %> (<%= count %>)
           <% end %>
         <% end %>
       </div>
     </div>
+
+    <!-- Search -->
+    <div class="mb-6 bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+      <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Search Messages</h3>
+      <%= form_with url: view_communications_path, method: :get, local: true, class: "space-y-4" do |form| %>
+        <%= form.hidden_field :type, value: @message_type %>
+        <%= form.hidden_field :folder, value: @filtered_folder if @filtered_folder.present? %>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div>
+            <%= form.label :search_subject, @message_type == 'linkedin' ? 'Search Subject/Content' : 'Search Subject', class: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" %>
+            <%= form.text_field :search_subject, 
+                value: @search_subject,
+                placeholder: @message_type == 'linkedin' ? 'Enter subject or content...' : 'Enter subject...',
+                class: "w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" %>
+          </div>
+          
+          <div>
+            <%= form.label :search_from, @message_type == 'linkedin' ? 'Search Participant' : 'Search From/To', class: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" %>
+            <%= form.text_field :search_from, 
+                value: @search_from,
+                placeholder: @message_type == 'linkedin' ? 'Enter participant name (searches contacts too)...' : 'Enter sender or recipient name/email (searches contacts too)...',
+                class: "w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" %>
+          </div>
+          
+          <div>
+            <%= form.label :search_date_from, 'From Date', class: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" %>
+            <%= form.date_field :search_date_from, 
+                value: @search_date_from,
+                class: "w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" %>
+          </div>
+          
+          <div>
+            <%= form.label :search_date_to, 'To Date', class: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" %>
+            <%= form.date_field :search_date_to, 
+                value: @search_date_to,
+                class: "w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" %>
+          </div>
+        </div>
+        
+        <div class="flex items-center space-x-4">
+          <%= form.submit "Search", class: "inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
+          
+          <% if @search_params.any? %>
+            <%= link_to view_communications_path(type: @message_type, folder: @filtered_folder),
+                class: "inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600" do %>
+              Clear Search
+            <% end %>
+          <% end %>
+        </div>
+        
+        <div class="text-xs text-gray-500 dark:text-gray-400">
+          <strong>💡 Tip:</strong> The "From" search is smart! Try typing just "ty" to find "Ty Roach" or partial names to find matching contacts and their email addresses.
+        </div>
+        
+        <% if @search_params.any? %>
+          <div class="text-sm text-gray-600 dark:text-gray-400">
+            <strong>Active filters:</strong>
+            <% if @search_subject.present? %>
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 ml-2">
+                <%= @message_type == 'linkedin' ? 'Subject/Content' : 'Subject' %>: <%= @search_subject %>
+              </span>
+            <% end %>
+            <% if @search_from.present? %>
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 ml-2">
+                <%= @message_type == 'linkedin' ? 'Participant' : 'From/To' %>: <%= @search_from %>
+              </span>
+            <% end %>
+            <% if @search_date_from.present? %>
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 ml-2">
+                From: <%= @search_date_from %>
+              </span>
+            <% end %>
+            <% if @search_date_to.present? %>
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 ml-2">
+                To: <%= @search_date_to %>
+              </span>
+            <% end %>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+
+    <!-- Search Debug Information -->
+    <% if @search_params.any? && (@debug_contact_emails || @debug_search_conditions) %>
+      <div class="mb-6 bg-yellow-50 dark:bg-yellow-900 border border-yellow-200 dark:border-yellow-700 rounded-lg p-4">
+      <!--lets make a details look ni0ce, it right now has the list indicator and the h4 is on a nwe line-->
+      <details class="group cursor-pointer bg-yellow-100 dark:bg-yellow-800 rounded-lg p-4">
+        <summary class="cursor-pointer text-yellow-800 dark:text-yellow-200 font-semibold">
+          Debug Information <span class="text-xs text-gray-500 dark:text-gray-400">(click to expand)</span>
+        </summary>
+        
+        <% if @search_from.present? %>
+          <div class="text-xs text-yellow-700 dark:text-yellow-300 space-y-2">
+            <div><strong>Search term:</strong> "<%= @search_from %>"</div>
+            <div><strong>Total contacts in database:</strong> <%= @debug_total_contacts %></div>
+            
+            <% if @debug_detailed %>
+              <div class="border-t border-yellow-200 dark:border-yellow-700 pt-2">
+                <strong>Improved Search Logic:</strong>
+                
+                <% if @debug_detailed[:search_words] && @debug_detailed[:search_words].length > 1 %>
+                  <div class="ml-2">
+                    <strong>Search words:</strong> <%= @debug_detailed[:search_words].join(", ") %>
+                  </div>
+                <% end %>
+                
+                <% if @debug_detailed[:exact_matches]&.any? %>
+                  <div class="ml-2 mt-1">
+                    <strong>📍 Exact matches (highest priority):</strong>
+                    <% @debug_detailed[:exact_matches].each do |contact| %>
+                      <div class="ml-2 text-green-700 dark:text-green-300">✓ ID <%= contact.id %>: <%= contact.full_name %> - <%= contact.emails %></div>
+                    <% end %>
+                  </div>
+                <% end %>
+                
+                <% if @debug_detailed[:word_matches]&.any? %>
+                  <div class="ml-2 mt-1">
+                    <strong>🔍 Word-by-word matches (all words must match):</strong>
+                    <% @debug_detailed[:word_matches].each do |contact| %>
+                      <div class="ml-2 text-blue-700 dark:text-blue-300">✓ ID <%= contact.id %>: <%= contact.full_name %> - <%= contact.emails %></div>
+                    <% end %>
+                  </div>
+                <% end %>
+                
+                <% if @debug_detailed[:full_term_matches]&.any? %>
+                  <div class="ml-2 mt-1">
+                    <strong>📝 Partial matches (any field contains full term):</strong>
+                    <% @debug_detailed[:full_term_matches].each do |contact| %>
+                      <div class="ml-2 text-gray-600 dark:text-gray-400">- ID <%= contact.id %>: <%= contact.full_name %> - <%= contact.emails %></div>
+                    <% end %>
+                  </div>
+                <% end %>
+                
+                <% if @debug_detailed[:contact_2150] %>
+                  <div class="ml-2 mt-1">
+                    <strong>Contact ID 2150:</strong> <%= @debug_detailed[:contact_2150].full_name %> 
+                    (<%= @debug_detailed[:contact_2150].emails %>)
+                    <br><small>Display: <%= @debug_detailed[:contact_2150].display_name %>, 
+                    Given: <%= @debug_detailed[:contact_2150].given_name %>, 
+                    Family: <%= @debug_detailed[:contact_2150].family_name %></small>
+                  </div>
+                <% else %>
+                  <div class="ml-2"><strong>Contact ID 2150:</strong> Not found</div>
+                <% end %>
+                
+                <div class="ml-2 mt-1">
+                  <strong>Total contacts with emails:</strong> <%= @debug_detailed[:total_contacts_with_emails] %>
+                </div>
+              </div>
+            <% end %>
+            
+            <div class="border-t border-yellow-200 dark:border-yellow-700 pt-2">
+              <% if @debug_contact_names && @debug_contact_names.any? %>
+                <div><strong>Matching contact names:</strong> <%= @debug_contact_names.join(", ") %></div>
+              <% else %>
+                <div><strong>Matching contact names:</strong> <em>None found</em></div>
+              <% end %>
+              
+              <% if @debug_contact_emails && @debug_contact_emails.any? %>
+                <div><strong>Found contact emails:</strong> <%= @debug_contact_emails.join(", ") %></div>
+              <% else %>
+                <div><strong>Found contact emails:</strong> <em>None found</em></div>
+              <% end %>
+            </div>
+            
+            <% if @debug_search_conditions %>
+              <div class="border-t border-yellow-200 dark:border-yellow-700 pt-2">
+                <div><strong>Search SQL condition:</strong> <code class="bg-yellow-100 dark:bg-yellow-800 px-1 rounded text-xs"><%= @debug_search_conditions[0] %></code></div>
+                <div><strong>Search parameters:</strong> <code class="bg-yellow-100 dark:bg-yellow-800 px-1 rounded text-xs"><%= @debug_search_conditions[1..-1].inspect %></code></div>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+        </details>
+      </div>
+    <% end %>
 
     <!-- Messages Table -->
     <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-md">
@@ -306,13 +488,13 @@
       <div class="mt-6 flex items-center justify-between">
         <div class="flex-1 flex justify-between sm:hidden">
           <% if @has_prev %>
-            <%= link_to view_communications_path(type: @message_type, page: @current_page - 1, folder: @filtered_folder),
+            <%= link_to view_communications_path({type: @message_type, page: @current_page - 1, folder: @filtered_folder}.merge(@search_params)),
                 class: "relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600" do %>
               Previous
             <% end %>
           <% end %>
           <% if @has_next %>
-            <%= link_to view_communications_path(type: @message_type, page: @current_page + 1, folder: @filtered_folder),
+            <%= link_to view_communications_path({type: @message_type, page: @current_page + 1, folder: @filtered_folder}.merge(@search_params)),
                 class: "ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600" do %>
               Next
             <% end %>
@@ -327,7 +509,7 @@
           <div>
             <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
               <% if @has_prev %>
-                <%= link_to view_communications_path(type: @message_type, page: @current_page - 1, folder: @filtered_folder),
+                <%= link_to view_communications_path({type: @message_type, page: @current_page - 1, folder: @filtered_folder}.merge(@search_params)),
                     class: "relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600" do %>
                   <span class="sr-only">Previous</span>
                   <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
@@ -342,7 +524,7 @@
                     <%= page_num %>
                   </span>
                 <% else %>
-                  <%= link_to view_communications_path(type: @message_type, page: page_num, folder: @filtered_folder),
+                  <%= link_to view_communications_path({type: @message_type, page: page_num, folder: @filtered_folder}.merge(@search_params)),
                       class: "relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600" do %>
                     <%= page_num %>
                   <% end %>
@@ -350,7 +532,7 @@
               <% end %>
 
               <% if @has_next %>
-                <%= link_to view_communications_path(type: @message_type, page: @current_page + 1, folder: @filtered_folder),
+                <%= link_to view_communications_path({type: @message_type, page: @current_page + 1, folder: @filtered_folder}.merge(@search_params)),
                     class: "relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600" do %>
                   <span class="sr-only">Next</span>
                   <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
