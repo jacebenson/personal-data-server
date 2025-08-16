@@ -57,6 +57,12 @@ class EntertainmentController < ApplicationController
     netflix_scope = current_user.entertainment_contents.netflix
     netflix_scope = netflix_scope.by_year(params[:filter_year]) if params[:filter_year].present?
 
+    # Add search functionality
+    if params[:search].present?
+      search_term = "%#{params[:search].downcase}%"
+      netflix_scope = netflix_scope.where("LOWER(title) LIKE ?", search_term)
+    end
+
     @netflix_records = netflix_scope.recent.limit(per_page).offset(offset)
     @total_count = netflix_scope.count
     @current_page = page
@@ -64,6 +70,7 @@ class EntertainmentController < ApplicationController
     @has_next = page < @total_pages
     @has_prev = page > 1
     @filter_year = params[:filter_year]
+    @search = params[:search]
 
     # Summary stats
     @years_available = current_user.entertainment_contents.netflix
@@ -121,6 +128,12 @@ class EntertainmentController < ApplicationController
     youtube_scope = current_user.entertainment_contents.youtube
     youtube_scope = youtube_scope.by_year(params[:filter_year]) if params[:filter_year].present?
 
+    # Add search functionality
+    if params[:search].present?
+      search_term = "%#{params[:search].downcase}%"
+      youtube_scope = youtube_scope.where("LOWER(title) LIKE ?", search_term)
+    end
+
     @youtube_records = youtube_scope.recent.limit(per_page).offset(offset)
     @total_count = youtube_scope.count
     @current_page = page
@@ -128,6 +141,7 @@ class EntertainmentController < ApplicationController
     @has_next = page < @total_pages
     @has_prev = page > 1
     @filter_year = params[:filter_year]
+    @search = params[:search]
 
     # Summary stats
     @years_available = current_user.entertainment_contents.youtube

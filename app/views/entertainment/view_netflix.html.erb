@@ -2,7 +2,19 @@
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="mb-8">
       <h1 class="text-3xl font-bold text-gray-900 dark:text-white">📺 Netflix Viewing History</h1>
-      <p class="mt-2 text-gray-600 dark:text-gray-400">Your complete Netflix viewing activity</p>
+      <p class="mt-2 text-gray-600 dark:text-gray-400">
+        <% if @search.present? %>
+          Search results for "<%= @search %>" - <%= pluralize(@total_count, 'title') %> found
+          <% if @filter_year.present? %>
+            in <%= @filter_year %>
+          <% end %>
+        <% else %>
+          Your complete Netflix viewing activity
+          <% if @filter_year.present? %>
+            for <%= @filter_year %>
+          <% end %>
+        <% end %>
+      </p>
     </div>
 
     <!-- Summary Stats -->
@@ -83,16 +95,40 @@
     <!-- Filters -->
     <div class="bg-white dark:bg-gray-800 shadow rounded-lg mb-6">
       <div class="p-6">
-        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Filters</h3>
-        <%= form_tag view_netflix_entertainment_index_path, method: :get, local: true, class: "flex flex-wrap gap-4" do %>
-          <div class="flex-1 min-w-0">
-            <%= select_tag :filter_year, 
-                options_for_select([["All Years", ""]] + @years_available.map { |year| [year, year] }, @filter_year),
-                class: "block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-red-500 focus:ring-red-500" %>
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Search & Filters</h3>
+        <%= form_tag view_netflix_entertainment_index_path, method: :get, local: true, class: "space-y-4" do %>
+          <!-- Search Field -->
+          <div class="flex flex-col sm:flex-row gap-4">
+            <div class="flex-1">
+              <%= text_field_tag :search, 
+                  @search,
+                  placeholder: "Search Netflix titles... (Press '/' to focus)",
+                  class: "block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-red-500 focus:ring-red-500",
+                  id: "netflix_search" %>
+            </div>
+            <div class="flex gap-2">
+              <%= submit_tag "Search", 
+                  class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" %>
+              <% if @search.present? %>
+                <%= link_to "Clear", view_netflix_entertainment_index_path(filter_year: @filter_year),
+                    class: "inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" %>
+              <% end %>
+            </div>
           </div>
-          <div class="flex space-x-3">
-            <%= submit_tag "Apply Filters", class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" %>
-            <%= link_to "Clear Filters", view_netflix_entertainment_index_path, class: "inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" %>
+          <!-- Search Results Info -->
+          <% if params[:search].present? %>
+            <div class="text-sm text-gray-600 dark:text-gray-400">
+              Showing results for "<%= params[:search] %>" - <%= pluralize(@total_count, 'title') %> found
+            </div>
+          <% end %>
+          <!-- Year Filter -->
+          <div class="flex flex-wrap gap-4">
+            <div class="flex-1 min-w-0">
+              <%= select_tag :filter_year, 
+                  options_for_select([["All Years", ""]] + @years_available.map { |year| [year, year] }, @filter_year),
+                  class: "block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-red-500 focus:ring-red-500",
+                  onchange: "this.form.submit();" %>
+            </div>
           </div>
         <% end %>
       </div>
@@ -104,8 +140,15 @@
         <div class="flex justify-between items-center mb-4">
           <h3 class="text-lg font-medium text-gray-900 dark:text-white">
             Netflix Viewing Records
-            <% if @filter_year.present? %>
-              <span class="text-sm font-normal text-gray-500 dark:text-gray-400">- <%= @filter_year %></span>
+            <% if @filter_year.present? || @search.present? %>
+              <span class="text-sm font-normal text-gray-500 dark:text-gray-400">
+                <% if @search.present? %>
+                  - Results for "<%= @search %>"
+                <% end %>
+                <% if @filter_year.present? %>
+                  - <%= @filter_year %>
+                <% end %>
+              </span>
             <% end %>
           </h3>
           <div class="space-x-3">
@@ -142,10 +185,10 @@
             <div class="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 sm:px-6 mt-4">
               <div class="flex flex-1 justify-between sm:hidden">
                 <% if @has_prev %>
-                  <%= link_to "Previous", view_netflix_entertainment_index_path(page: @current_page - 1, filter_year: @filter_year), class: "relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50" %>
+                  <%= link_to "Previous", view_netflix_entertainment_index_path(page: @current_page - 1, filter_year: @filter_year, search: @search), class: "relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50" %>
                 <% end %>
                 <% if @has_next %>
-                  <%= link_to "Next", view_netflix_entertainment_index_path(page: @current_page + 1, filter_year: @filter_year), class: "relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50" %>
+                  <%= link_to "Next", view_netflix_entertainment_index_path(page: @current_page + 1, filter_year: @filter_year, search: @search), class: "relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50" %>
                 <% end %>
               </div>
               <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
@@ -158,7 +201,7 @@
                 <div>
                   <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
                     <% if @has_prev %>
-                      <%= link_to view_netflix_entertainment_index_path(page: @current_page - 1, filter_year: @filter_year), class: "relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-none focus:ring-2 focus:ring-red-500" do %>
+                      <%= link_to view_netflix_entertainment_index_path(page: @current_page - 1, filter_year: @filter_year, search: @search), class: "relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-none focus:ring-2 focus:ring-red-500" do %>
                         <span class="sr-only">Previous</span>
                         <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                           <path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clip-rule="evenodd" />
@@ -175,12 +218,12 @@
                       <% if page == @current_page %>
                         <span class="relative z-10 inline-flex items-center bg-red-600 px-4 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"><%= page %></span>
                       <% else %>
-                        <%= link_to page, view_netflix_entertainment_index_path(page: page, filter_year: @filter_year), class: "relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-none focus:ring-2 focus:ring-red-500" %>
+                        <%= link_to page, view_netflix_entertainment_index_path(page: page, filter_year: @filter_year, search: @search), class: "relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-none focus:ring-2 focus:ring-red-500" %>
                       <% end %>
                     <% end %>
 
                     <% if @has_next %>
-                      <%= link_to view_netflix_entertainment_index_path(page: @current_page + 1, filter_year: @filter_year), class: "relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-none focus:ring-2 focus:ring-red-500" do %>
+                      <%= link_to view_netflix_entertainment_index_path(page: @current_page + 1, filter_year: @filter_year, search: @search), class: "relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-none focus:ring-2 focus:ring-red-500" do %>
                         <span class="sr-only">Next</span>
                         <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                           <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
@@ -210,3 +253,13 @@
 
   </div>
 </div>
+
+<script>
+  // Focus search field when '/' is pressed
+  document.addEventListener('keydown', function(e) {
+    if (e.key === '/' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+      e.preventDefault();
+      document.getElementById('netflix_search').focus();
+    }
+  });
+</script>

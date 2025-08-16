@@ -5,9 +5,16 @@
         <div>
           <h1 class="text-3xl font-bold text-gray-900 dark:text-white">📺 YouTube Watch History</h1>
           <p class="mt-2 text-gray-600 dark:text-gray-400">
-            <%= @total_count %> videos watched
-            <% if @filter_year.present? %>
-              in <%= @filter_year %>
+            <% if @search.present? %>
+              Search results for "<%= @search %>" - <%= pluralize(@total_count, 'video') %> found
+              <% if @filter_year.present? %>
+                in <%= @filter_year %>
+              <% end %>
+            <% else %>
+              <%= pluralize(@total_count, 'video') %> watched
+              <% if @filter_year.present? %>
+                in <%= @filter_year %>
+              <% end %>
             <% end %>
           </p>
         </div>
@@ -99,25 +106,65 @@
       </div>
     </div>
 
-    <!-- Filters -->
+    <!-- Search & Filters -->
     <div class="bg-white dark:bg-gray-800 shadow rounded-lg mb-6">
       <div class="p-6">
-        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Filters</h3>
-        <div class="flex flex-wrap gap-3">
-          <%= link_to "All Years", view_youtube_entertainment_index_path,
-              class: "inline-flex items-center px-3 py-2 border #{@filter_year.blank? ? 'border-red-500 bg-red-50 text-red-700' : 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50'} dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" %>
-          <% @years_available.each do |year| %>
-            <%= link_to year.to_s, view_youtube_entertainment_index_path(filter_year: year),
-                class: "inline-flex items-center px-3 py-2 border #{@filter_year.to_s == year.to_s ? 'border-red-500 bg-red-50 text-red-700' : 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50'} dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" %>
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Search & Filters</h3>
+        <%= form_tag view_youtube_entertainment_index_path, method: :get, local: true, class: "space-y-4" do %>
+          <!-- Search Field -->
+          <div class="flex flex-col sm:flex-row gap-4">
+            <div class="flex-1">
+              <%= text_field_tag :search, 
+                  @search,
+                  placeholder: "Search YouTube videos... (Press '/' to focus)",
+                  class: "block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-red-500 focus:ring-red-500",
+                  id: "youtube_search" %>
+            </div>
+            <div class="flex gap-2">
+              <%= submit_tag "Search", 
+                  class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" %>
+              <% if @search.present? %>
+                <%= link_to "Clear", view_youtube_entertainment_index_path(filter_year: @filter_year),
+                    class: "inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" %>
+              <% end %>
+            </div>
+          </div>
+          <!-- Search Results Info -->
+          <% if @search.present? %>
+            <div class="text-sm text-gray-600 dark:text-gray-400">
+              Showing results for "<%= @search %>" - <%= pluralize(@total_count, 'video') %> found
+            </div>
           <% end %>
-        </div>
+          <!-- Year Filter Buttons -->
+          <div class="flex flex-wrap gap-3">
+            <%= link_to "All Years", view_youtube_entertainment_index_path(search: @search),
+                class: "inline-flex items-center px-3 py-2 border #{@filter_year.blank? ? 'border-red-500 bg-red-50 text-red-700' : 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50'} dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" %>
+            <% @years_available.each do |year| %>
+              <%= link_to year.to_s, view_youtube_entertainment_index_path(filter_year: year, search: @search),
+                  class: "inline-flex items-center px-3 py-2 border #{@filter_year.to_s == year.to_s ? 'border-red-500 bg-red-50 text-red-700' : 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50'} dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" %>
+            <% end %>
+          </div>
+          <%= hidden_field_tag :filter_year, @filter_year if @filter_year.present? %>
+        <% end %>
       </div>
     </div>
 
     <!-- Records List -->
     <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-md">
       <div class="px-4 py-5 sm:p-6">
-        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Watch History</h3>
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
+          Watch History
+          <% if @filter_year.present? || @search.present? %>
+            <span class="text-sm font-normal text-gray-500 dark:text-gray-400">
+              <% if @search.present? %>
+                - Results for "<%= @search %>"
+              <% end %>
+              <% if @filter_year.present? %>
+                - <%= @filter_year %>
+              <% end %>
+            </span>
+          <% end %>
+        </h3>
 
         <% if @youtube_records.any? %>
           <div class="space-y-3">
@@ -195,7 +242,7 @@
             <div class="mt-6 flex items-center justify-between">
               <div class="flex-1 flex justify-between">
                 <% if @has_prev %>
-                  <%= link_to "Previous", view_youtube_entertainment_index_path(page: @current_page - 1, filter_year: @filter_year),
+                  <%= link_to "Previous", view_youtube_entertainment_index_path(page: @current_page - 1, filter_year: @filter_year, search: @search),
                       class: "relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600" %>
                 <% else %>
                   <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-800 cursor-not-allowed">
@@ -208,7 +255,7 @@
                 </span>
 
                 <% if @has_next %>
-                  <%= link_to "Next", view_youtube_entertainment_index_path(page: @current_page + 1, filter_year: @filter_year),
+                  <%= link_to "Next", view_youtube_entertainment_index_path(page: @current_page + 1, filter_year: @filter_year, search: @search),
                       class: "relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600" %>
                 <% else %>
                   <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-800 cursor-not-allowed">
@@ -239,3 +286,13 @@
 
   </div>
 </div>
+
+<script>
+  // Focus search field when '/' is pressed
+  document.addEventListener('keydown', function(e) {
+    if (e.key === '/' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+      e.preventDefault();
+      document.getElementById('youtube_search').focus();
+    }
+  });
+</script>
