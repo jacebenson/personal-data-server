@@ -3,8 +3,9 @@ require "csv"
 class LinkedinConnectionsProcessor
   attr_reader :results
 
-  def initialize(user)
+  def initialize(user, custom_source = nil)
     @user = user
+    @custom_source = custom_source
     @results = {
       processed: 0,
       created: 0,
@@ -93,7 +94,7 @@ class LinkedinConnectionsProcessor
       job_title: position&.strip,
       linkedin_url: linkedin_url&.strip,
       connected_on: connected_on&.strip,
-      source: "linkedin_connections",
+      source: @custom_source || "linkedin",
       skip: false
     }
   end

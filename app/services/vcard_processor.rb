@@ -3,10 +3,11 @@ require "zip"
 class VcardProcessor
   attr_reader :user, :errors, :warnings
 
-  def initialize(uploaded_file, user, source_file_name = nil)
+  def initialize(uploaded_file, user, source_file_name = nil, custom_source = nil)
     @uploaded_file = uploaded_file
     @user = user
     @source_file_name = source_file_name || uploaded_file.original_filename
+    @custom_source = custom_source
     @errors = []
     @warnings = []
     @imported_count = 0
@@ -221,7 +222,7 @@ class VcardProcessor
 
   def extract_contact_data(properties, filename)
     data = {
-      source: "vcard",
+      source: @custom_source || "vcard",
       source_file: filename,
       imported_at: Time.current
     }

@@ -7,6 +7,8 @@ class Contact < ApplicationRecord
   scope :by_source, ->(source) { where(source: source) }
   scope :recent, -> { order(created_at: :desc) }
   scope :alphabetical, -> { order(:display_name, :given_name, :family_name) }
+  scope :merged_contacts, -> { where("source LIKE '%+%'") }
+  scope :single_source, -> { where("source NOT LIKE '%+%' OR source IS NULL") }
   scope :search, ->(term) do
     return all if term.blank?
 
@@ -94,6 +96,26 @@ class Contact < ApplicationRecord
     count += phone_list.length if phones.present?
     count += 1 if address.present?
     count
+  end
+
+  # Check if this contact was created by merging multiple contacts
+  def merged_contact?
+    source.present? && source.include?("+")
+  end
+
+  # Get the list of original sources this contact was merged from
+  def original_sources
+    return [source] unless merged_contact?
+    source.split(" + ").map(&:strip)
+  end
+
+  # Get a readable display of the source(s)
+  def source_display
+    if merged_contact?
+      original_sources.map(&:humanize).join(" + ")
+    else
+      source&.humanize || "Unknown"
+    end
   end
 
   def linkedin_url

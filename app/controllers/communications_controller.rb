@@ -163,9 +163,6 @@ class CommunicationsController < ApplicationController
   def debug_contact_search(search_term)
     return {} if search_term.blank?
     
-    # Let's also check specific contact ID 2150 if it exists
-    contact_2150 = current_user.contacts.find_by(id: 2150)
-    
     # Test the exact match first
     exact_matches = current_user.contacts.where(
       "display_name = ? COLLATE NOCASE",
@@ -194,7 +191,6 @@ class CommunicationsController < ApplicationController
     end
     
     {
-      contact_2150: contact_2150,
       exact_matches: exact_matches.limit(5),
       full_term_matches: full_term_matches.limit(5),
       word_matches: word_matches.limit(5),

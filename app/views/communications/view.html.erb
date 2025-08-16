@@ -198,7 +198,7 @@
         </div>
         
         <div class="text-xs text-gray-500 dark:text-gray-400">
-          <strong>💡 Tip:</strong> The "From" search is smart! Try typing just "ty" to find "Ty Roach" or partial names to find matching contacts and their email addresses.
+          <strong>💡 Tip:</strong> The "From" search is smart! Try typing just "bart" to find "bart simpson" or partial names to find matching contacts and their email addresses.
         </div>
         
         <% if @search_params.any? %>
@@ -257,7 +257,11 @@
                   <div class="ml-2 mt-1">
                     <strong>📍 Exact matches (highest priority):</strong>
                     <% @debug_detailed[:exact_matches].each do |contact| %>
-                      <div class="ml-2 text-green-700 dark:text-green-300">✓ ID <%= contact.id %>: <%= contact.full_name %> - <%= contact.emails %></div>
+                      <div class="ml-2 text-green-700 dark:text-green-300">
+                        ✓ ID <%= contact.id %>: 
+                        <%= link_to contact.full_name, contact_path(contact), class: "text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-200 underline", target: "_blank" %> - 
+                        <%= contact.emails %>
+                      </div>
                     <% end %>
                   </div>
                 <% end %>
@@ -266,7 +270,11 @@
                   <div class="ml-2 mt-1">
                     <strong>🔍 Word-by-word matches (all words must match):</strong>
                     <% @debug_detailed[:word_matches].each do |contact| %>
-                      <div class="ml-2 text-blue-700 dark:text-blue-300">✓ ID <%= contact.id %>: <%= contact.full_name %> - <%= contact.emails %></div>
+                      <div class="ml-2 text-blue-700 dark:text-blue-300">
+                        ✓ ID <%= contact.id %>: 
+                        <%= link_to contact.full_name, contact_path(contact), class: "text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 underline", target: "_blank" %> - 
+                        <%= contact.emails %>
+                      </div>
                     <% end %>
                   </div>
                 <% end %>
@@ -275,21 +283,13 @@
                   <div class="ml-2 mt-1">
                     <strong>📝 Partial matches (any field contains full term):</strong>
                     <% @debug_detailed[:full_term_matches].each do |contact| %>
-                      <div class="ml-2 text-gray-600 dark:text-gray-400">- ID <%= contact.id %>: <%= contact.full_name %> - <%= contact.emails %></div>
+                      <div class="ml-2 text-gray-600 dark:text-gray-400">
+                        - ID <%= contact.id %>: 
+                        <%= link_to contact.full_name, contact_path(contact), class: "text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-100 underline", target: "_blank" %> - 
+                        <%= contact.emails %>
+                      </div>
                     <% end %>
                   </div>
-                <% end %>
-                
-                <% if @debug_detailed[:contact_2150] %>
-                  <div class="ml-2 mt-1">
-                    <strong>Contact ID 2150:</strong> <%= @debug_detailed[:contact_2150].full_name %> 
-                    (<%= @debug_detailed[:contact_2150].emails %>)
-                    <br><small>Display: <%= @debug_detailed[:contact_2150].display_name %>, 
-                    Given: <%= @debug_detailed[:contact_2150].given_name %>, 
-                    Family: <%= @debug_detailed[:contact_2150].family_name %></small>
-                  </div>
-                <% else %>
-                  <div class="ml-2"><strong>Contact ID 2150:</strong> Not found</div>
                 <% end %>
                 
                 <div class="ml-2 mt-1">

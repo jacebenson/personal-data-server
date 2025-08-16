@@ -145,14 +145,42 @@
 
     <!-- Contacts List -->
     <% if @contacts.any? %>
-      <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-md">
-        <ul class="divide-y divide-gray-200 dark:divide-gray-700">
-          <% @contacts.each do |contact| %>
-            <li>
-              <%= link_to contact_path(contact), class: "block hover:bg-gray-50 dark:hover:bg-gray-700" do %>
+      <!-- Merge Selected Contacts Form -->
+      <%= form_with url: merge_contacts_path, method: :post, local: true, id: "merge_contacts_form", class: "space-y-4" do |form| %>
+        <!-- Merge Button (initially hidden) -->
+        <div id="merge_button_container" class="hidden bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 rounded-md p-4">
+          <div class="flex justify-between items-center">
+            <div>
+              <p class="text-sm text-blue-800 dark:text-blue-200">
+                <span id="selected_count">0</span> contacts selected for merging
+              </p>
+            </div>
+            <div class="space-x-3">
+              <button type="button" id="clear_selection" class="inline-flex items-center px-3 py-2 border border-blue-300 dark:border-blue-600 text-sm font-medium rounded-md text-blue-700 dark:text-blue-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                Clear Selection
+              </button>
+              <%= form.submit "Merge Selected Contacts", 
+                  id: "merge_selected_button",
+                  data: { confirm: "Merge the selected contacts? This action cannot be undone." },
+                  class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700" %>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-md">
+          <ul class="divide-y divide-gray-200 dark:divide-gray-700">
+            <% @contacts.each do |contact| %>
+              <li>
                 <div class="px-4 py-4 sm:px-6">
                   <div class="flex items-center justify-between">
                     <div class="flex items-center">
+                      <!-- Checkbox for selection -->
+                      <div class="flex-shrink-0 mr-4">
+                        <%= check_box_tag "contact_ids[]", contact.id, false, 
+                            class: "contact-checkbox h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 dark:border-gray-600 rounded",
+                            data: { contact_id: contact.id } %>
+                      </div>
+
                       <!-- Avatar placeholder -->
                       <div class="flex-shrink-0 h-12 w-12">
                         <% if contact.photo_url.present? || contact.photo_data.present? %>
@@ -170,17 +198,26 @@
                         <% end %>
                       </div>
 
-                      <div class="ml-4">
-                        <div class="flex items-center">
-                          <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
-                            <%= contact.full_name %>
-                          </p>
-                          <% if contact.source.present? %>
-                            <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
-                              <%= contact.source.titleize %>
-                            </span>
-                          <% end %>
-                        </div>
+                      <div class="ml-4 flex-1">
+                        <div class="flex items-center justify-between">
+                          <div>
+                            <div class="flex items-center">
+                              <%= link_to contact.full_name, contact_path(contact), 
+                                  class: "text-sm font-medium text-gray-900 dark:text-white hover:text-purple-600" %>
+                              <% if contact.source.present? %>
+                                <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= contact.merged_contact? ? 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200' : 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' %>">
+                                  <% if contact.merged_contact? %>
+                                    <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                      <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                                      <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
+                                    </svg>
+                                    Merged: <%= contact.source_display %>
+                                  <% else %>
+                                    <%= contact.source_display %>
+                                  <% end %>
+                                </span>
+                              <% end %>
+                            </div>
 
                         <div class="mt-1 flex items-center space-x-4">
                           <% if contact.organization.present? %>
@@ -327,3 +364,65 @@
     <% end %>
   </div>
 </div>
+
+<script>
+function initializeContactSelection() {
+  const mergeButton = document.getElementById('merge_button_container');
+  const selectedCountElement = document.getElementById('selected_count');
+  const clearSelectionButton = document.getElementById('clear_selection');
+
+  function updateMergeButtonVisibility() {
+    const selectedCheckboxes = document.querySelectorAll('.contact-checkbox:checked');
+    const count = selectedCheckboxes.length;
+    
+    console.log('Checkboxes checked:', count); // Debug logging
+    
+    if (selectedCountElement) {
+      selectedCountElement.textContent = count;
+    }
+    
+    if (mergeButton) {
+      if (count >= 2) {
+        mergeButton.classList.remove('hidden');
+        console.log('Showing merge button'); // Debug logging
+      } else {
+        mergeButton.classList.add('hidden');
+        console.log('Hiding merge button'); // Debug logging
+      }
+    }
+  }
+
+  // Use event delegation to handle checkbox changes (works with dynamically loaded content)
+  document.addEventListener('change', function(event) {
+    if (event.target.classList.contains('contact-checkbox')) {
+      console.log('Checkbox changed:', event.target.value, event.target.checked); // Debug logging
+      updateMergeButtonVisibility();
+    }
+  });
+
+  // Clear selection functionality
+  if (clearSelectionButton) {
+    clearSelectionButton.addEventListener('click', function() {
+      console.log('Clear selection clicked'); // Debug logging
+      const checkboxes = document.querySelectorAll('.contact-checkbox');
+      checkboxes.forEach(checkbox => {
+        checkbox.checked = false;
+      });
+      updateMergeButtonVisibility();
+    });
+  }
+
+  // Initial check
+  updateMergeButtonVisibility();
+}
+
+// Initialize on DOM content loaded
+document.addEventListener('DOMContentLoaded', initializeContactSelection);
+
+// Also initialize on Turbo events (for Rails 7+ with Turbo)
+document.addEventListener('turbo:load', initializeContactSelection);
+document.addEventListener('turbo:render', initializeContactSelection);
+
+// Fallback for older Turbolinks
+document.addEventListener('turbolinks:load', initializeContactSelection);
+</script>

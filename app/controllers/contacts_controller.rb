@@ -34,6 +34,8 @@ class ContactsController < ApplicationController
       render 'show'
     else
       # Show contact upload form (renders index.html.erb by default)
+      # Get existing sources for the dropdown
+      @existing_sources = current_user.contacts.distinct.pluck(:source).compact.sort
     end
   end
 
@@ -41,7 +43,10 @@ class ContactsController < ApplicationController
     # Process uploaded vCard files (including zipped vcards)
     if params[:file].present?
       begin
-        result = VcardProcessor.new(params[:file], current_user).process
+        # Determine the source
+        source = determine_source_from_params(params, 'vcard')
+        
+        result = VcardProcessor.new(params[:file], current_user, nil, source).process
 
         message = "Successfully imported #{result[:count]} contacts."
         if result[:skipped] && result[:skipped] > 0
@@ -75,7 +80,8 @@ class ContactsController < ApplicationController
         temp_file.write(params[:file].read)
         temp_file.close
 
-        processor = LinkedinConnectionsProcessor.new(current_user)
+        # LinkedIn connections always use "linkedin" as the source
+        processor = LinkedinConnectionsProcessor.new(current_user, 'linkedin')
         results = processor.process_csv_file(temp_file.path)
 
         message = "LinkedIn import completed: #{results[:created]} new contacts created"
@@ -130,9 +136,10 @@ class ContactsController < ApplicationController
   def merge
     # Merge specific contacts
     contact_ids = params[:contact_ids]
+    redirect_path = request.referer&.include?('duplicates') ? duplicates_contacts_path : contacts_path(show: true)
 
     if contact_ids.blank? || contact_ids.length < 2
-      redirect_to duplicates_contacts_path, alert: "Please select at least 2 contacts to merge."
+      redirect_to redirect_path, alert: "Please select at least 2 contacts to merge."
       return
     end
 
@@ -140,7 +147,7 @@ class ContactsController < ApplicationController
       contacts = current_user.contacts.where(id: contact_ids)
 
       if contacts.count != contact_ids.length
-        redirect_to duplicates_contacts_path, alert: "Some selected contacts were not found."
+        redirect_to redirect_path, alert: "Some selected contacts were not found."
         return
       end
 
@@ -150,31 +157,37 @@ class ContactsController < ApplicationController
       redirect_to contact_path(primary_contact),
                   notice: "Successfully merged #{contact_ids.length} contacts into #{primary_contact.full_name}."
     rescue => e
-      redirect_to duplicates_contacts_path, alert: "Error merging contacts: #{e.message}"
+      redirect_to redirect_path, alert: "Error merging contacts: #{e.message}"
     end
   end
 
   def auto_merge
     # Handle both GET (confirmation) and POST (actual merge) requests
-    if request.get?
-      # For GET requests, redirect to the duplicates page for confirmation
-      redirect_to duplicates_contacts_path
-    else
-      # For POST requests, automatically merge all duplicate contacts
+    if request.post?
       begin
         merge_service = ContactMergeService.new(current_user)
         results = merge_service.auto_merge_all!
 
-        message = "Auto-merge completed: #{results[:contacts_merged]} groups merged, #{results[:contacts_removed]} duplicate contacts removed."
-
-        if results[:errors].any?
-          message += " #{results[:errors].length} errors occurred."
-        end
-
-        redirect_to contacts_path, notice: message
+        message = "Auto-merge completed: #{results[:merged_count]} contact groups merged, #{results[:contacts_merged]} total contacts merged."
+        redirect_to contacts_path(show: true), notice: message
       rescue => e
         redirect_to duplicates_contacts_path, alert: "Error during auto-merge: #{e.message}"
       end
+    else
+      # Show confirmation page
+      merge_service = ContactMergeService.new(current_user)
+      @duplicate_groups = merge_service.find_duplicates
+      @total_to_merge = @duplicate_groups.sum { |group| group.length - 1 }
+    end
+  end
+
+  private
+
+  def determine_source_from_params(params, default_source)
+    if params[:source] == 'custom'
+      params[:custom_source].present? ? params[:custom_source] : default_source
+    else
+      params[:source].present? ? params[:source] : default_source
     end
   end
 end

@@ -45,15 +45,18 @@ class ContactMergeService
   # Automatically merge all found duplicates
   def auto_merge_all!
     duplicate_groups = find_duplicates
+    merged_count = 0
 
     duplicate_groups.each do |group|
       begin
         merge_contact_group!(group)
+        merged_count += 1
       rescue => e
         @merge_results[:errors] << "Error merging group: #{e.message}"
       end
     end
 
+    @merge_results[:merged_count] = merged_count
     @merge_results
   end
 
@@ -65,7 +68,27 @@ class ContactMergeService
     primary_contact = select_primary_contact(contacts)
     secondary_contacts = contacts - [ primary_contact ]
 
-    # Merge data from secondary contacts into primary
+    # Create composite source from all contacts being merged, extracting individual sources
+    all_sources = []
+    contacts.each do |contact|
+      if contact.source.present?
+        all_sources.concat(contact.original_sources)
+      end
+    end
+    
+    # Remove duplicates and sort
+    all_sources = all_sources.compact.uniq.sort
+    
+    if all_sources.any?
+      composite_source = all_sources.join(" + ")
+    else
+      composite_source = "merged_contacts"
+    end
+    
+    # Update primary contact's source to show it's been merged
+    primary_contact.source = composite_source
+
+    # Merge data from secondary contacts into primary (this will save the record)
     merge_contact_data!(primary_contact, secondary_contacts)
 
     # Delete secondary contacts
