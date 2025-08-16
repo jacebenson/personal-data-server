@@ -11,45 +11,27 @@ class NullEdgeController < ApplicationController
   end
 
   def fetch_attendees
-    # Fetch current attendee count from nullEDGE website
-    begin
-      require 'net/http'
-      require 'uri'
-
-      uri = URI('https://events.ringcentral.com/events/nulledge')
-      response = Net::HTTP.get_response(uri)
+    # Manual entry of attendee count
+    attendee_count = params[:count].to_i
+    
+    if attendee_count > 0
+      today = Date.current
       
-      if response.code == '200'
-        body = response.body
-        
-        # Look for pattern like ">100 People are registered<"
-        match = body.match(/>(\d+)\s+People\s+are\s+registered</i)
-        
-        if match
-          attendee_count = match[1].to_i
-          today = Date.current
-          
-          # Find or create record for today
-          attendee_record = current_user.null_edge_attendees.find_or_initialize_by(date: today)
-          attendee_record.count = attendee_count
-          
-          if attendee_record.save
-            if attendee_record.previously_new_record?
-              redirect_to null_edge_index_path, notice: "Successfully fetched #{attendee_count} attendees for #{today.strftime('%B %d, %Y')}"
-            else
-              redirect_to null_edge_index_path, notice: "Updated attendee count to #{attendee_count} for #{today.strftime('%B %d, %Y')}"
-            end
-          else
-            redirect_to null_edge_index_path, alert: "Error saving attendee data: #{attendee_record.errors.full_messages.join(', ')}"
-          end
+      # Find or create record for today
+      attendee_record = current_user.null_edge_attendees.find_or_initialize_by(date: today)
+      attendee_record.count = attendee_count
+      
+      if attendee_record.save
+        if attendee_record.previously_new_record?
+          redirect_to null_edge_index_path, notice: "Successfully added #{attendee_count} registrations for #{today.strftime('%B %d, %Y')}"
         else
-          redirect_to null_edge_index_path, alert: "Could not find attendee count in the page content. The page format may have changed."
+          redirect_to null_edge_index_path, notice: "Updated registration count to #{attendee_count} for #{today.strftime('%B %d, %Y')}"
         end
       else
-        redirect_to null_edge_index_path, alert: "Error fetching nullEDGE page: HTTP #{response.code}"
+        redirect_to null_edge_index_path, alert: "Error saving registration data: #{attendee_record.errors.full_messages.join(', ')}"
       end
-    rescue => e
-      redirect_to null_edge_index_path, alert: "Error fetching attendee count: #{e.message}"
+    else
+      redirect_to null_edge_index_path, alert: "Please enter a valid registration count greater than 0"
     end
   end
 

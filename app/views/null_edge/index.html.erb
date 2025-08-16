@@ -99,26 +99,37 @@
       </div>
     </div>
 
-    <!-- Fetch Attendees Section -->
+    <!-- Manual Entry Section -->
     <div class="bg-white dark:bg-gray-800 shadow rounded-lg mb-6">
       <div class="p-6">
-        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Fetch Current Attendee Count</h3>
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Add Current Registration Count</h3>
         <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-          Click the button below to fetch the current attendee count from the nullEDGE event page.
+          Enter the current registration count from the nullEDGE event page manually.
         </p>
         
-        <div class="flex items-center space-x-4">
-          <%= form_with url: fetch_attendees_null_edge_index_path, method: :post, local: true, class: "inline" do |form| %>
-            <%= form.submit "Fetch Current Count", 
-                class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
-          <% end %>
-          
-          <% if @last_fetch %>
+        <%= form_with url: fetch_attendees_null_edge_index_path, method: :post, local: true, class: "space-y-4" do |form| %>
+          <div class="flex items-end space-x-4">
+            <div class="flex-1">
+              <%= form.label :count, "Registration Count", class: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" %>
+              <%= form.number_field :count, 
+                  placeholder: "e.g., 329", 
+                  min: 1,
+                  class: "block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white" %>
+            </div>
+            <div>
+              <%= form.submit "Add Count", 
+                  class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
+            </div>
+          </div>
+        <% end %>
+        
+        <% if @last_fetch %>
+          <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
             <span class="text-sm text-gray-500 dark:text-gray-400">
-              Last fetched: <%= time_ago_in_words(@last_fetch) %> ago
+              Last updated: <%= time_ago_in_words(@last_fetch) %> ago
             </span>
-          <% end %>
-        </div>
+          </div>
+        <% end %>
       </div>
     </div>
 
