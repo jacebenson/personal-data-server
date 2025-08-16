@@ -13,6 +13,7 @@ class EntertainmentContent < ApplicationRecord
   scope :netflix, -> { where(content_type: 'netflix') }
   scope :audible_books, -> { where(content_type: 'audible_book') }
   scope :podcasts, -> { where(content_type: 'podcast') }
+  scope :youtube, -> { where(content_type: 'youtube') }
 
   def formatted_date_consumed
     date_consumed&.strftime("%B %d, %Y")
@@ -26,6 +27,6 @@ class EntertainmentContent < ApplicationRecord
   end
 
   def self.content_types
-    %w[netflix audible_book podcast]
+    %w[netflix audible_book podcast youtube]
   end
 end

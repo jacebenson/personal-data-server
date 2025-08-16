@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_15_121000) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_16_044051) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -366,6 +366,28 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_15_121000) do
     t.index ["user_id"], name: "index_linkedin_messages_on_user_id"
   end
 
+  create_table "podcast_episodes", force: :cascade do |t|
+    t.integer "podcast_feed_id", null: false
+    t.string "title", null: false
+    t.text "description"
+    t.string "audio_url"
+    t.string "website_url"
+    t.datetime "published_at"
+    t.string "duration"
+    t.integer "file_size"
+    t.string "guid", null: false
+    t.boolean "listened", default: false
+    t.datetime "listened_at"
+    t.text "metadata"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["listened"], name: "index_podcast_episodes_on_listened"
+    t.index ["podcast_feed_id", "guid"], name: "index_podcast_episodes_on_podcast_feed_id_and_guid", unique: true
+    t.index ["podcast_feed_id", "published_at"], name: "index_podcast_episodes_on_podcast_feed_id_and_published_at"
+    t.index ["podcast_feed_id"], name: "index_podcast_episodes_on_podcast_feed_id"
+    t.index ["published_at"], name: "index_podcast_episodes_on_published_at"
+  end
+
   create_table "podcast_feeds", force: :cascade do |t|
     t.integer "user_id", null: false
     t.string "title", null: false
@@ -431,6 +453,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_15_121000) do
   add_foreign_key "health_vital_signs", "health_patients"
   add_foreign_key "investments", "users"
   add_foreign_key "linkedin_messages", "users"
+  add_foreign_key "podcast_episodes", "podcast_feeds"
   add_foreign_key "podcast_feeds", "users"
   add_foreign_key "social_security_earnings", "users"
 end

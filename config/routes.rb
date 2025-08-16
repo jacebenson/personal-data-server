@@ -61,6 +61,10 @@ Rails.application.routes.draw do
       post :upload_netflix, to: 'entertainment#upload_netflix'
       get :view_netflix, to: redirect('/entertainment/view_netflix')
       delete :clear_netflix, to: 'entertainment#clear_netflix'
+      get :youtube, to: redirect('/entertainment/youtube')
+      post :upload_youtube, to: 'entertainment#upload_youtube'
+      get :view_youtube, to: redirect('/entertainment/view_youtube')
+      delete :clear_youtube, to: 'entertainment#clear_youtube'
 
       # Duplicate and account management
       get :manage_duplicates
@@ -134,11 +138,23 @@ Rails.application.routes.draw do
       get :view_netflix
       delete :clear_netflix
       
+      # YouTube watch history
+      get :youtube
+      post :upload_youtube
+      get :view_youtube
+      delete :clear_youtube
+      
       # Podcast feed management
       get :podcasts
       post :upload_opml
       post :add_podcast_feed
       delete :clear_podcast_feeds
+      
+      # Podcast episode views
+      get 'podcast/:id', to: 'entertainment#podcast_episodes', as: :podcast_episodes
+      get 'podcast/:podcast_id/episode/:id', to: 'entertainment#podcast_episode', as: :podcast_episode
+      patch 'podcast/:podcast_id/episode/:id/toggle_listened', to: 'entertainment#toggle_episode_listened', as: :toggle_episode_listened
+      get :all_episodes
     end
     
     member do

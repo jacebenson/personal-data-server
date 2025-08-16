@@ -149,10 +149,16 @@
         <div class="p-6">
           <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Bulk Actions</h3>
           <div class="flex flex-wrap gap-3">
-            <%= link_to "Sync All Feeds", entertainment_sync_all_podcast_feeds_path, method: :post,
+            <%= link_to "View All Episodes", all_episodes_entertainment_index_path,
+                class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500" %>
+            <%= link_to "Sync All Feeds", entertainment_sync_all_podcast_feeds_path,
+                data: { turbo_method: :post },
                 class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500" %>
-            <%= link_to "Clear All Feeds", clear_podcast_feeds_entertainment_index_path, method: :delete,
-                confirm: "Are you sure you want to delete all podcast feeds?",
+            <%= link_to "Clear All Feeds", clear_podcast_feeds_entertainment_index_path,
+                data: { 
+                  turbo_method: :delete,
+                  turbo_confirm: "Are you sure you want to delete all podcast feeds?"
+                },
                 class: "inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500" %>
           </div>
         </div>
@@ -204,14 +210,23 @@
                     </div>
                   </div>
                   <div class="flex items-center space-x-2 ml-4">
-                    <%= link_to sync_podcast_feed_entertainment_path(feed), method: :post,
+                    <%= link_to podcast_episodes_entertainment_index_path(feed),
+                        class: "inline-flex items-center p-2 border border-purple-300 rounded-md shadow-sm text-sm font-medium text-purple-700 bg-white hover:bg-purple-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500",
+                        title: "View episodes" do %>
+                      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 00-2-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H9z"></path>
+                      </svg>
+                    <% end %>
+                    <%= link_to sync_podcast_feed_entertainment_path(feed),
+                        data: { turbo_method: :post },
                         class: "inline-flex items-center p-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500",
                         title: "Sync feed" do %>
                       <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                       </svg>
                     <% end %>
-                    <%= link_to toggle_podcast_feed_entertainment_path(feed), method: :patch,
+                    <%= link_to toggle_podcast_feed_entertainment_path(feed),
+                        data: { turbo_method: :patch },
                         class: "inline-flex items-center p-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500",
                         title: feed.active? ? "Deactivate" : "Activate" do %>
                       <% if feed.active? %>

@@ -27,12 +27,15 @@ class CategoriesController < ApplicationController
   def entertainment
     # Entertainment data counts
     @netflix_count = current_user.entertainment_contents.netflix.count
+    @youtube_count = current_user.entertainment_contents.youtube.count
     @audible_books_count = current_user.entertainment_contents.audible_books.count
     @podcasts_count = current_user.entertainment_contents.podcasts.count
     @podcast_feeds_count = current_user.podcast_feeds.active.count
+    @podcast_episodes_count = PodcastEpisode.joins(:podcast_feed).where(podcast_feeds: { user: current_user }).count
     @total_content_count = current_user.entertainment_contents.count
 
     @last_netflix_upload = current_user.entertainment_contents.netflix.maximum(:imported_at)
+    @last_youtube_upload = current_user.entertainment_contents.youtube.maximum(:imported_at)
     @last_audible_upload = current_user.entertainment_contents.audible_books.maximum(:imported_at)
     @last_podcast_upload = current_user.entertainment_contents.podcasts.maximum(:imported_at)
     @last_podcast_sync = current_user.podcast_feeds.maximum(:last_synced_at)

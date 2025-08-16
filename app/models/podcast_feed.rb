@@ -1,5 +1,6 @@
 class PodcastFeed < ApplicationRecord
   belongs_to :user
+  has_many :podcast_episodes, dependent: :destroy
 
   validates :title, presence: true
   validates :feed_url, presence: true, uniqueness: { scope: :user_id }

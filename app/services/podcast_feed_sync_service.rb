@@ -31,6 +31,9 @@ class PodcastFeedSyncService
         metadata: build_metadata(channel).to_json
       )
 
+      # Sync episodes
+      sync_episodes(doc)
+
       true
     rescue => e
       # Log the error and update the feed with error information
@@ -76,6 +79,78 @@ class PodcastFeedSyncService
 
   def count_episodes(doc)
     doc.xpath('//item').count
+  end
+
+  def sync_episodes(doc)
+    # Extract all episodes from the RSS feed
+    episodes = doc.xpath('//item')
+    synced_count = 0
+    skipped_count = 0
+
+    episodes.each do |item|
+      # Extract episode data
+      guid = extract_text(item, 'guid') || extract_text(item, 'link')
+      next unless guid # Skip episodes without GUID
+
+      # Check if episode already exists
+      existing_episode = @podcast_feed.podcast_episodes.find_by(guid: guid)
+      if existing_episode
+        skipped_count += 1
+        next
+      end
+
+      # Extract episode metadata
+      title = extract_text(item, 'title')
+      description = extract_text(item, 'description') || extract_text(item, 'itunes:summary')
+      pub_date_text = extract_text(item, 'pubDate')
+      published_at = nil
+      
+      if pub_date_text
+        begin
+          published_at = DateTime.parse(pub_date_text)
+        rescue
+          # Ignore parsing errors
+        end
+      end
+
+      # Extract audio URL and metadata
+      enclosure = item.at('enclosure')
+      audio_url = enclosure&.[]('url')
+      file_size = enclosure&.[]('length')&.to_i
+      
+      # Extract iTunes-specific data
+      duration = extract_text(item, 'itunes:duration')
+      website_url = extract_text(item, 'link')
+      
+      # Build episode metadata
+      episode_metadata = {
+        author: extract_text(item, 'itunes:author'),
+        subtitle: extract_text(item, 'itunes:subtitle'),
+        explicit: extract_text(item, 'itunes:explicit'),
+        episode_type: extract_text(item, 'itunes:episodeType'),
+        season: extract_text(item, 'itunes:season'),
+        episode: extract_text(item, 'itunes:episode'),
+        keywords: extract_text(item, 'itunes:keywords'),
+        content_type: enclosure&.[]('type')
+      }.compact
+
+      # Create the episode
+      @podcast_feed.podcast_episodes.create!(
+        title: title || 'Untitled Episode',
+        description: description,
+        audio_url: audio_url,
+        website_url: website_url,
+        published_at: published_at,
+        duration: duration,
+        file_size: file_size,
+        guid: guid,
+        metadata: episode_metadata.to_json
+      )
+
+      synced_count += 1
+    end
+
+    Rails.logger.info "Synced #{synced_count} new episodes for #{@podcast_feed.title}, skipped #{skipped_count} existing episodes"
   end
 
   def build_metadata(channel)

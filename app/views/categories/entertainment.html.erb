@@ -5,7 +5,7 @@
       <p class="mt-2 text-gray-600 dark:text-gray-400">Track your entertainment consumption across platforms</p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       <!-- Netflix Viewing History -->
       <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
         <div class="p-6">
@@ -40,6 +40,46 @@
             <% if @netflix_count > 0 %>
               <%= link_to "Clear All Data", clear_netflix_entertainment_index_path, method: :delete,
                   confirm: "Are you sure you want to delete all Netflix viewing records?",
+                  class: "w-full flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600" %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <!-- YouTube Watch History -->
+      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+        <div class="p-6">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg class="h-8 w-8 text-red-600" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+              </svg>
+            </div>
+            <div class="ml-4 flex-1">
+              <h3 class="text-lg font-medium text-gray-900 dark:text-white">YouTube History</h3>
+              <p class="text-sm text-gray-500 dark:text-gray-400">Videos watched</p>
+              <div class="mt-2">
+                <p class="text-2xl font-semibold text-gray-900 dark:text-white"><%= @youtube_count %></p>
+                <p class="text-xs text-gray-500 dark:text-gray-400">
+                  <% if @youtube_count > 0 %>
+                    Last upload: <%= @last_youtube_upload&.strftime("%B %d, %Y") || "Never" %>
+                  <% else %>
+                    No data uploaded
+                  <% end %>
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="mt-6 space-y-3">
+            <% if @youtube_count > 0 %>
+              <%= link_to "View All Records", view_youtube_entertainment_index_path,
+                  class: "w-full flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600" %>
+            <% end %>
+            <%= link_to "Upload YouTube Data", youtube_entertainment_index_path,
+                class: "w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" %>
+            <% if @youtube_count > 0 %>
+              <%= link_to "Clear All Data", clear_youtube_entertainment_index_path, method: :delete,
+                  confirm: "Are you sure you want to delete all YouTube watch history records?",
                   class: "w-full flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600" %>
             <% end %>
           </div>
@@ -84,25 +124,34 @@
             <div class="ml-4 flex-1">
               <h3 class="text-lg font-medium text-gray-900 dark:text-white">Podcast Feeds</h3>
               <p class="text-sm text-gray-500 dark:text-gray-400">RSS feeds you subscribe to</p>
-              <div class="mt-2">
-                <p class="text-2xl font-semibold text-gray-900 dark:text-white"><%= @podcast_feeds_count %></p>
-                <p class="text-xs text-gray-500 dark:text-gray-400">
-                  <% if @podcast_feeds_count > 0 %>
-                    Last sync: <%= @last_podcast_sync&.strftime("%B %d, %Y") || "Never" %>
-                  <% else %>
-                    No feeds added
-                  <% end %>
-                </p>
+              <div class="mt-2 grid grid-cols-2 gap-4">
+                <div>
+                  <p class="text-2xl font-semibold text-gray-900 dark:text-white"><%= @podcast_feeds_count %></p>
+                  <p class="text-xs text-gray-500 dark:text-gray-400">Active Feeds</p>
+                </div>
+                <div>
+                  <p class="text-2xl font-semibold text-gray-900 dark:text-white"><%= @podcast_episodes_count %></p>
+                  <p class="text-xs text-gray-500 dark:text-gray-400">Total Episodes</p>
+                </div>
               </div>
+              <% if @last_podcast_sync %>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  Last sync: <%= @last_podcast_sync&.strftime("%B %d, %Y") %>
+                </p>
+              <% end %>
             </div>
           </div>
           <div class="mt-6 space-y-3">
+            <% if @podcast_episodes_count > 0 %>
+              <%= link_to "All Episodes", all_episodes_entertainment_index_path,
+                  class: "w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500" %>
+            <% end %>
             <% if @podcast_feeds_count > 0 %>
               <%= link_to "Manage Feeds", podcasts_entertainment_index_path,
                   class: "w-full flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600" %>
             <% end %>
             <%= link_to "Add Podcast Feeds", podcasts_entertainment_index_path,
-                class: "w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500" %>
+                class: "w-full flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600" %>
             <% if @podcast_feeds_count > 0 %>
               <%= link_to "Clear All Feeds", clear_podcast_feeds_entertainment_index_path, method: :delete,
                   confirm: "Are you sure you want to delete all podcast feeds?",
@@ -118,10 +167,14 @@
       <div class="mt-8 bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
         <div class="p-6">
           <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Entertainment Summary</h3>
-          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
             <div class="text-center">
               <p class="text-2xl font-semibold text-red-600"><%= @netflix_count %></p>
               <p class="text-sm text-gray-500 dark:text-gray-400">Netflix Items</p>
+            </div>
+            <div class="text-center">
+              <p class="text-2xl font-semibold text-red-600"><%= @youtube_count %></p>
+              <p class="text-sm text-gray-500 dark:text-gray-400">YouTube Videos</p>
             </div>
             <div class="text-center">
               <p class="text-2xl font-semibold text-orange-600"><%= @audible_books_count %></p>

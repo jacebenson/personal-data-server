@@ -4,12 +4,15 @@ class EntertainmentController < ApplicationController
   def index
     # Show entertainment category overview
     @netflix_count = current_user.entertainment_contents.netflix.count
+    @youtube_count = current_user.entertainment_contents.youtube.count
     @audible_books_count = current_user.entertainment_contents.audible_books.count
     @podcasts_count = current_user.entertainment_contents.podcasts.count
     @podcast_feeds_count = current_user.podcast_feeds.active.count
+    @podcast_episodes_count = PodcastEpisode.joins(:podcast_feed).where(podcast_feeds: { user: current_user }).count
     @total_content_count = current_user.entertainment_contents.count
 
     @last_netflix_upload = current_user.entertainment_contents.netflix.maximum(:imported_at)
+    @last_youtube_upload = current_user.entertainment_contents.youtube.maximum(:imported_at)
     @last_audible_upload = current_user.entertainment_contents.audible_books.maximum(:imported_at)
     @last_podcast_upload = current_user.entertainment_contents.podcasts.maximum(:imported_at)
     @last_podcast_sync = current_user.podcast_feeds.maximum(:last_synced_at)
@@ -76,6 +79,70 @@ class EntertainmentController < ApplicationController
     count = current_user.entertainment_contents.netflix.count
     current_user.entertainment_contents.netflix.destroy_all
     redirect_to entertainment_path, notice: "Successfully deleted #{count} Netflix viewing records."
+  end
+
+  # YouTube watch history methods
+  def youtube
+    # Show YouTube upload form
+  end
+
+  def upload_youtube
+    # Process uploaded YouTube JSON
+    if params[:file].present?
+      begin
+        result = YoutubeDataProcessor.new(params[:file].path, current_user).process
+
+        message = "Successfully imported #{result[:count]} YouTube watch history records."
+        if result[:skipped] && result[:skipped] > 0
+          message += " Skipped #{result[:skipped]} records"
+          if result[:duplicates] && result[:duplicates] > 0
+            message += " (#{result[:duplicates]} duplicates)"
+          end
+          message += "."
+        end
+
+        redirect_to youtube_entertainment_index_path, notice: message
+      rescue => e
+        redirect_to youtube_entertainment_index_path, alert: "Error processing file: #{e.message}"
+      end
+    else
+      redirect_to youtube_entertainment_index_path, alert: "Please select a file to upload."
+    end
+  end
+
+  def view_youtube
+    # Show imported YouTube records
+    page = params[:page].to_i
+    page = 1 if page < 1
+    per_page = 50
+    offset = (page - 1) * per_page
+
+    # Filter by year if specified
+    youtube_scope = current_user.entertainment_contents.youtube
+    youtube_scope = youtube_scope.by_year(params[:filter_year]) if params[:filter_year].present?
+
+    @youtube_records = youtube_scope.recent.limit(per_page).offset(offset)
+    @total_count = youtube_scope.count
+    @current_page = page
+    @total_pages = (@total_count.to_f / per_page).ceil
+    @has_next = page < @total_pages
+    @has_prev = page > 1
+    @filter_year = params[:filter_year]
+
+    # Summary stats
+    @years_available = current_user.entertainment_contents.youtube
+                                  .pluck(:date_consumed)
+                                  .map { |d| d.year }
+                                  .uniq.sort.reverse
+    
+    @total_videos_watched = @total_count
+  end
+
+  def clear_youtube
+    # Clear all YouTube records for the current user
+    count = current_user.entertainment_contents.youtube.count
+    current_user.entertainment_contents.youtube.destroy_all
+    redirect_to entertainment_path, notice: "Successfully deleted #{count} YouTube watch history records."
   end
 
   # Podcast feed management methods
@@ -204,6 +271,87 @@ class EntertainmentController < ApplicationController
     count = current_user.podcast_feeds.count
     current_user.podcast_feeds.destroy_all
     redirect_to entertainment_path, notice: "Successfully deleted #{count} podcast feeds."
+  end
+
+  def podcast_episodes
+    # Show episodes for a specific podcast feed
+    @podcast_feed = current_user.podcast_feeds.find(params[:id])
+    
+    # Simple pagination
+    page = params[:page].to_i
+    page = 1 if page < 1
+    per_page = 20
+    offset = (page - 1) * per_page
+
+    @episodes = @podcast_feed.podcast_episodes.published_desc.limit(per_page).offset(offset)
+    @total_episodes = @podcast_feed.podcast_episodes.count
+    @listened_count = @podcast_feed.podcast_episodes.listened.count
+    @unlistened_count = @podcast_feed.podcast_episodes.unlistened.count
+    
+    # Pagination info
+    @current_page = page
+    @total_pages = (@total_episodes.to_f / per_page).ceil
+    @has_next = page < @total_pages
+    @has_prev = page > 1
+  end
+
+  def podcast_episode
+    # Show a specific podcast episode
+    @podcast_feed = current_user.podcast_feeds.find(params[:podcast_id])
+    @episode = @podcast_feed.podcast_episodes.find(params[:id])
+  end
+
+  def all_episodes
+    # Show all podcast episodes across all feeds in reverse chronological order
+    page = params[:page].to_i
+    page = 1 if page < 1
+    per_page = 50
+    offset = (page - 1) * per_page
+
+    episodes_scope = PodcastEpisode.joins(:podcast_feed)
+                                  .where(podcast_feeds: { user_id: current_user.id })
+                                  .published_desc
+                                  .includes(:podcast_feed)
+
+    # Add search functionality
+    if params[:search].present?
+      search_term = "%#{params[:search].downcase}%"
+      episodes_scope = episodes_scope.where(
+        "LOWER(podcast_episodes.title) LIKE ? OR LOWER(podcast_episodes.description) LIKE ? OR LOWER(podcast_feeds.title) LIKE ?",
+        search_term, search_term, search_term
+      )
+    end
+
+    @episodes = episodes_scope.limit(per_page).offset(offset)
+    @total_episodes = episodes_scope.count
+    @listened_count = PodcastEpisode.joins(:podcast_feed)
+                                   .where(podcast_feeds: { user_id: current_user.id })
+                                   .listened.count
+    
+    # Pagination info
+    @current_page = page
+    @total_pages = (@total_episodes.to_f / per_page).ceil
+    @has_next = page < @total_pages
+    @has_prev = page > 1
+    
+    # Search and pagination parameters for view
+    @search_params = params[:search].present? ? { search: params[:search] } : {}
+  end
+
+  def toggle_episode_listened
+    # Toggle listened status of an episode
+    @podcast_feed = current_user.podcast_feeds.find(params[:podcast_id])
+    @episode = @podcast_feed.podcast_episodes.find(params[:id])
+    
+    if @episode.listened?
+      @episode.mark_as_unlistened!
+      message = "Marked as unlistened"
+    else
+      @episode.mark_as_listened!
+      message = "Marked as listened"
+    end
+
+    redirect_back_or_to(podcast_episodes_entertainment_index_path(@podcast_feed), notice: message)
   end
 
   private
