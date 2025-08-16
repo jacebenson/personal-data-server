@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_16_064937) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_16_083523) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -387,6 +387,16 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_16_064937) do
     t.index ["user_id"], name: "index_linkedin_messages_on_user_id"
   end
 
+  create_table "null_edge_attendees", force: :cascade do |t|
+    t.date "date", null: false
+    t.integer "count", null: false
+    t.integer "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "date"], name: "index_null_edge_attendees_on_user_id_and_date", unique: true
+    t.index ["user_id"], name: "index_null_edge_attendees_on_user_id"
+  end
+
   create_table "podcast_episodes", force: :cascade do |t|
     t.integer "podcast_feed_id", null: false
     t.string "title", null: false
@@ -475,6 +485,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_16_064937) do
   add_foreign_key "health_vital_signs", "health_patients"
   add_foreign_key "investments", "users"
   add_foreign_key "linkedin_messages", "users"
+  add_foreign_key "null_edge_attendees", "users"
   add_foreign_key "podcast_episodes", "podcast_feeds"
   add_foreign_key "podcast_feeds", "users"
   add_foreign_key "social_security_earnings", "users"

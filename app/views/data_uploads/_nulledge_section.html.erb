@@ -1,0 +1,57 @@
+<!-- nullEDGE Events Section -->
+<div class="mb-8">
+  <%= link_to null_edge_index_path, class: "group block" do %>
+    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg hover:shadow-lg transition-shadow duration-200">
+      <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center">
+            <div class="h-8 w-8 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center mr-3">
+              <span class="text-xl">🎯</span>
+            </div>
+            <h3 class="text-xl font-semibold text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400">nullEDGE Events</h3>
+          </div>
+          <svg class="h-5 w-5 text-gray-400 group-hover:text-purple-600 dark:group-hover:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+          </svg>
+        </div>
+      </div>
+      <div class="p-6">
+        <% latest_attendee_count = current_user.null_edge_attendees.recent.first %>
+        <% total_records = current_user.null_edge_attendees.count %>
+        <% this_month_records = current_user.null_edge_attendees.this_month.count %>
+        
+        <div class="space-y-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <span class="text-2xl mr-3">👥</span>
+              <div>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Latest Attendee Count</p>
+                <p class="text-lg font-semibold text-gray-900 dark:text-white">
+                  <%= latest_attendee_count&.count || 'N/A' %>
+                </p>
+              </div>
+            </div>
+            <% if latest_attendee_count %>
+              <div class="text-right">
+                <p class="text-xs text-gray-500 dark:text-gray-400">
+                  <%= latest_attendee_count.formatted_date %>
+                </p>
+              </div>
+            <% end %>
+          </div>
+          
+          <div class="grid grid-cols-2 gap-4 text-center">
+            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+              <p class="text-lg font-semibold text-gray-900 dark:text-white"><%= total_records %></p>
+              <p class="text-xs text-gray-500 dark:text-gray-400">Total Records</p>
+            </div>
+            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+              <p class="text-lg font-semibold text-gray-900 dark:text-white"><%= this_month_records %></p>
+              <p class="text-xs text-gray-500 dark:text-gray-400">This Month</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>

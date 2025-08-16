@@ -125,6 +125,15 @@ Rails.application.routes.draw do
     end
   end
 
+  # nullEDGE attendee tracking routes
+  resources :null_edge, only: [:index] do
+    collection do
+      post :fetch_attendees
+      get :view
+      delete :clear
+    end
+  end
+
   # Health data routes
   resources :health, only: [ :index ] do
     collection do
