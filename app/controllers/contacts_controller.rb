@@ -113,6 +113,32 @@ class ContactsController < ApplicationController
     redirect_to contacts_path(show: true), alert: "Contact not found."
   end
 
+  def edit
+    @contact = current_user.contacts.find(params[:id])
+  rescue ActiveRecord::RecordNotFound
+    redirect_to contacts_path(show: true), alert: "Contact not found."
+  end
+
+  def update
+    @contact = current_user.contacts.find(params[:id])
+    
+    if @contact.update(contact_params)
+      redirect_to contact_path(@contact), notice: "Contact updated successfully."
+    else
+      render :edit, status: :unprocessable_entity
+    end
+  rescue ActiveRecord::RecordNotFound
+    redirect_to contacts_path(show: true), alert: "Contact not found."
+  end
+
+  def destroy
+    @contact = current_user.contacts.find(params[:id])
+    @contact.destroy
+    redirect_to contacts_path(show: true), notice: "Contact deleted successfully."
+  rescue ActiveRecord::RecordNotFound
+    redirect_to contacts_path(show: true), alert: "Contact not found."
+  end
+
   def clear
     # Clear all contacts for the current user
     count = current_user.contacts.count
@@ -189,5 +215,14 @@ class ContactsController < ApplicationController
     else
       params[:source].present? ? params[:source] : default_source
     end
+  end
+
+  def contact_params
+    params.require(:contact).permit(
+      :given_name, :family_name, :middle_name, :display_name, :nickname,
+      :name_prefix, :name_suffix, :organization, :job_title, :department,
+      :emails, :phones, :urls, :address, :birthday, :notes, :categories,
+      :photo_url, :social_profiles, :source
+    )
   end
 end

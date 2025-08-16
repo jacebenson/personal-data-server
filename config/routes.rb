@@ -98,7 +98,7 @@ Rails.application.routes.draw do
   get 'calendars/events/:id', to: 'calendars#show_event', as: 'calendar_event'
 
   # Contact management routes
-  resources :contacts, only: [:index, :show] do
+  resources :contacts, only: [:index, :show, :edit, :update, :destroy] do
     collection do
       post :upload_vcard
       post :upload_linkedin_connections
