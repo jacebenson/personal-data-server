@@ -39,22 +39,7 @@
       <div class="hidden justify-between items-center w-full lg:flex lg:w-auto lg:order-1" id="mobile-menu-2">
         <% if current_user %>
           <ul class="flex flex-col mt-4 font-medium lg:flex-row lg:space-x-8 lg:mt-0">
-            <li>
-              <%= link_to "Data Uploads", data_uploads_path,
-                  class: "block py-2 pr-4 pl-3 #{request.path == data_uploads_path ? 'text-blue-700 dark:text-blue-500' : 'text-gray-700 dark:text-gray-400'} hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 lg:hover:text-blue-700 lg:p-0 lg:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white lg:dark:hover:bg-transparent" %>
-            </li>
-            <li>
-              <%= link_to "💰 Financial", financial_path,
-                  class: "block py-2 pr-4 pl-3 #{request.path == financial_path ? 'text-blue-700 dark:text-blue-500' : 'text-gray-700 dark:text-gray-400'} hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 lg:hover:text-blue-700 lg:p-0 lg:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white lg:dark:hover:bg-transparent" %>
-            </li>
-            <li>
-              <%= link_to "📧📅 Correspondance", personal_path,
-                  class: "block py-2 pr-4 pl-3 #{request.path == personal_path ? 'text-blue-700 dark:text-blue-500' : 'text-gray-700 dark:text-gray-400'} hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 lg:hover:text-blue-700 lg:p-0 lg:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white lg:dark:hover:bg-transparent" %>
-            </li>
-            <li>
-              <%= link_to "🏥 Health", health_index_path,
-                  class: "block py-2 pr-4 pl-3 #{request.path.start_with?('/health') ? 'text-blue-700 dark:text-blue-500' : 'text-gray-700 dark:text-gray-400'} hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 lg:hover:text-blue-700 lg:p-0 lg:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white lg:dark:hover:bg-transparent" %>
-            </li>
+            <!-- Navigation items removed per user request -->
           </ul>
         <% else %>
           <ul class="flex flex-col mt-4 font-medium lg:flex-row lg:space-x-8 lg:mt-0">

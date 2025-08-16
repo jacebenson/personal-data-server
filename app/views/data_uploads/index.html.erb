@@ -1,21 +1,43 @@
 <div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="mb-8">
-      <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Personal Dashboard</h1>
-      <p class="mt-2 text-gray-600 dark:text-gray-400">Your personal data at a glance</p>
+    <div class="mb-8 flex justify-between items-center">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Personal Dashboard</h1>
+        <p class="mt-2 text-gray-600 dark:text-gray-400">Your personal data at a glance</p>
+      </div>
+      <!-- Privacy Toggle -->
+      <div class="flex items-center space-x-3">
+        <span class="text-sm text-gray-600 dark:text-gray-400">Privacy Mode</span>
+        <button id="privacy-toggle" type="button" class="relative inline-flex h-6 w-11 items-center rounded-full bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-gray-600 cursor-pointer">
+          <span class="sr-only">Toggle privacy mode</span>
+          <span id="privacy-toggle-switch" class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-1"></span>
+        </button>
+        <span class="text-sm text-gray-600 dark:text-gray-400">
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+          </svg>
+        </span>
+      </div>
     </div>
 
     <!-- Health Data Section - Full Width -->
     <div class="mb-8">
-      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
-        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-          <div class="flex items-center">
-            <div class="h-8 w-8 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center mr-3">
-              <span class="text-xl">🏥</span>
+      <%= link_to health_index_path, class: "group block" do %>
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg hover:shadow-lg transition-shadow duration-200">
+          <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center">
+                <div class="h-8 w-8 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center mr-3">
+                  <span class="text-xl">🏥</span>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400">Health</h3>
+              </div>
+              <svg class="h-5 w-5 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
             </div>
-            <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Health Data</h3>
           </div>
-        </div>
         <div class="p-6">
           <% health_patient = HealthPatient.first %>
           <% if health_patient %>
@@ -57,7 +79,7 @@
                     <!-- Chart -->
                     <%= line_chart chart_data, 
                         height: "200px",
-                        min: 200,
+                        min: 350,
                         colors: ["#3B82F6"],
                         suffix: " lbs",
                         curve: false,
@@ -75,11 +97,11 @@
                     <!-- Current stats overlay -->
                     <div class="mt-2 text-center">
                       <div class="text-sm font-medium text-gray-900 dark:text-white">
-                        Current: <%= latest_weight_lbs %> lbs
+                        Current: <span class="privacy-sensitive"><%= latest_weight_lbs %> lbs</span>
                         <% if weight_records.count > 1 %>
                           <% weight_change_lbs = latest_weight_lbs - first_weight_lbs %>
                           <span class="ml-2 <%= weight_change_lbs > 0 ? 'text-red-600' : 'text-green-600' %>">
-                            (<%= weight_change_lbs > 0 ? '+' : '' %><%= weight_change_lbs.round(1) %> lbs)
+                            (<span class="privacy-sensitive"><%= weight_change_lbs > 0 ? '+' : '' %><%= weight_change_lbs.round(1) %> lbs</span>)
                           </span>
                         <% end %>
                       </div>
@@ -94,20 +116,58 @@
               
               <!-- Sleep Chart -->
               <div>
-                <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-4">CPAP Usage (Last 7 Days)</h4>
-                <div class="h-64 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center relative">
-                  <div class="text-center">
-                    <svg class="h-12 w-12 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                    </svg>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">
-                      Bar chart with 8hr goal line<br>
-                      <%= health_patient.health_sleep_data.where(session_date: 7.days.ago..Date.current).count %> sleep sessions
-                    </p>
-                  </div>
-                  <!-- 8 hour goal line placeholder -->
-                  <div class="absolute top-1/2 left-4 right-4 border-t-2 border-dashed border-red-400 opacity-50"></div>
-                  <span class="absolute top-1/2 right-2 text-xs text-red-500 bg-white dark:bg-gray-800 px-1">8hrs</span>
+                <h4 class="text-lg font-medium text-gray-900 dark:text-white mb-4">CPAP Usage (Last 30 Days)</h4>
+                <div class="h-64 bg-gray-100 dark:bg-gray-700 rounded-lg p-4">
+                  <% sleep_records = health_patient.health_sleep_data.where(session_date: 30.days.ago..Date.current).order(:session_date) %>
+                  <% if sleep_records.any? %>
+                    <% 
+                      # Prepare data for chart - convert scientific notation to hours
+                      chart_data = sleep_records.map do |record|
+                        usage_hours = record.usage_hours.to_f
+                        date = Date.parse(record.session_date.to_s)
+                        [date.strftime("%m/%d"), usage_hours.round(1)]
+                      end
+                      
+                      # Get latest stats
+                      latest_record = sleep_records.last
+                      latest_hours = latest_record.usage_hours.to_f
+                      hours = latest_hours.to_i
+                      minutes = ((latest_hours - hours) * 60).round
+                      
+                      # Calculate average
+                      avg_hours = sleep_records.average(:usage_hours).to_f
+                    %>
+                    
+                    <!-- Chart with 8-hour goal line -->
+                    <div class="relative">
+                      <%= column_chart chart_data, 
+                          height: "180px",
+                          max: 10,
+                          colors: ["#3B82F6"],
+                          suffix: "h" %>
+                      
+                      <!-- 8-hour goal line overlay -->
+                      <div class="absolute inset-0 pointer-events-none">
+                        <div class="absolute left-12 right-4 border-t-2 border-dashed border-red-500 opacity-75" style="top: <%= 180 - (8.0 / 10.0 * 180) %>px;">
+                        </div>
+                        <span class="absolute right-1 text-xs text-red-600 bg-white dark:bg-gray-700 px-1 rounded" style="top: <%= 180 - (8.0 / 10.0 * 180) - 10 %>px;">8h goal</span>
+                      </div>
+                    </div>
+                    
+                    <!-- Current stats -->
+                    <div class="mt-2 flex justify-between text-sm">
+                      <div class="text-gray-900 dark:text-white">
+                        <span class="font-medium">Last: <%= hours %>h <%= minutes %>m</span>
+                      </div>
+                      <div class="text-gray-600 dark:text-gray-300">
+                        Avg: <%= avg_hours.round(1) %>h
+                      </div>
+                    </div>
+                  <% else %>
+                    <div class="flex items-center justify-center h-full">
+                      <p class="text-gray-500 dark:text-gray-400">No sleep data available</p>
+                    </div>
+                  <% end %>
                 </div>
               </div>
             </div>
@@ -118,6 +178,7 @@
           <% end %>
         </div>
       </div>
+      <% end %>
     </div>
 
     <!-- Other Categories -->
@@ -128,27 +189,21 @@
           <div class="p-6">
             <div class="flex items-center mb-4">
               <div class="h-10 w-10 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center mr-3">
-                <span class="text-xl">�</span>
+                <span class="text-xl">💸</span>
               </div>
               <h3 class="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-green-600 dark:group-hover:text-green-400">Money</h3>
             </div>
             <div class="space-y-3">
               <div>
                 <p class="text-2xl font-bold text-gray-900 dark:text-white">
-                  $<%= number_with_delimiter((current_user.investments.sum(:amount) / 1000).round(0)) %>k / $1.2M
+                  <span class="privacy-sensitive">$<%= number_with_delimiter((current_user.investments.sum(:amount) / 1000).round(0)) %>k</span> / $1.2M
                 </p>
-                <p class="text-sm text-gray-500 dark:text-gray-400">(goal)</p>
               </div>
               <div>
                 <p class="text-lg font-semibold text-gray-900 dark:text-white">
-                  $<%= number_with_delimiter(current_user.bank_statements.where(account: 'Ally Personal Checking').sum(:amount).round(0)) %> in your pocket
+                  <span class="privacy-sensitive">$<%= number_with_delimiter(current_user.bank_statements.where(account: 'Ally Personal Checking').sum(:amount).round(0)) %></span> in your pocket
                 </p>
               </div>
-            </div>
-            <div class="mt-4 flex justify-end">
-              <svg class="h-5 w-5 text-gray-400 group-hover:text-green-600 dark:group-hover:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-              </svg>
             </div>
           </div>
         </div>
@@ -157,13 +212,20 @@
       <!-- Personal Data Category -->
       <%= link_to personal_path, class: "group block" do %>
         <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg hover:shadow-lg transition-shadow duration-200">
-          <div class="p-6">
-            <div class="flex items-center mb-4">
-              <div class="h-10 w-10 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center mr-3">
-                <span class="text-xl">📅</span>
+          <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center">
+                <div class="h-8 w-8 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center mr-3">
+                  <span class="text-xl">📅</span>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400">Events + Msgs</h3>
               </div>
-              <h3 class="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400">Events + Msgs</h3>
+              <svg class="h-5 w-5 text-gray-400 group-hover:text-purple-600 dark:group-hover:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
             </div>
+          </div>
+          <div class="p-6">
             <div class="space-y-2">
               <% today_events = current_user.calendar_events.today.chronological.limit(2) %>
               <% if today_events.any? %>
@@ -182,11 +244,6 @@
                 <p class="text-sm text-gray-500 dark:text-gray-400">No events today</p>
               <% end %>
             </div>
-            <div class="mt-4 flex justify-end">
-              <svg class="h-5 w-5 text-gray-400 group-hover:text-purple-600 dark:group-hover:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-              </svg>
-            </div>
           </div>
         </div>
       <% end %>
@@ -197,7 +254,7 @@
           <div class="p-6">
             <div class="flex items-center mb-4">
               <div class="h-10 w-10 bg-red-100 dark:bg-red-900 rounded-lg flex items-center justify-center mr-3">
-                <span class="text-xl">�</span>
+                <span class="text-xl">🎬</span>
               </div>
               <h3 class="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-red-600 dark:group-hover:text-red-400">Entertainment</h3>
             </div>
@@ -223,11 +280,6 @@
                 <span class="text-gray-600 dark:text-gray-300 ml-1">new podcast ep.</span>
               </div>
             </div>
-            <div class="mt-4 flex justify-end">
-              <svg class="h-5 w-5 text-gray-400 group-hover:text-red-600 dark:group-hover:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-              </svg>
-            </div>
           </div>
         </div>
       <% end %>
@@ -235,3 +287,74 @@
 
   </div>
 </div>
+
+<style>
+  .privacy-sensitive {
+    transition: filter 0.3s ease;
+  }
+  
+  .privacy-mode .privacy-sensitive {
+    filter: blur(4px);
+    user-select: none;
+  }
+  
+  .privacy-mode .privacy-sensitive:hover {
+    filter: blur(2px);
+  }
+  
+  /* Toggle switch styles */
+  .privacy-active {
+    background-color: #3B82F6 !important;
+  }
+  
+  .privacy-active .toggle-switch {
+    transform: translateX(1.25rem);
+  }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const privacyToggle = document.getElementById('privacy-toggle');
+  const privacySwitch = document.getElementById('privacy-toggle-switch');
+  const body = document.body;
+  
+  if (!privacyToggle || !privacySwitch) {
+    console.error('Privacy toggle elements not found');
+    return;
+  }
+  
+  // Load saved privacy state
+  const isPrivacyMode = localStorage.getItem('privacyMode') === 'true';
+  
+  if (isPrivacyMode) {
+    enablePrivacyMode();
+  }
+  
+  privacyToggle.addEventListener('click', function(e) {
+    e.preventDefault();
+    console.log('Privacy toggle clicked'); // Debug log
+    
+    if (body.classList.contains('privacy-mode')) {
+      disablePrivacyMode();
+    } else {
+      enablePrivacyMode();
+    }
+  });
+  
+  function enablePrivacyMode() {
+    console.log('Enabling privacy mode'); // Debug log
+    body.classList.add('privacy-mode');
+    privacyToggle.classList.add('privacy-active');
+    privacySwitch.style.transform = 'translateX(1.25rem)';
+    localStorage.setItem('privacyMode', 'true');
+  }
+  
+  function disablePrivacyMode() {
+    console.log('Disabling privacy mode'); // Debug log
+    body.classList.remove('privacy-mode');
+    privacyToggle.classList.remove('privacy-active');
+    privacySwitch.style.transform = 'translateX(0.25rem)';
+    localStorage.setItem('privacyMode', 'false');
+  }
+});
+</script>
