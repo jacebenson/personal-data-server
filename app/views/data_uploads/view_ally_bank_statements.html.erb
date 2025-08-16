@@ -43,166 +43,200 @@
       </div>
     </div>
 
-    <!-- Summary Stats -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
-        <div class="p-5">
-          <div class="flex items-center">
-            <div class="flex-shrink-0">
-              <svg class="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-              </svg>
-            </div>
-            <div class="ml-5 w-0 flex-1">
-              <dl>
-                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Total Records</dt>
-                <dd class="text-lg font-medium text-gray-900 dark:text-white"><%= number_with_delimiter(@total_count) %></dd>
-              </dl>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
-        <div class="p-5">
-          <div class="flex items-center">
-            <div class="flex-shrink-0">
-              <svg class="h-6 w-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11l5-5m0 0l5 5m-5-5v12"></path>
-              </svg>
-            </div>
-            <div class="ml-5 w-0 flex-1">
-              <dl>
-                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Total Deposits</dt>
-                <dd class="text-lg font-medium text-green-600 dark:text-green-400">$<%= number_with_precision(@total_deposits, precision: 2, delimiter: ',') %></dd>
-              </dl>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
-        <div class="p-5">
-          <div class="flex items-center">
-            <div class="flex-shrink-0">
-              <svg class="h-6 w-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 13l-5 5m0 0l-5-5m5 5V6"></path>
-              </svg>
-            </div>
-            <div class="ml-5 w-0 flex-1">
-              <dl>
-                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Total Withdrawals</dt>
-                <dd class="text-lg font-medium text-red-600 dark:text-red-400">$<%= number_with_precision(@total_withdrawals.abs, precision: 2, delimiter: ',') %></dd>
-              </dl>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
-        <div class="p-5">
-          <div class="flex items-center">
-            <div class="flex-shrink-0">
-              <svg class="h-6 w-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-              </svg>
-            </div>
-            <div class="ml-5 w-0 flex-1">
-              <dl>
-                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Date Range</dt>
-                <dd class="text-sm font-medium text-gray-900 dark:text-white">
-                  <% if @date_range[:earliest] && @date_range[:latest] %>
-                    <%= @date_range[:earliest].strftime('%m/%d/%Y') %> - <%= @date_range[:latest].strftime('%m/%d/%Y') %>
-                  <% else %>
-                    No records
+    <!-- Account Balances - Focus on Current Balance -->
+    <div class="mb-8">
+      <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Current Account Balances</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <% @account_summaries.each do |account, data| %>
+          <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border-l-4 <%= data[:net] >= 0 ? 'border-green-500' : 'border-red-500' %>">
+            <div class="p-6">
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white truncate"><%= account %></h3>
+                <div class="flex items-center space-x-1">
+                  <%= link_to view_ally_bank_statements_data_uploads_path(account: account),
+                      class: "p-1 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200" do %>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                    </svg>
                   <% end %>
-                </dd>
-              </dl>
+                </div>
+              </div>
+              
+              <!-- Current Balance - Most Important -->
+              <div class="text-center mb-4">
+                <div class="text-3xl font-bold <%= data[:net] >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' %>">
+                  $<%= number_with_precision(data[:net], precision: 2, delimiter: ',') %>
+                </div>
+                <div class="text-sm text-gray-500 dark:text-gray-400">Current Balance</div>
+              </div>
+
+              <!-- Quick Stats -->
+              <div class="grid grid-cols-2 gap-3 text-sm">
+                <div class="text-center">
+                  <div class="text-green-600 dark:text-green-400 font-semibold">
+                    +$<%= number_with_precision(data[:deposits], precision: 0, delimiter: ',') %>
+                  </div>
+                  <div class="text-xs text-gray-500 dark:text-gray-400">Total In</div>
+                </div>
+                <div class="text-center">
+                  <div class="text-red-600 dark:text-red-400 font-semibold">
+                    -$<%= number_with_precision(data[:withdrawals], precision: 0, delimiter: ',') %>
+                  </div>
+                  <div class="text-xs text-gray-500 dark:text-gray-400">Total Out</div>
+                </div>
+              </div>
+              
+              <!-- Transaction Count -->
+              <div class="mt-3 text-center">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
+                  <%= pluralize(data[:count], 'transaction') %>
+                </span>
+              </div>
             </div>
           </div>
-        </div>
+        <% end %>
       </div>
     </div>
 
-    <!-- Account Summaries -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-      <% @account_summaries.each do |account, data| %>
-        <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
-          <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-            <div class="flex items-center justify-between">
-              <div>
-                <h3 class="text-lg font-medium text-gray-900 dark:text-white"><%= account %></h3>
-                <p class="text-sm text-gray-500 dark:text-gray-400"><%= pluralize(data[:count], 'transaction') %></p>
+    <!-- Recent Activity (Last 30 Days) -->
+    <%
+      thirty_days_ago = 30.days.ago
+      recent_transactions = current_user.bank_statements.where('date >= ?', thirty_days_ago).order(date: :desc)
+      recent_by_account = recent_transactions.group_by(&:account)
+    %>
+    
+    <% if recent_transactions.any? %>
+      <div class="mb-8">
+        <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">Recent Activity (Last 30 Days)</h2>
+        
+        <!-- Recent Summary Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <svg class="h-6 w-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                </svg>
               </div>
-              <div class="flex items-center space-x-2">
-                <%= link_to view_ally_bank_statements_data_uploads_path(account: account),
-                    class: "inline-flex items-center px-3 py-1 rounded-md text-xs font-medium text-blue-700 bg-blue-100 hover:bg-blue-200 dark:bg-blue-900 dark:text-blue-200 dark:hover:bg-blue-800" do %>
-                  <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                  </svg>
-                  View
-                <% end %>
-                <%= form_with url: remove_account_transactions_data_uploads_path(account: account), method: :delete, local: true, class: "inline-block" do |form| %>
-                  <%= form.submit "Delete",
-                      class: "inline-flex items-center px-3 py-1 rounded-md text-xs font-medium text-red-700 bg-red-100 hover:bg-red-200 dark:bg-red-900 dark:text-red-200 dark:hover:bg-red-800 cursor-pointer",
-                      onclick: "return confirm('Are you sure you want to delete all #{data[:count]} transactions from the #{account} account? This action cannot be undone.')" %>
-                <% end %>
+              <div class="ml-3">
+                <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Transactions</div>
+                <div class="text-lg font-semibold text-gray-900 dark:text-white"><%= recent_transactions.count %></div>
               </div>
             </div>
           </div>
-          <div class="p-6">
-            <div class="grid grid-cols-3 gap-4">
-              <div class="text-center">
-                <div class="text-2xl font-bold text-green-600 dark:text-green-400">
-                  +$<%= number_with_precision(data[:deposits], precision: 2, delimiter: ',') %>
-                </div>
-                <div class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Deposits</div>
+          
+          <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <svg class="h-6 w-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11l5-5m0 0l5 5m-5-5v12"></path>
+                </svg>
               </div>
-              <div class="text-center">
-                <div class="text-2xl font-bold text-red-600 dark:text-red-400">
-                  -$<%= number_with_precision(data[:withdrawals], precision: 2, delimiter: ',') %>
-                </div>
-                <div class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Withdrawals</div>
-              </div>
-              <div class="text-center">
-                <div class="text-2xl font-bold <%= data[:net] >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' %>">
-                  <%= data[:net] >= 0 ? '+' : '' %>$<%= number_with_precision(data[:net], precision: 2, delimiter: ',') %>
-                </div>
-                <div class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Net</div>
+              <div class="ml-3">
+                <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Income</div>
+                <div class="text-lg font-semibold text-green-600 dark:text-green-400">+$<%= number_with_precision(recent_transactions.where('amount > 0').sum(:amount), precision: 0, delimiter: ',') %></div>
               </div>
             </div>
-
-            <!-- Progress bar showing deposit vs withdrawal ratio -->
-            <div class="mt-4">
-              <div class="flex text-sm text-gray-600 dark:text-gray-400 mb-1">
-                <span>Activity Breakdown</span>
+          </div>
+          
+          <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <svg class="h-6 w-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 13l-5 5m0 0l-5-5m5 5V6"></path>
+                </svg>
               </div>
-              <% total_activity = data[:deposits] + data[:withdrawals] %>
-              <% if total_activity > 0 %>
-                <% deposit_percentage = (data[:deposits] / total_activity * 100).round(1) %>
-                <% withdrawal_percentage = (data[:withdrawals] / total_activity * 100).round(1) %>
-                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
-                  <div class="h-full flex">
-                    <div class="bg-green-500 transition-all duration-300" style="width: <%= deposit_percentage %>%"></div>
-                    <div class="bg-red-500 transition-all duration-300" style="width: <%= withdrawal_percentage %>%"></div>
+              <div class="ml-3">
+                <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Spending</div>
+                <div class="text-lg font-semibold text-red-600 dark:text-red-400">-$<%= number_with_precision(recent_transactions.where('amount < 0').sum(:amount).abs, precision: 0, delimiter: ',') %></div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <svg class="h-6 w-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                </svg>
+              </div>
+              <div class="ml-3">
+                <% recent_net = recent_transactions.sum(:amount) %>
+                <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Net Change</div>
+                <div class="text-lg font-semibold <%= recent_net >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' %>">
+                  <%= recent_net >= 0 ? '+' : '' %>$<%= number_with_precision(recent_net, precision: 0, delimiter: ',') %>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Transactions by Account (Collapsible) -->
+        <div class="space-y-4">
+          <% recent_by_account.each do |account, transactions| %>
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow">
+              <details class="group">
+                <summary class="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg">
+                  <div class="flex items-center space-x-3">
+                    <svg class="w-4 h-4 text-gray-400 group-open:rotate-90 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-white"><%= account %></h3>
+                    <span class="text-sm text-gray-500 dark:text-gray-400">(<%= pluralize(transactions.count, 'transaction') %>)</span>
+                  </div>
+                  <div class="text-right">
+                    <% account_net = transactions.sum(&:amount) %>
+                    <div class="text-lg font-semibold <%= account_net >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400' %>">
+                      <%= account_net >= 0 ? '+' : '' %>$<%= number_with_precision(account_net, precision: 2, delimiter: ',') %>
+                    </div>
+                    <div class="text-xs text-gray-500 dark:text-gray-400">30-day change</div>
+                  </div>
+                </summary>
+                
+                <div class="px-4 pb-4">
+                  <div class="max-h-80 overflow-y-auto">
+                    <table class="min-w-full">
+                      <thead class="bg-gray-50 dark:bg-gray-700">
+                        <tr>
+                          <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Date</th>
+                          <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Description</th>
+                          <th class="px-3 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Amount</th>
+                        </tr>
+                      </thead>
+                      <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                        <% transactions.first(10).each do |transaction| %>
+                          <tr>
+                            <td class="px-3 py-2 text-sm text-gray-900 dark:text-gray-300"><%= transaction.date.strftime('%m/%d') %></td>
+                            <td class="px-3 py-2 text-sm text-gray-900 dark:text-gray-300">
+                              <div class="max-w-xs truncate" title="<%= transaction.description %>"><%= transaction.description %></div>
+                            </td>
+                            <td class="px-3 py-2 text-sm text-right font-medium">
+                              <% if transaction.amount >= 0 %>
+                                <span class="text-green-600 dark:text-green-400">+$<%= number_with_precision(transaction.amount, precision: 2, delimiter: ',') %></span>
+                              <% else %>
+                                <span class="text-red-600 dark:text-red-400">-$<%= number_with_precision(transaction.amount.abs, precision: 2, delimiter: ',') %></span>
+                              <% end %>
+                            </td>
+                          </tr>
+                        <% end %>
+                        <% if transactions.count > 10 %>
+                          <tr>
+                            <td colspan="3" class="px-3 py-2 text-center text-sm text-gray-500 dark:text-gray-400">
+                              ... and <%= transactions.count - 10 %> more transactions
+                            </td>
+                          </tr>
+                        <% end %>
+                      </tbody>
+                    </table>
                   </div>
                 </div>
-                <div class="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  <span><%= deposit_percentage %>% deposits</span>
-                  <span><%= withdrawal_percentage %>% withdrawals</span>
-                </div>
-              <% else %>
-                <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
-                  <div class="bg-gray-400 h-full rounded-full" style="width: 100%"></div>
-                </div>
-                <div class="text-center text-xs text-gray-500 dark:text-gray-400 mt-1">No activity</div>
-              <% end %>
+              </details>
             </div>
-          </div>
+          <% end %>
         </div>
-      <% end %>
-    </div>
+      </div>
+    <% end %>
 
     <!-- Balance Adjustment Modal -->
     <div id="balance-adjustment-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
