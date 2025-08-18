@@ -16,6 +16,22 @@ class Api::V1::BaseController < ApplicationController
       return
     end
     
+    # Try Bearer token authentication
+    if request.headers['Authorization']&.start_with?('Bearer ')
+      token = request.headers['Authorization'].split(' ', 2).last
+      Rails.logger.info "API Auth: Attempting Bearer token authentication"
+      
+      user = User.find_by_bearer_token(token)
+      if user
+        Rails.logger.info "API Auth: Bearer token valid for user: #{user.email}"
+        @authenticated_api_user = user
+        session[:authenticated_api_user_id] = user.id
+        return
+      else
+        Rails.logger.warn "API Auth: Invalid Bearer token"
+      end
+    end
+    
     # Try basic auth for API access
     authenticate_or_request_with_http_basic do |email, password|
       Rails.logger.info "API Auth attempt: #{email}"

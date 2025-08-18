@@ -5,6 +5,10 @@ Rails.application.configure do
   # Add these lines to allow access from framework.local
   config.hosts << "framework.local"
   config.hosts << "framework"
+  #https://framework.tailba1bb.ts.net/
+  config.hosts << "framework.tailba1bb.ts.net"
+  # allow network "71.34.22.254"
+config.web_console.permissions = '0.0.0.0/0'
   # Make code changes take effect immediately without server restart.
   config.enable_reloading = true
 

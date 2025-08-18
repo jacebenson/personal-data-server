@@ -1,0 +1,152 @@
+<% content_for :title, "User Profile" %>
+
+<div class="max-w-4xl mx-auto py-8">
+  <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+    <!-- Header -->
+    <div class="bg-blue-600 px-6 py-4">
+      <h1 class="text-2xl font-bold text-white">User Profile</h1>
+      <p class="text-blue-100">Manage your account and API access</p>
+    </div>
+
+    <!-- Content -->
+    <div class="p-6">
+      <!-- User Information -->
+      <div class="mb-8">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">Account Information</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Email</label>
+            <p class="mt-1 text-sm text-gray-900 bg-gray-50 px-3 py-2 rounded"><%= @user.email %></p>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Account Created</label>
+            <p class="mt-1 text-sm text-gray-900 bg-gray-50 px-3 py-2 rounded"><%= @user.created_at.strftime("%B %d, %Y at %I:%M %p") %></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- API Access Section -->
+      <div class="mb-8">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">API Access</h2>
+        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <div class="ml-3">
+              <h3 class="text-sm font-medium text-yellow-800">Important Security Information</h3>
+              <p class="mt-1 text-sm text-yellow-700">
+                Keep your Bearer token secure and never share it publicly. This token provides full access to your personal data via the API.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bearer Token Display -->
+        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Bearer Token</label>
+          <div class="flex items-center space-x-2">
+            <div class="flex-1">
+              <input 
+                type="text" 
+                readonly 
+                value="<%= @bearer_token %>" 
+                class="w-full px-3 py-2 text-sm font-mono bg-white border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                id="bearer-token-input"
+              >
+            </div>
+            <button 
+              type="button"
+              onclick="copyToken()"
+              class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              Copy
+            </button>
+          </div>
+          <p class="mt-2 text-xs text-gray-600">
+            Use this token in the Authorization header: <code class="bg-gray-200 px-1 rounded">Authorization: Bearer <%= @bearer_token %></code>
+          </p>
+        </div>
+      </div>
+
+      <!-- API Usage Examples -->
+      <div class="mb-8">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">API Usage Examples</h2>
+        <div class="space-y-4">
+          <!-- cURL Example -->
+          <div>
+            <h3 class="text-sm font-medium text-gray-700 mb-2">cURL Example</h3>
+            <pre class="bg-gray-900 text-green-400 p-4 rounded text-sm overflow-x-auto"><code>curl -X POST <%= request.base_url %>/api/v1/mcp/search_all_data \
+  -H "Authorization: Bearer <%= @bearer_token %>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "search": {
+      "query": "your search terms",
+      "timeframe": "recent",
+      "limit": 20
+    }
+  }'</code></pre>
+          </div>
+
+          <!-- JavaScript Example -->
+          <div>
+            <h3 class="text-sm font-medium text-gray-700 mb-2">JavaScript Example</h3>
+            <pre class="bg-gray-900 text-green-400 p-4 rounded text-sm overflow-x-auto"><code>const response = await fetch('<%= request.base_url %>/api/v1/mcp/search_all_data', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer <%= @bearer_token %>',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    search: {
+      query: 'your search terms',
+      timeframe: 'recent',
+      limit: 20
+    }
+  })
+});
+
+const data = await response.json();
+console.log(data);</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex justify-between items-center pt-6 border-t border-gray-200">
+        <div>
+          <%= link_to "API Documentation", "/openapi.json", 
+              class: "text-blue-600 hover:text-blue-800 text-sm font-medium", 
+              target: "_blank" %>
+        </div>
+        <div class="space-x-4">
+          <%= link_to "Back to Dashboard", dashboard_path, 
+              class: "px-4 py-2 bg-gray-300 text-gray-700 text-sm font-medium rounded hover:bg-gray-400" %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function copyToken() {
+  const tokenInput = document.getElementById('bearer-token-input');
+  tokenInput.select();
+  document.execCommand('copy');
+  
+  // Show feedback
+  const button = event.target;
+  const originalText = button.textContent;
+  button.textContent = 'Copied!';
+  button.classList.add('bg-green-600');
+  button.classList.remove('bg-blue-600');
+  
+  setTimeout(() => {
+    button.textContent = originalText;
+    button.classList.remove('bg-green-600');
+    button.classList.add('bg-blue-600');
+  }, 2000);
+}
+</script>

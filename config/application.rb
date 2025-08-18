@@ -16,6 +16,25 @@ module PersonalDataServer
     # Common ones are `templates`, `generators`, or `middleware`, for example.
     config.autoload_lib(ignore: %w[assets tasks])
 
+    # Configure CORS for API access
+    config.middleware.insert_before 0, Rack::Cors do
+      allow do
+        origins '*'  # In production, specify actual origins like 'https://yourdomain.com'
+        resource '/api/*',
+          headers: :any,
+          methods: [:get, :post, :put, :patch, :delete, :options, :head],
+          credentials: false
+      end
+      
+      allow do
+        origins '*'
+        resource '/openapi.json',
+          headers: :any,
+          methods: [:get, :options, :head],
+          credentials: false
+      end
+    end
+
     # Configuration for the application, engines, and railties goes here.
     #
     # These settings can be overridden in specific environments using the files

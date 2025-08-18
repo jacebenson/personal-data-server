@@ -2,6 +2,14 @@ Rails.application.routes.draw do
   devise_for :users
   get "pages/home"
 
+  # User profile route
+  resource :user, only: [:show] do
+    post :regenerate_token
+  end
+
+  # OpenAPI/Swagger specification endpoint
+  get "openapi.json", to: "openapi#show", defaults: { format: :json }
+
   # Category pages
   get "financial", to: "financial#index"
   get "personal", to: "personal#index"
