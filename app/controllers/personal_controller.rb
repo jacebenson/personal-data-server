@@ -1,7 +1,7 @@
-class CategoriesController < ApplicationController
+class PersonalController < ApplicationController
   before_action :authenticate_user!
 
-  def personal
+  def index
     # Personal data counts
     @email_messages_count = current_user.email_messages.count
     @linkedin_messages_count = current_user.linkedin_messages.count

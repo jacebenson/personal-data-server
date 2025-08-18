@@ -1,256 +1,28 @@
 <div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <%= render 'shared/breadcrumb', breadcrumbs: [
+      { name: "Home", path: root_path },
+      { name: "Entertainment", path: entertainment_index_path }
+    ] %>
     <div class="mb-8">
-      <h1 class="text-3xl font-bold text-gray-900 dark:text-white">🎬 Entertainment Data</h1>
-      <p class="mt-2 text-gray-600 dark:text-gray-400">Manage and view your entertainment consumption data</p>
+      <h1 class="text-3xl font-bold text-gray-900 dark:text-white">🎬 Entertainment Content</h1>
+      <p class="mt-2 text-gray-600 dark:text-gray-400">Track your entertainment consumption across platforms</p>
     </div>
 
-    <!-- Overview Stats -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
-        <div class="p-5">
-          <div class="flex items-center">
-            <div class="flex-shrink-0">
-              <svg class="h-8 w-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2h3a1 1 0 011 1v1a1 1 0 01-1 1v9a2 2 0 01-2 2H6a2 2 0 01-2-2V7a1 1 0 01-1-1V5a1 1 0 011-1h3zM9 4h6V3H9v1zm-2 3v10h10V7H7z"></path>
-              </svg>
-            </div>
-            <div class="ml-5 w-0 flex-1">
-              <dl>
-                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Total Content</dt>
-                <dd class="text-lg font-medium text-gray-900 dark:text-white"><%= @total_content_count %></dd>
-              </dl>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
-        <div class="p-5">
-          <div class="flex items-center">
-            <div class="flex-shrink-0">
-              <svg class="h-8 w-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-              </svg>
-            </div>
-            <div class="ml-5 w-0 flex-1">
-              <dl>
-                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Netflix</dt>
-                <dd class="text-lg font-medium text-gray-900 dark:text-white"><%= @netflix_count %></dd>
-              </dl>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
-        <div class="p-5">
-          <div class="flex items-center">
-            <div class="flex-shrink-0">
-              <svg class="h-8 w-8 text-red-600" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-              </svg>
-            </div>
-            <div class="ml-5 w-0 flex-1">
-              <dl>
-                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">YouTube</dt>
-                <dd class="text-lg font-medium text-gray-900 dark:text-white"><%= @youtube_count %></dd>
-              </dl>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
-        <div class="p-5">
-          <div class="flex items-center">
-            <div class="flex-shrink-0">
-              <svg class="h-8 w-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 016 0v6a3 3 0 01-3 3z"></path>
-              </svg>
-            </div>
-            <div class="ml-5 w-0 flex-1">
-              <dl>
-                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Podcast Feeds</dt>
-                <dd class="text-lg font-medium text-gray-900 dark:text-white"><%= @podcast_feeds_count %></dd>
-              </dl>
-            </div>
-          </div>
-        </div>
-      </div>
+    <!-- Entertainment Cards Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <%= render 'entertainment/netflix_card' %>
+      <%= render 'entertainment/youtube_card' %>
+      <%= render 'entertainment/audible_library_card' %>
+      <%= render 'entertainment/podcasts_card' %>
     </div>
 
-    <!-- Content Categories -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-      <!-- Streaming Services -->
-      <div class="space-y-6">
-        <h2 class="text-xl font-semibold text-gray-900 dark:text-white">📺 Video Streaming</h2>
-        
-        <!-- Video Streaming Combined -->
-        <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
-          <div class="p-6">
-            <div class="flex items-center justify-between mb-4">
-              <div class="flex items-center">
-                <div class="flex-shrink-0">
-                  <svg class="h-8 w-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                  </svg>
-                </div>
-                <div class="ml-4">
-                  <h3 class="text-lg font-medium text-gray-900 dark:text-white">Video Content</h3>
-                  <p class="text-sm text-gray-500 dark:text-gray-400">
-                    <%= @netflix_count + @youtube_count %> total videos/shows watched
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <!-- Netflix Section -->
-            <div class="border-l-4 border-red-500 pl-4 mb-4">
-              <div class="flex items-center justify-between">
-                <div class="flex items-center">
-                  <div class="flex-shrink-0">
-                    <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                    </svg>
-                  </div>
-                  <div class="ml-3">
-                    <h4 class="text-md font-medium text-gray-900 dark:text-white">Netflix</h4>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">
-                      <%= @netflix_count %> titles
-                      <% if @last_netflix_upload %>
-                        • Last upload <%= time_ago_in_words(@last_netflix_upload) %> ago
-                      <% end %>
-                    </p>
-                  </div>
-                </div>
-                <div class="flex space-x-2">
-                  <%= link_to "Upload", netflix_entertainment_index_path,
-                      class: "inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" %>
-                  <% if @netflix_count > 0 %>
-                    <%= link_to "View", view_netflix_entertainment_index_path,
-                        class: "inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" %>
-                  <% end %>
-                </div>
-              </div>
-            </div>
-
-            <!-- YouTube Section -->
-            <div class="border-l-4 border-red-500 pl-4">
-              <div class="flex items-center justify-between">
-                <div class="flex items-center">
-                  <div class="flex-shrink-0">
-                    <svg class="h-6 w-6 text-red-600" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-                    </svg>
-                  </div>
-                  <div class="ml-3">
-                    <h4 class="text-md font-medium text-gray-900 dark:text-white">YouTube</h4>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">
-                      <%= @youtube_count %> videos
-                      <% if @last_youtube_upload %>
-                        • Last upload <%= time_ago_in_words(@last_youtube_upload) %> ago
-                      <% end %>
-                    </p>
-                  </div>
-                </div>
-                <div class="flex space-x-2">
-                  <%= link_to "Upload", youtube_entertainment_index_path,
-                      class: "inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" %>
-                  <% if @youtube_count > 0 %>
-                    <%= link_to "View", view_youtube_entertainment_index_path,
-                        class: "inline-flex items-center px-2 py-1 border border-gray-300 text-xs font-medium rounded text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" %>
-                  <% end %>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+    <!-- Summary Statistics -->
+    <% if @total_content_count > 0 || @podcast_feeds_count > 0 %>
+      <div class="mt-8">
+        <%= render 'entertainment/summary' %>
       </div>
-
-      <!-- Audio Content -->
-      <div class="space-y-6">
-        <h2 class="text-xl font-semibold text-gray-900 dark:text-white">🎧 Audio Content</h2>
-        
-        <!-- Podcasts -->
-        <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
-          <div class="p-6">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center">
-                <div class="flex-shrink-0">
-                  <svg class="h-8 w-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 016 0v6a3 3 0 01-3 3z"></path>
-                  </svg>
-                </div>
-                <div class="ml-4">
-                  <h3 class="text-lg font-medium text-gray-900 dark:text-white">Podcasts</h3>
-                  <p class="text-sm text-gray-500 dark:text-gray-400">
-                    <%= @podcast_feeds_count %> feeds • <%= @podcast_episodes_count %> episodes
-                    <% if @last_podcast_sync %>
-                      • Last sync <%= time_ago_in_words(@last_podcast_sync) %> ago
-                    <% end %>
-                  </p>
-                </div>
-              </div>
-              <div class="flex space-x-2">
-                <%= link_to "Manage", podcasts_entertainment_index_path,
-                    class: "inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500" %>
-                <% if @podcast_episodes_count > 0 %>
-                  <%= link_to "Episodes", all_episodes_entertainment_index_path,
-                      class: "inline-flex items-center px-3 py-2 border border-gray-300 text-sm leading-4 font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500" %>
-                <% end %>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Audible Books -->
-        <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
-          <div class="p-6">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center">
-                <div class="flex-shrink-0">
-                  <svg class="h-8 w-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                  </svg>
-                </div>
-                <div class="ml-4">
-                  <h3 class="text-lg font-medium text-gray-900 dark:text-white">Audible Books</h3>
-                  <p class="text-sm text-gray-500 dark:text-gray-400">
-                    <%= @audible_books_count %> books
-                    <% if @last_audible_upload %>
-                      • Last upload <%= time_ago_in_words(@last_audible_upload) %> ago
-                    <% end %>
-                  </p>
-                </div>
-              </div>
-              <div class="flex space-x-2">
-                <span class="inline-flex items-center px-3 py-2 border border-gray-300 text-sm leading-4 font-medium rounded-md text-gray-400 bg-gray-100 dark:bg-gray-700 cursor-not-allowed">
-                  Coming Soon
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Quick Actions -->
-    <div class="mt-8 bg-white dark:bg-gray-800 shadow rounded-lg">
-      <div class="p-6">
-        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Quick Actions</h3>
-        <div class="flex flex-wrap gap-3">
-          <%= link_to "📺 Upload Netflix Data", netflix_entertainment_index_path,
-              class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" %>
-          <%= link_to "📺 Upload YouTube History", youtube_entertainment_index_path,
-              class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" %>
-          <%= link_to "🎙️ Manage Podcasts", podcasts_entertainment_index_path,
-              class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500" %>
-          <%= link_to "📊 View All Data", data_uploads_path,
-              class: "inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
-        </div>
-      </div>
-    </div>
+    <% end %>
 
   </div>
 </div>

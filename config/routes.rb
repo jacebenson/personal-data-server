@@ -3,9 +3,9 @@ Rails.application.routes.draw do
   get "pages/home"
 
   # Category pages
-  get "financial", to: "categories#financial"
-  get "personal", to: "categories#personal"
-  get "entertainment", to: "categories#entertainment"
+  get "financial", to: "financial#index"
+  get "personal", to: "personal#index"
+  get "entertainment", to: "entertainment#index"
 
   # Data uploads routes
   resources :data_uploads, only: [ :index ] do
