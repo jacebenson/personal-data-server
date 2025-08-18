@@ -1,0 +1,409 @@
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="mb-8">
+      <div class="flex justify-between items-center">
+        <div>
+          <%= render 'shared/breadcrumb', breadcrumbs: [
+            { name: "Home", path: root_path },
+            { name: "Shopping", path: shopping_path },
+            { name: "View Orders", path: nil }
+          ] %>
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-white">🛒 Amazon Orders</h1>
+          <p class="mt-2 text-gray-600 dark:text-gray-400">View your imported Amazon order history</p>
+        </div>
+        <% if @amazon_orders.any? %>
+          <div class="flex space-x-3">
+            <%= link_to upload_shopping_index_path,
+                class: "inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500" do %>
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+              </svg>
+              Upload More
+            <% end %>
+            <%= button_to clear_orders_shopping_index_path, method: :delete,
+                confirm: "Are you sure you want to delete all Amazon orders? This cannot be undone.",
+                class: "inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700" do %>
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+              </svg>
+              Clear All Orders
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <% if @amazon_orders.any? %>
+      <!-- Summary Stats -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+          <div class="p-5">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <svg class="h-6 w-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                </svg>
+              </div>
+              <div class="ml-5 w-0 flex-1">
+                <dl>
+                  <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Total Orders</dt>
+                  <dd class="text-lg font-medium text-gray-900 dark:text-white"><%= @total_count %></dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+          <div class="p-5">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+              </div>
+              <div class="ml-5 w-0 flex-1">
+                <dl>
+                  <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">This Year</dt>
+                  <dd class="text-lg font-medium text-gray-900 dark:text-white">
+                    <%= current_user.amazon_orders.where('order_date >= ?', Date.current.beginning_of_year).count %>
+                  </dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+          <div class="p-5">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                </svg>
+              </div>
+              <div class="ml-5 w-0 flex-1">
+                <dl>
+                  <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">This Month</dt>
+                  <dd class="text-lg font-medium text-gray-900 dark:text-white">
+                    <%= current_user.amazon_orders.where('order_date >= ?', Date.current.beginning_of_month).count %>
+                  </dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+          <div class="p-5">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <svg class="h-6 w-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                </svg>
+              </div>
+              <div class="ml-5 w-0 flex-1">
+                <dl>
+                  <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Recent</dt>
+                  <dd class="text-lg font-medium text-gray-900 dark:text-white">
+                    <%= current_user.amazon_orders.where('order_date >= ?', 30.days.ago).count %>
+                  </dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="bg-white dark:bg-gray-800 shadow rounded-lg mb-6">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white">Filters</h3>
+        </div>
+        <div class="p-6">
+          <%= form_with url: view_orders_shopping_index_path, method: :get, local: true, class: "flex flex-wrap items-end gap-4" do |form| %>
+            <div>
+              <%= form.label :search, "Search", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+              <%= form.text_field :search, 
+                  value: params[:search],
+                  placeholder: "Product name...",
+                  class: "mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white" %>
+            </div>
+
+            <div>
+              <%= form.label :order_type, "Type", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+              <%= form.select :order_type,
+                  options_for_select([["All Types", "all"]] + @available_order_types.map { |t| [t.capitalize, t] }, params[:order_type]),
+                  {},
+                  { class: "mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white" } %>
+            </div>
+
+            <div>
+              <%= form.submit "Filter", class: "inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
+              <%= link_to "Clear", view_orders_shopping_index_path, class: "ml-2 inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Orders Table -->
+      <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+            Orders
+            <span class="text-sm font-normal text-gray-500 dark:text-gray-400">
+              (Showing <%= [@amazon_orders.count, @per_page].min %> of <%= @total_count %> orders)
+            </span>
+          </h3>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead class="bg-gray-50 dark:bg-gray-900">
+              <tr>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  Type
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  What
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  When
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  How Much
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  Status
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  Order ID
+                </th>
+              </tr>
+            </thead>
+            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+              <% @amazon_orders.each do |order| %>
+                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                  <!-- Type Column -->
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <% if order.order_type == 'digital' %>
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                        📱 Digital
+                      </span>
+                    <% else %>
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                        📦 Retail
+                      </span>
+                    <% end %>
+                  </td>
+
+                  <!-- What Column -->
+                  <td class="px-6 py-4">
+                    <div class="text-sm font-medium">
+                      <% if order.asin.present? %>
+                        <%
+                          # Determine the appropriate product URL based on publisher and subscription status
+                          product_url = if order.publisher == "Audible" && !order.subscription_info.present?
+                            "https://www.audible.com/pd/#{order.asin}"
+                          else
+                            "https://www.amazon.com/dp/#{order.asin}"
+                          end
+                        %>
+                        <a href="<%= product_url %>"
+                           target="_blank"
+                           class="text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 hover:underline">
+                          <%= truncate(order.product_name, length: 60) %>
+                          <svg class="inline-block w-3 h-3 ml-1 opacity-50" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"></path>
+                            <path d="M5 5a2 2 0 00-2 2v6a2 2 0 002 2h6a2 2 0 002-2v-2a1 1 0 10-2 0v2H5V7h2a1 1 0 000-2H5z"></path>
+                          </svg>
+                        </a>
+                      <% else %>
+                        <span class="text-gray-900 dark:text-white">
+                          <%= truncate(order.product_name, length: 60) %>
+                        </span>
+                      <% end %>
+                    </div>
+                    <% if order.asin.present? %>
+                      <div class="text-xs text-gray-500 dark:text-gray-400 font-mono">
+                        ASIN: <%= order.asin %>
+                      </div>
+                    <% end %>
+                    <% if order.order_type == 'retail' && order.quantity && order.quantity > 1 %>
+                      <div class="text-sm text-gray-500 dark:text-gray-400">
+                        Quantity: <%= order.quantity %>
+                      </div>
+                    <% end %>
+                    <% if order.order_type == 'digital' %>
+                      <div class="text-xs text-gray-500 dark:text-gray-400">
+                        <%
+                          # Determine the service source based on publisher
+                          service_source = if order.publisher == "Audible"
+                            "Audible"
+                          elsif order.publisher&.include?("Amazon.com Services")
+                            "Amazon"
+                          else
+                            "Amazon" # Default to Amazon for digital purchases
+                          end
+                        %>
+                        📡 <%= service_source %>
+                        <% if order.subscription_info.present? %>
+                          <span class="ml-1 inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+                            🔄 Subscription
+                          </span>
+                        <% end %>
+                      </div>
+                      <% if order.publisher.present? && order.publisher != "Amazon.com Services, Inc" %>
+                        <div class="text-sm text-gray-500 dark:text-gray-400">
+                          Publisher: <%= order.publisher %>
+                        </div>
+                      <% end %>
+                    <% end %>
+                  </td>
+
+                  <!-- When Column -->
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm text-gray-900 dark:text-white">
+                      <%= order.order_date&.strftime('%b %d, %Y') %>
+                    </div>
+                    <% if order.order_type == 'retail' && order.ship_date.present? %>
+                      <div class="text-xs text-gray-500 dark:text-gray-400">
+                        Shipped: <%= order.ship_date.strftime("%b %d, %Y") %>
+                      </div>
+                    <% elsif order.order_type == 'digital' && order.fulfilled_date.present? %>
+                      <div class="text-xs text-gray-500 dark:text-gray-400">
+                        Fulfilled: <%= order.fulfilled_date.strftime("%b %d, %Y") %>
+                      </div>
+                    <% end %>
+                  </td>
+
+                  <!-- How Much Column -->
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm font-medium text-gray-900 dark:text-white">
+                      <% if order.total_owed.present? %>
+                        $<%= number_with_delimiter(order.total_owed) %>
+                      <% elsif order.our_price.present? %>
+                        $<%= number_with_delimiter(order.our_price) %>
+                      <% else %>
+                        N/A
+                      <% end %>
+                    </div>
+                    <% if order.order_type == 'retail' %>
+                      <% if order.unit_price_tax && order.unit_price_tax > 0 %>
+                        <div class="text-xs text-gray-500 dark:text-gray-400">
+                          +$<%= '%.2f' % order.unit_price_tax %> tax
+                        </div>
+                      <% end %>
+                      <% if order.shipping_charge && order.shipping_charge > 0 %>
+                        <div class="text-xs text-gray-500 dark:text-gray-400">
+                          +$<%= '%.2f' % order.shipping_charge %> shipping
+                        </div>
+                      <% end %>
+                    <% end %>
+                  </td>
+
+                  <!-- Status Column -->
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <% if order.order_type == 'retail' %>
+                      <div class="text-sm text-gray-900 dark:text-white">
+                        <%= order.order_status || 'Completed' %>
+                      </div>
+                      <% if order.shipment_status.present? %>
+                        <div class="text-xs text-gray-500 dark:text-gray-400">
+                          <%= order.shipment_status %>
+                        </div>
+                      <% end %>
+                    <% elsif order.order_type == 'digital' %>
+                      <% if order.is_fulfilled %>
+                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                          ✅ Fulfilled
+                        </span>
+                      <% else %>
+                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                          ⏳ Pending
+                        </span>
+                      <% end %>
+                    <% end %>
+                  </td>
+
+                  <!-- Order ID Column -->
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="text-sm font-mono">
+                      <a href="https://www.amazon.com/gp/your-account/order-details?orderID=<%= order.order_id %>"
+                         target="_blank"
+                         class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:underline">
+                        <%= order.order_id %>
+                        <svg class="inline-block w-3 h-3 ml-1" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"></path>
+                          <path d="M5 5a2 2 0 00-2 2v6a2 2 0 002 2h6a2 2 0 002-2v-2a1 1 0 10-2 0v2H5V7h2a1 1 0 000-2H5z"></path>
+                        </svg>
+                      </a>
+                    </div>
+                    <% if order.order_type == 'retail' && order.tracking_number.present? && !order.tracking_number.include?("Not Available") %>
+                      <div class="text-xs text-blue-600 dark:text-blue-400">
+                        📦 <%= truncate(order.tracking_number, length: 20) %>
+                      </div>
+                    <% end %>
+                    <% if order.is_prime_eligible %>
+                      <div class="text-xs text-blue-600 dark:text-blue-400">
+                        Prime
+                      </div>
+                    <% end %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <% if @total_pages > 1 %>
+          <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
+            <div class="text-sm text-gray-500 dark:text-gray-400">
+              Showing <%= (@page - 1) * @per_page + 1 %>-<%= [@page * @per_page, @total_count].min %> of <%= @total_count %> results
+            </div>
+            <div class="flex space-x-2">
+              <% if @page > 1 %>
+                <%= link_to "Previous", view_orders_shopping_index_path(page: @page - 1), 
+                    class: "px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700" %>
+              <% end %>
+              
+              <% ([1, @page - 2].max..[@page + 2, @total_pages].min).each do |page_num| %>
+                <% if page_num == @page %>
+                  <span class="px-3 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md">
+                    <%= page_num %>
+                  </span>
+                <% else %>
+                  <%= link_to page_num, view_orders_shopping_index_path(page: page_num), 
+                      class: "px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700" %>
+                <% end %>
+              <% end %>
+              
+              <% if @page < @total_pages %>
+                <%= link_to "Next", view_orders_shopping_index_path(page: @page + 1), 
+                    class: "px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700" %>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <!-- Empty State -->
+      <div class="text-center py-12">
+        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+        </svg>
+        <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No orders found</h3>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Get started by uploading your Amazon order data.</p>
+        <div class="mt-6">
+          <%= link_to upload_shopping_index_path,
+              class: "inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" do %>
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            Upload Orders
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

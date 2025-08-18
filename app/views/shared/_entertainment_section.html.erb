@@ -1,0 +1,42 @@
+<!-- Entertainment Category -->
+<%= link_to entertainment_path, class: "group block" do %>
+  <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg hover:shadow-lg transition-shadow duration-200">
+    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center">
+          <div class="h-8 w-8 bg-red-100 dark:bg-red-900 rounded-lg flex items-center justify-center mr-3">
+            <span class="text-xl">🎬</span>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900 dark:text-white group-hover:text-red-600 dark:group-hover:text-red-400">Entertainment</h3>
+        </div>
+        <svg class="h-5 w-5 text-gray-400 group-hover:text-red-600 dark:group-hover:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+        </svg>
+      </div>
+    </div>
+    <div class="p-6">
+      <div class="space-y-2">
+        <div class="flex items-center text-sm">
+          <span class="text-lg mr-2">👀</span>
+          <span class="font-medium text-gray-900 dark:text-white">
+            <%= current_user.entertainment_contents.where(
+              content_type: ['netflix', 'youtube'],
+              date_consumed: Date.current.beginning_of_day..Date.current.end_of_day
+            ).count %>
+          </span>
+          <span class="text-gray-600 dark:text-gray-300 ml-1">videos today</span>
+        </div>
+        <div class="flex items-center text-sm">
+          <span class="text-lg mr-2">👂</span>
+          <span class="font-medium text-gray-900 dark:text-white">
+            <%= current_user.entertainment_contents.where(
+              content_type: 'podcast',
+              date_consumed: 1.week.ago.beginning_of_day..Time.current
+            ).count %>
+          </span>
+          <span class="text-gray-600 dark:text-gray-300 ml-1">new podcast ep.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>

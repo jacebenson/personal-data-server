@@ -1,0 +1,113 @@
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="mb-8">
+      <%= link_to data_uploads_path, class: "inline-flex items-center text-blue-600 hover:text-blue-500" do %>
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+        Back to Data Uploads
+      <% end %>
+
+      <h1 class="mt-4 text-3xl font-bold text-gray-900 dark:text-white">Manage Duplicate Transactions</h1>
+      <p class="mt-2 text-gray-600 dark:text-gray-400">Review and remove any duplicate bank statement entries</p>
+    </div>
+
+    <% if @duplicates.any? %>
+      <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden mb-6">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-yellow-50 dark:bg-yellow-900">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-lg font-medium text-yellow-800 dark:text-yellow-200">
+                <%= pluralize(@duplicates.count, 'duplicate transaction group') %> found
+              </h3>
+              <p class="text-sm text-yellow-600 dark:text-yellow-300">
+                These transactions have identical date, amount, and description (accounts may vary).
+              </p>
+            </div>
+            <%= form_with url: remove_duplicates_data_uploads_path, method: :delete, local: true, class: "inline-block" do |form| %>
+              <%= form.submit "Remove All Duplicates",
+                  class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 cursor-pointer",
+                  onclick: "return confirm('Are you sure? This will remove duplicate transactions, keeping only the first occurrence of each.')" %>
+            <% end %>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead class="bg-gray-50 dark:bg-gray-900">
+              <tr>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  Date
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  Description
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  Amount
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  Accounts
+                </th>
+                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  Duplicates
+                </th>
+              </tr>
+            </thead>
+            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+              <% @duplicates.each do |duplicate| %>
+                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
+                    <%= duplicate[:date].strftime('%m/%d/%Y') %>
+                  </td>
+                  <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-300">
+                    <div class="max-w-xs truncate" title="<%= duplicate[:description] %>">
+                      <%= duplicate[:description] %>
+                    </div>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <% if duplicate[:amount] >= 0 %>
+                      <span class="text-green-600 dark:text-green-400">+$<%= number_with_precision(duplicate[:amount], precision: 2, delimiter: ',') %></span>
+                    <% else %>
+                      <span class="text-red-600 dark:text-red-400">-$<%= number_with_precision(duplicate[:amount].abs, precision: 2, delimiter: ',') %></span>
+                    <% end %>
+                  </td>
+                  <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-300">
+                    <% accounts = duplicate[:accounts].split(',').uniq %>
+                    <% if accounts.length == 1 %>
+                      <%= accounts.first %>
+                    <% else %>
+                      <div class="space-y-1">
+                        <% accounts.each do |account| %>
+                          <div class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 mr-1">
+                            <%= account %>
+                          </div>
+                        <% end %>
+                      </div>
+                    <% end %>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                      <%= duplicate[:count] %> copies
+                    </span>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    <% else %>
+      <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+        <div class="px-6 py-12 text-center">
+          <svg class="mx-auto h-12 w-12 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <h3 class="mt-2 text-lg font-medium text-gray-900 dark:text-white">No Duplicates Found</h3>
+          <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            All your bank statement transactions are unique. The duplicate prevention system is working correctly.
+          </p>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -6,43 +6,33 @@ Rails.application.routes.draw do
   get "financial", to: "financial#index"
   get "personal", to: "personal#index"
   get "entertainment", to: "entertainment#index"
+  get "shopping", to: "shopping#index"
 
-  # Data uploads routes
-  resources :data_uploads, only: [ :index ] do
+  # Legacy data_uploads routes - redirected to appropriate controllers
+  resources :data_uploads, only: [:index] do
     collection do
-      # Ally Bank specific routes
-      get :ally_bank_statements
-      post :upload_ally_bank_statements
-      get :view_ally_bank_statements
+      # Redirect to dashboard
+      get '', to: redirect('/dashboard')
+      
+      # Financial redirects
+      get :ally_bank_statements, to: redirect('/financial/bank_statements')
+      post :upload_ally_bank_statements, to: redirect('/financial/upload_bank_statements')
+      get :view_ally_bank_statements, to: redirect('/financial/view_bank_statements')
+      get :fidelity_data, to: redirect('/financial/fidelity_upload')
+      post :upload_fidelity_data, to: redirect('/financial/upload_fidelity_data')
+      get :principal_investments, to: redirect('/financial/principal_upload')
+      post :upload_principal_investments, to: redirect('/financial/upload_principal_data')
+      get :view_investments, to: redirect('/financial/view_investments')
+      get :manage_duplicates, to: redirect('/financial/manage_duplicates')
+      delete :clear_investments, to: redirect('/financial/clear_investments')
 
-      # Investment routes
-      get :fidelity_data
-      post :upload_fidelity_data
-      get :principal_investments
-      post :upload_principal_investments
-      get :view_investments
-      delete :clear_investments
+      # Shopping redirects
+      get :amazon_orders, to: redirect('/shopping/upload')
+      post :upload_amazon_orders, to: redirect('/shopping/upload_orders')
+      get :view_amazon_orders, to: redirect('/shopping/view_orders')
+      delete :clear_amazon_orders, to: redirect('/shopping/clear_orders')
 
-      # Social Security routes - redirected to dedicated controller
-      get :social_security_earnings, to: redirect('/social_security')
-      post :upload_social_security_earnings, to: 'social_security#upload_earnings'
-      get :view_social_security_earnings, to: redirect('/social_security/view_earnings')
-
-      # Amazon shopping routes
-      get :amazon_orders
-      post :upload_amazon_orders
-      get :view_amazon_orders
-      delete :clear_amazon_orders
-
-      # Communication routes - redirected to dedicated controller
-      get :communications, to: redirect('/communications')
-      post :upload_mbox, to: 'communications#upload_mbox'
-      post :upload_linkedin_messages, to: 'communications#upload_linkedin_messages'
-      get :view_communications, to: redirect('/communications/view')
-      get "view_communications/:id", to: redirect { |params, _| "/communications/#{params[:id]}" }
-      delete :clear_communications, to: 'communications#clear'
-
-      # Calendar routes (legacy - redirect to new calendar routes)
+      # Calendar redirects
       get :calendars, to: redirect('/calendars')
       post :upload_ics_file, to: 'calendars#upload_ics_file'
       get :view_calendars, to: redirect('/calendars')
@@ -55,7 +45,16 @@ Rails.application.routes.draw do
       delete :clear_calendars, to: 'calendars#clear_all'
       delete "remove_calendar/:id", to: 'calendars#destroy'
 
-      # Entertainment routes - redirected to dedicated controller
+      # Other legacy redirects
+      get :social_security_earnings, to: redirect('/social_security')
+      post :upload_social_security_earnings, to: 'social_security#upload_earnings'
+      get :view_social_security_earnings, to: redirect('/social_security/view_earnings')
+      get :communications, to: redirect('/communications')
+      post :upload_mbox, to: 'communications#upload_mbox'
+      post :upload_linkedin_messages, to: 'communications#upload_linkedin_messages'
+      get :view_communications, to: redirect('/communications/view')
+      get "view_communications/:id", to: redirect { |params, _| "/communications/#{params[:id]}" }
+      delete :clear_communications, to: 'communications#clear'
       get :entertainment, to: redirect('/entertainment')
       get :netflix, to: redirect('/entertainment/netflix')
       post :upload_netflix, to: 'entertainment#upload_netflix'
@@ -65,15 +64,10 @@ Rails.application.routes.draw do
       post :upload_youtube, to: 'entertainment#upload_youtube'
       get :view_youtube, to: redirect('/entertainment/view_youtube')
       delete :clear_youtube, to: 'entertainment#clear_youtube'
-
-      # Duplicate and account management
-      get :manage_duplicates
-      delete :remove_duplicates
-      delete :remove_account_transactions
-      delete :remove_all_transactions
-
-      # Balance adjustment routes
-      post :add_balance_adjustment
+      delete :remove_duplicates, to: redirect('/financial/remove_duplicates')
+      delete :remove_account_transactions, to: redirect('/financial/clear_bank_statements')
+      delete :remove_all_transactions, to: redirect('/financial/clear_bank_statements')
+      post :add_balance_adjustment, to: 'financial#add_balance_adjustment'
     end
   end
 
@@ -111,6 +105,37 @@ Rails.application.routes.draw do
   
   # Event detail view
   get 'calendars/events/:id', to: 'calendars#show_event', as: 'calendar_event'
+
+  # Financial data management routes
+  resources :financial, only: [:index] do
+    collection do
+      get :bank_statements
+      post :upload_bank_statements
+      get :view_bank_statements
+      get :fidelity_upload
+      post :upload_fidelity_data
+      get :principal_upload
+      post :upload_principal_data
+      get :view_investments
+      get :manage_duplicates
+      delete :remove_duplicates
+      delete :clear_bank_statements
+      delete :clear_investments
+      post :add_balance_adjustment
+    end
+  end
+
+  # Shopping/Amazon order management routes
+  resources :shopping, only: [:index] do
+    collection do
+      get :upload
+      get :upload_digital
+      post :upload_orders
+      post :upload_digital_orders
+      get :view_orders
+      delete :clear_orders
+    end
+  end
 
   # Contact management routes
   resources :contacts, only: [:index, :show, :edit, :update, :destroy] do
@@ -231,8 +256,11 @@ Rails.application.routes.draw do
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
+  # Dashboard route
+  get "dashboard", to: "dashboard#index"
+
   authenticated :user do
-    root "data_uploads#index", as: :authenticated_user_root
+    root "dashboard#index", as: :authenticated_user_root
   end
 
   # Defines the root path route ("/")

@@ -32,13 +32,13 @@
           </div>
           <div class="mt-6 space-y-3">
             <% if @bank_statements_count > 0 %>
-              <%= link_to "View All Records", view_ally_bank_statements_data_uploads_path,
+              <%= link_to "View All Records", view_bank_statements_financial_index_path,
                   class: "w-full flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600" %>
             <% end %>
-            <%= link_to "Upload New Statements", ally_bank_statements_data_uploads_path,
+            <%= link_to "Upload New Statements", bank_statements_financial_index_path,
                 class: "w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
             <% if @bank_statements_count > 0 %>
-              <%= link_to "Manage Duplicates", manage_duplicates_data_uploads_path,
+              <%= link_to "Manage Duplicates", manage_duplicates_financial_index_path,
                   class: "w-full flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600" %>
             <% end %>
           </div>
@@ -67,12 +67,12 @@
           </div>
           <div class="mt-6 space-y-3">
             <% if @investments_count > 0 %>
-              <%= link_to "View All Records", view_investments_data_uploads_path,
+              <%= link_to "View All Records", view_investments_financial_index_path,
                   class: "w-full flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600" %>
             <% end %>
-            <%= link_to "Upload Fidelity Data", fidelity_data_data_uploads_path,
+            <%= link_to "Upload Fidelity Data", fidelity_upload_financial_index_path,
                 class: "w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700" %>
-            <%= link_to "Upload Principal OFX", principal_investments_data_uploads_path,
+            <%= link_to "Upload Principal OFX", principal_upload_financial_index_path,
                 class: "w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700" %>
           </div>
         </div>
@@ -109,41 +109,6 @@
             <% end %>
             <%= link_to "Upload SSA XML", social_security_index_path,
                 class: "w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-orange-600 hover:bg-orange-700" %>
-          </div>
-        </div>
-      </div>
-
-      <!-- Amazon Shopping -->
-      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
-        <div class="p-6">
-          <div class="flex items-center">
-            <div class="flex-shrink-0">
-              <svg class="h-8 w-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
-              </svg>
-            </div>
-            <div class="ml-4 flex-1">
-              <h3 class="text-lg font-medium text-gray-900 dark:text-white">Amazon Shopping</h3>
-              <p class="text-sm text-gray-500 dark:text-gray-400">Order history and purchase data</p>
-              <div class="mt-2">
-                <p class="text-2xl font-semibold text-gray-900 dark:text-white"><%= @amazon_orders_count %></p>
-                <p class="text-xs text-gray-500 dark:text-gray-400">
-                  <% if @amazon_orders_count > 0 %>
-                    Last upload: <%= @last_amazon_upload&.strftime("%B %d, %Y") || "Never" %>
-                  <% else %>
-                    No data uploaded
-                  <% end %>
-                </p>
-              </div>
-            </div>
-          </div>
-          <div class="mt-6 space-y-3">
-            <% if @amazon_orders_count > 0 %>
-              <%= link_to "View All Orders", view_amazon_orders_data_uploads_path,
-                  class: "w-full flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600" %>
-            <% end %>
-            <%= link_to "Upload Amazon Orders", amazon_orders_data_uploads_path,
-                class: "w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-yellow-600 hover:bg-yellow-700" %>
           </div>
         </div>
       </div>
