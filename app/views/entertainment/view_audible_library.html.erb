@@ -1,0 +1,183 @@
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <%= render 'shared/breadcrumb', breadcrumbs: [
+        { name: "Home", path: root_path },
+        { name: "Entertainment", path: entertainment_index_path },
+        { name: "Audible Library", path: view_audible_library_entertainment_index_path }
+      ] %>
+    <!-- Header -->
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-900 dark:text-white">📚 Audible Library</h1>
+      <p class="mt-2 text-gray-600 dark:text-gray-400">Your audiobook collection</p>
+    </div>
+
+    <!-- Summary Stats -->
+    <div class="mb-8 bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+      <div class="p-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="text-center">
+            <p class="text-2xl font-semibold text-blue-600"><%= @total_count %></p>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Total library items</p>
+          </div>
+          <div class="text-center">
+            <p class="text-2xl font-semibold text-blue-600">
+              <%= @years_available.first || "N/A" %>
+            </p>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Most recent addition</p>
+          </div>
+          <div class="text-center">
+            <p class="text-2xl font-semibold text-blue-600">
+              <%= @years_available.last || "N/A" %>
+            </p>
+            <p class="text-sm text-gray-500 dark:text-gray-400">First addition</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filters and Search -->
+    <div class="mb-6 bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+      <div class="p-4">
+        <%= form_with url: view_audible_library_entertainment_index_path, method: :get, local: true, class: "flex flex-wrap gap-4 items-end" do |form| %>
+          <!-- Search -->
+          <div class="flex-1 min-w-64">
+            <%= form.label :search, "Search library", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+            <%= form.text_field :search, 
+                value: @search,
+                placeholder: "Search by book title...",
+                class: "mt-1 block w-full border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white" %>
+          </div>
+
+          <!-- Year Filter -->
+          <div>
+            <%= form.label :filter_year, "Year", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+            <%= form.select :filter_year, 
+                options_for_select([["All Years", ""]] + @years_available.map { |year| [year, year] }, @filter_year),
+                {},
+                class: "mt-1 block border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white" %>
+          </div>
+
+          <!-- Submit Button -->
+          <div>
+            <%= form.submit "Filter", class: "px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+          </div>
+
+          <!-- Clear Filters -->
+          <div>
+            <%= link_to "Clear", view_audible_library_entertainment_index_path, class: "px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-sm font-medium rounded-md hover:bg-gray-50 dark:hover:bg-gray-600" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Records List -->
+    <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-md">
+      <% if @audible_library_records.any? %>
+        <ul class="divide-y divide-gray-200 dark:divide-gray-700">
+          <% @audible_library_records.each do |record| %>
+            <% metadata = record.parsed_metadata %>
+            <li>
+              <div class="px-4 py-4 sm:px-6">
+                <div class="flex items-center justify-between">
+                  <div class="flex-1">
+                    <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
+                      <%= record.title %>
+                      <% if metadata['asin'] %>
+                        <a href="https://www.audible.com/webplayer?asin=<%= metadata['asin'] %>" 
+                           target="_blank" 
+                           class="ml-2 inline-flex items-center text-blue-600 hover:text-blue-700 text-xs">
+                          <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                            <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
+                          </svg>
+                          View/Play
+                        </a>
+                      <% end %>
+                    </p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                      Added: <%= record.formatted_date_consumed %>
+                      <% if metadata['origin_type'] %>
+                        • <%= metadata['origin_type'] %>
+                      <% end %>
+                      <% if metadata['downloaded'] == 'Yes' %>
+                        • Downloaded
+                      <% end %>
+                    </p>
+                    <% if metadata['asin'] %>
+                      <p class="text-xs text-gray-400 dark:text-gray-500">
+                        ASIN: <%= metadata['asin'] %>
+                        <% if metadata['order_number'] %>
+                          • Order: <%= metadata['order_number'] %>
+                        <% end %>
+                        <% if metadata['date_first_downloaded'] %>
+                          • First Downloaded: <%= metadata['date_first_downloaded'] %>
+                        <% end %>
+                      </p>
+                    <% end %>
+                  </div>
+                  <div class="flex-shrink-0">
+                    <div class="flex items-center space-x-2">
+                      <% if metadata['downloaded'] == 'Yes' %>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                          Downloaded
+                        </span>
+                      <% end %>
+                      <% if metadata['deleted'] == 'Yes' %>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                          Deleted
+                        </span>
+                      <% end %>
+                      <% if metadata['preorder'] == 'Yes' %>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                          Preorder
+                        </span>
+                      <% end %>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <div class="px-4 py-8 text-center">
+          <p class="text-gray-500 dark:text-gray-400">No Audible library items found.</p>
+          <% if @search.present? || @filter_year.present? %>
+            <p class="text-sm text-gray-400 dark:text-gray-500 mt-1">Try adjusting your search or filters.</p>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Pagination -->
+    <% if @total_pages > 1 %>
+      <div class="mt-6 flex items-center justify-between">
+        <div class="text-sm text-gray-700 dark:text-gray-300">
+          Showing page <%= @current_page %> of <%= @total_pages %> 
+          (<%= @total_count %> total items)
+        </div>
+        <div class="flex space-x-2">
+          <% if @has_prev %>
+            <%= link_to "Previous", 
+                view_audible_library_entertainment_index_path(page: @current_page - 1, search: @search, filter_year: @filter_year),
+                class: "px-3 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600" %>
+          <% end %>
+          <% if @has_next %>
+            <%= link_to "Next", 
+                view_audible_library_entertainment_index_path(page: @current_page + 1, search: @search, filter_year: @filter_year),
+                class: "px-3 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600" %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Actions -->
+    <div class="mt-8 flex space-x-4">
+      <%= link_to "Upload More Data", audible_library_entertainment_index_path,
+          class: "px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+      <%= link_to "Back to Entertainment", entertainment_path,
+          class: "px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-sm font-medium rounded-md hover:bg-gray-50 dark:hover:bg-gray-600" %>
+    </div>
+
+  </div>
+</div>

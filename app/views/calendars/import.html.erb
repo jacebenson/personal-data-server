@@ -1,6 +1,12 @@
 <div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
   <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="mb-8">
+            <%= render 'shared/breadcrumb', breadcrumbs: [
+      { name: "Home", path: root_path },
+      { name: "Personal", path: personal_path },
+      { name: "Calendars", path: calendars_path },
+      { name: "Import Calendar Data", path: nil }
+    ] %>
       <h1 class="text-3xl font-bold text-gray-900 dark:text-white">📅 Calendar Data Import</h1>
       <p class="mt-2 text-gray-600 dark:text-gray-400">Import calendar events from files or set up remote calendar sources</p>
     </div>

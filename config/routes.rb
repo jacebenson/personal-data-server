@@ -166,6 +166,18 @@ Rails.application.routes.draw do
       get :view_youtube
       delete :clear_youtube
       
+      # Audible listening history
+      get :audible
+      post :upload_audible
+      get :view_audible
+      delete :clear_audible
+      
+      # Audible library
+      get :audible_library
+      post :upload_audible_library
+      get :view_audible_library
+      delete :clear_audible_library
+      
       # Podcast feed management
       get :podcasts
       post :upload_opml

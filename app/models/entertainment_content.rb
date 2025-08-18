@@ -12,6 +12,7 @@ class EntertainmentContent < ApplicationRecord
   scope :by_source, ->(source) { where(source: source) }
   scope :netflix, -> { where(content_type: 'netflix') }
   scope :audible_books, -> { where(content_type: 'audible_book') }
+  scope :audible_library, -> { where(content_type: 'audible_library') }
   scope :podcasts, -> { where(content_type: 'podcast') }
   scope :youtube, -> { where(content_type: 'youtube') }
 
@@ -27,6 +28,6 @@ class EntertainmentContent < ApplicationRecord
   end
 
   def self.content_types
-    %w[netflix audible_book podcast youtube]
+    %w[netflix audible_book audible_library podcast youtube]
   end
 end

@@ -1,6 +1,12 @@
 <div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="mb-8">
+                    <%= render 'shared/breadcrumb', breadcrumbs: [
+      { name: "Home", path: root_path },
+      { name: "Financial", path: financial_path },
+      { name: "Amazon Orders", path: amazon_orders_data_uploads_path },
+      { name: "Upload Orders", path: nil }
+    ] %>
       <h1 class="text-3xl font-bold text-gray-900 dark:text-white">🛒 Upload Amazon Orders</h1>
       <p class="mt-2 text-gray-600 dark:text-gray-400">Upload both your Digital Items and Retail Order History CSV files from Amazon's "Your Orders" export</p>
     </div>
