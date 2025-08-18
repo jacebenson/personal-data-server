@@ -10,18 +10,61 @@ class Api::V1::BaseController < ApplicationController
 
   def authenticate_api_user!
     # Try cookie-based authentication first (for web sessions)
-    return if user_signed_in?
+    if user_signed_in?
+      Rails.logger.info "API Auth: Already signed in via session - User: #{current_user.email}"
+      @authenticated_api_user = current_user
+      return
+    end
     
     # Try basic auth for API access
     authenticate_or_request_with_http_basic do |email, password|
+      Rails.logger.info "API Auth attempt: #{email}"
+      Rails.logger.info "API Auth password length: #{password&.length || 0}"
+      Rails.logger.info "API Auth headers: #{request.headers['Authorization']&.first(50)}"
+      
       user = User.find_by(email: email)
-      if user&.valid_password?(password)
-        sign_in user
-        true
+      if user
+        Rails.logger.info "API Auth: User found - #{user.email}"
+        password_valid = user.valid_password?(password)
+        Rails.logger.info "API Auth: Password valid: #{password_valid}"
+        
+        if password_valid
+          Rails.logger.info "API Auth successful for: #{email}"
+          sign_in user
+          # Store authenticated user in instance variable and session
+          @authenticated_api_user = user
+          session[:authenticated_api_user_id] = user.id
+          Rails.logger.info "API Auth: @authenticated_api_user set to #{@authenticated_api_user.email}"
+          return true
+        else
+          Rails.logger.warn "API Auth failed - invalid password for: #{email}"
+          return false
+        end
       else
-        false
+        Rails.logger.warn "API Auth failed - user not found: #{email}"
+        return false
       end
     end
+    
+    # If we get here, authentication failed
+    Rails.logger.warn "API Auth: No authentication provided or failed"
+    render json: { success: false, error: "Authentication required" }, status: :unauthorized
+    false
+  end
+  
+  # Override current_user to use our authenticated user
+  def current_user
+    # Return authenticated API user if available
+    return @authenticated_api_user if @authenticated_api_user
+    
+    # Try to get from session if we have an ID stored
+    if session[:authenticated_api_user_id]
+      @authenticated_api_user ||= User.find_by(id: session[:authenticated_api_user_id])
+      return @authenticated_api_user if @authenticated_api_user
+    end
+    
+    # Fall back to regular Devise current_user
+    super
   end
 
   def set_default_format

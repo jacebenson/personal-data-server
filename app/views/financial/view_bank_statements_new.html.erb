@@ -1,0 +1,14 @@
+<% content_for :title, "Bank Statements" %>
+
+<%= render 'header' %>
+
+<div class="container mx-auto px-6 py-8">
+  <div class="space-y-6">
+    <%= render 'account_summaries' %>
+    <%= render 'transactions_table' %>
+    <%= render 'pagination' %>
+  </div>
+</div>
+
+<%= render 'balance_adjustment_modal' %>
+<%= render 'balance_adjustment_js' %>

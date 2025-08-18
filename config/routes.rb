@@ -243,6 +243,25 @@ Rails.application.routes.draw do
       
       # Transactions API - amazon orders and bank statements with search
       get :transactions, to: 'transactions#index'
+      
+      # MCP (Model Context Protocol) specific endpoints
+      namespace :mcp do
+        # Core Actions (Priority endpoints)
+        post :search_all_data, to: 'search#search_all_data'
+        post :find_person_contact, to: 'communications#find_person_contact'
+        post :get_financial_summary, to: 'financial#get_financial_summary'
+        post :find_recent_mentions, to: 'communications#find_recent_mentions'
+        
+        # Advanced Actions
+        post :analyze_spending_pattern, to: 'financial#analyze_spending_pattern'
+        post :get_conversation_history, to: 'communications#get_conversation_history'
+        post :calculate_savings_potential, to: 'financial#calculate_savings_potential'
+        post :discover_content_recommendations, to: 'content#discover_content_recommendations'
+        
+        # Specialized Actions
+        post :analyze_health_trends, to: 'health#analyze_health_trends'
+        post :find_favorite_media, to: 'content#find_favorite_media'
+      end
     end
   end
 
