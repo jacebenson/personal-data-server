@@ -12,24 +12,8 @@ class Api::V1::BaseController < ApplicationController
     # Try cookie-based authentication first (for web sessions)
     if user_signed_in?
       Rails.logger.info "API Auth: Already signed in via session - User: #{current_user.email}"
-      @authenticated_api_user = current_user
+      @current_user = current_user
       return
-    end
-    
-    # Try Bearer token authentication
-    if request.headers['Authorization']&.start_with?('Bearer ')
-      token = request.headers['Authorization'].split(' ', 2).last
-      Rails.logger.info "API Auth: Attempting Bearer token authentication"
-      
-      user = User.find_by_bearer_token(token)
-      if user
-        Rails.logger.info "API Auth: Bearer token valid for user: #{user.email}"
-        @authenticated_api_user = user
-        session[:authenticated_api_user_id] = user.id
-        return
-      else
-        Rails.logger.warn "API Auth: Invalid Bearer token"
-      end
     end
     
     # Try basic auth for API access
@@ -47,10 +31,9 @@ class Api::V1::BaseController < ApplicationController
         if password_valid
           Rails.logger.info "API Auth successful for: #{email}"
           sign_in user
-          # Store authenticated user in instance variable and session
-          @authenticated_api_user = user
-          session[:authenticated_api_user_id] = user.id
-          Rails.logger.info "API Auth: @authenticated_api_user set to #{@authenticated_api_user.email}"
+          # Ensure current_user is set for API requests
+          @current_user = user
+          Rails.logger.info "API Auth: @current_user set to #{@current_user.email}"
           return true
         else
           Rails.logger.warn "API Auth failed - invalid password for: #{email}"
@@ -70,17 +53,7 @@ class Api::V1::BaseController < ApplicationController
   
   # Override current_user to use our authenticated user
   def current_user
-    # Return authenticated API user if available
-    return @authenticated_api_user if @authenticated_api_user
-    
-    # Try to get from session if we have an ID stored
-    if session[:authenticated_api_user_id]
-      @authenticated_api_user ||= User.find_by(id: session[:authenticated_api_user_id])
-      return @authenticated_api_user if @authenticated_api_user
-    end
-    
-    # Fall back to regular Devise current_user
-    super
+    @current_user || super
   end
 
   def set_default_format

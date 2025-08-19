@@ -48,14 +48,25 @@ class Api::V1::Mcp::BaseController < Api::V1::BaseController
 
   # Override current_user to ensure we get the authenticated user from parent
   def current_user
-    # First try the parent's current_user method
-    parent_user = super
+    # Check if we have a current user from the parent controller's authentication
+    return @current_user if @current_user
     
-    if parent_user
-      @current_user = parent_user
+    # Try to get from parent's method
+    begin
+      parent_user = super
+      @current_user = parent_user if parent_user
+      return @current_user
+    rescue
+      Rails.logger.warn "MCP: Failed to get current_user from super"
+    end
+    
+    # Try to get from session if available
+    if user_signed_in?
+      @current_user = warden.user
       return @current_user
     end
     
+    Rails.logger.warn "MCP: No current_user found anywhere"
     nil
   end
 
@@ -158,6 +169,8 @@ class Api::V1::Mcp::BaseController < Api::V1::BaseController
   
   # Log MCP API requests for monitoring and analytics
   def log_mcp_request
+    Rails.logger.info "MCP log_mcp_request: current_user = #{current_user.inspect}"
+    Rails.logger.info "MCP log_mcp_request: @current_user = #{@current_user.inspect}"
     Rails.logger.info "MCP API Request: #{controller_name}##{action_name} - User: #{current_user&.email} - Params: #{filtered_params}"
   end
   

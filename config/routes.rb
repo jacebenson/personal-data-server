@@ -2,14 +2,6 @@ Rails.application.routes.draw do
   devise_for :users
   get "pages/home"
 
-  # User profile route
-  resource :user, only: [:show] do
-    post :regenerate_token
-  end
-
-  # OpenAPI/Swagger specification endpoint
-  get "openapi.json", to: "openapi#show", defaults: { format: :json }
-
   # Category pages
   get "financial", to: "financial#index"
   get "personal", to: "personal#index"
@@ -49,7 +41,6 @@ Rails.application.routes.draw do
       post :create_calendar, to: 'calendars#create'
       get "edit_calendar/:id", to: redirect { |params, _| "/calendars/#{params[:id]}/edit" }
       patch "update_calendar/:id", to: 'calendars#update'
-      post :sync_calendar, to: 'calendars#sync'
       delete :clear_calendars, to: 'calendars#clear_all'
       delete "remove_calendar/:id", to: 'calendars#destroy'
 
@@ -113,6 +104,16 @@ Rails.application.routes.draw do
   
   # Event detail view
   get 'calendars/events/:id', to: 'calendars#show_event', as: 'calendar_event'
+
+  # Personal data management routes
+  resources :personal, only: [:index] do
+    collection do
+      get :upload
+      post :upload_data
+      get :view_data
+      delete :clear_data
+    end
+  end
 
   # Financial data management routes
   resources :financial, only: [:index] do

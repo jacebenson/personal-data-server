@@ -82,7 +82,7 @@ class Api::V1::Mcp::SearchController < Api::V1::Mcp::BaseController
     
     # Search emails if Communication model exists
     if defined?(Communication) && current_user.respond_to?(:communications)
-      email_scope = current_user.communications.where("subject LIKE ? COLLATE NOCASE OR sender LIKE ? COLLATE NOCASE OR content LIKE ? COLLATE NOCASE", 
+      email_scope = current_user.communications.where("subject ILIKE ? OR sender ILIKE ? OR content ILIKE ?", 
                                                       "%#{query}%", "%#{query}%", "%#{query}%")
       email_scope = apply_timeframe(email_scope, timeframe, :created_at) if timeframe
       
@@ -101,7 +101,7 @@ class Api::V1::Mcp::SearchController < Api::V1::Mcp::BaseController
     
     # Search LinkedIn messages if LinkedinMessage model exists
     if defined?(LinkedinMessage) && current_user.respond_to?(:linkedin_messages)
-      linkedin_scope = current_user.linkedin_messages.where("content LIKE ? COLLATE NOCASE OR from_name LIKE ? COLLATE NOCASE", 
+      linkedin_scope = current_user.linkedin_messages.where("content ILIKE ? OR sender ILIKE ?", 
                                                            "%#{query}%", "%#{query}%")
       linkedin_scope = apply_timeframe(linkedin_scope, timeframe, :sent_at) if timeframe
       
@@ -109,7 +109,7 @@ class Api::V1::Mcp::SearchController < Api::V1::Mcp::BaseController
         {
           type: 'linkedin_message',
           id: msg.id,
-          sender: msg.from_name,
+          sender: msg.sender,
           date: msg.sent_at,
           snippet: truncate_content(msg.content, 200)
         }
@@ -128,7 +128,7 @@ class Api::V1::Mcp::SearchController < Api::V1::Mcp::BaseController
     
     # Search bank transactions if BankStatement model exists
     if defined?(BankStatement) && current_user.respond_to?(:bank_statements)
-      transaction_scope = current_user.bank_statements.where("description LIKE ? OR category LIKE ?", 
+      transaction_scope = current_user.bank_statements.where("description ILIKE ? OR category ILIKE ?", 
                                                            "%#{query}%", "%#{query}%")
       transaction_scope = apply_timeframe(transaction_scope, timeframe, :transaction_date) if timeframe
       
@@ -147,7 +147,7 @@ class Api::V1::Mcp::SearchController < Api::V1::Mcp::BaseController
     
     # Search Amazon orders if AmazonOrder model exists
     if defined?(AmazonOrder)
-      order_scope = current_user.amazon_orders.where("product_name LIKE ? OR order_status LIKE ?", 
+      order_scope = current_user.amazon_orders.where("title ILIKE ? OR category ILIKE ?", 
                                                     "%#{query}%", "%#{query}%")
       order_scope = apply_timeframe(order_scope, timeframe, :order_date) if timeframe
       
@@ -155,10 +155,10 @@ class Api::V1::Mcp::SearchController < Api::V1::Mcp::BaseController
         {
           type: 'amazon_order',
           id: order.id,
-          title: order.product_name,
-          amount: order.our_price,
+          title: order.title,
+          amount: order.item_total,
           date: order.order_date,
-          category: order.order_status
+          category: order.category
         }
       end
       results.concat(orders)
@@ -197,7 +197,7 @@ class Api::V1::Mcp::SearchController < Api::V1::Mcp::BaseController
       # Search in relevant text fields
       text_columns = model.column_names.select { |col| %w[notes description type category].include?(col) }
       if text_columns.any?
-        where_clause = text_columns.map { |col| "#{col} LIKE ?" }.join(' OR ')
+        where_clause = text_columns.map { |col| "#{col} ILIKE ?" }.join(' OR ')
         scope = scope.where(where_clause, *(["%#{query}%"] * text_columns.length))
       end
       
@@ -226,7 +226,7 @@ class Api::V1::Mcp::SearchController < Api::V1::Mcp::BaseController
     results = []
     
     if defined?(CalendarEvent)
-      event_scope = current_user.calendar_events.where("summary LIKE ? OR description LIKE ? OR location LIKE ?", 
+      event_scope = current_user.calendar_events.where("title ILIKE ? OR description ILIKE ? OR location ILIKE ?", 
                                                       "%#{query}%", "%#{query}%", "%#{query}%")
       event_scope = apply_timeframe(event_scope, timeframe, :start_time) if timeframe
       
@@ -234,7 +234,7 @@ class Api::V1::Mcp::SearchController < Api::V1::Mcp::BaseController
         {
           type: 'calendar_event',
           id: event.id,
-          title: event.summary,
+          title: event.title,
           description: truncate_content(event.description, 200),
           start_time: event.start_time,
           end_time: event.end_time,
@@ -252,7 +252,7 @@ class Api::V1::Mcp::SearchController < Api::V1::Mcp::BaseController
     
     # Search Netflix data
     if defined?(NetflixViewingActivity)
-      netflix_scope = current_user.netflix_viewing_activities.where("title LIKE ?", "%#{query}%")
+      netflix_scope = current_user.netflix_viewing_activities.where("title ILIKE ?", "%#{query}%")
       netflix_scope = apply_timeframe(netflix_scope, timeframe, :date) if timeframe
       
       netflix_results = netflix_scope.limit(limit/3).map do |activity|
@@ -269,7 +269,7 @@ class Api::V1::Mcp::SearchController < Api::V1::Mcp::BaseController
     
     # Search YouTube data
     if defined?(YoutubeWatchHistory)
-      youtube_scope = current_user.youtube_watch_histories.where("title LIKE ? OR channel LIKE ?", 
+      youtube_scope = current_user.youtube_watch_histories.where("title ILIKE ? OR channel ILIKE ?", 
                                                                 "%#{query}%", "%#{query}%")
       youtube_scope = apply_timeframe(youtube_scope, timeframe, :watched_at) if timeframe
       
@@ -287,7 +287,7 @@ class Api::V1::Mcp::SearchController < Api::V1::Mcp::BaseController
     
     # Search Audible library
     if defined?(AudibleLibraryItem)
-      audible_scope = current_user.audible_library_items.where("title LIKE ? OR author LIKE ?", 
+      audible_scope = current_user.audible_library_items.where("title ILIKE ? OR author ILIKE ?", 
                                                              "%#{query}%", "%#{query}%")
       
       audible_results = audible_scope.limit(limit/3).map do |item|
