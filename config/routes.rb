@@ -32,18 +32,6 @@ Rails.application.routes.draw do
       get :view_amazon_orders, to: redirect('/shopping/view_orders')
       delete :clear_amazon_orders, to: redirect('/shopping/clear_orders')
 
-      # Calendar redirects
-      get :calendars, to: redirect('/calendars')
-      post :upload_ics_file, to: 'calendars#upload_ics_file'
-      get :view_calendars, to: redirect('/calendars')
-      get "view_calendars/:id", to: "calendars#show_event", as: :show_calendar_event
-      get :new_calendar, to: redirect('/calendars/new')
-      post :create_calendar, to: 'calendars#create'
-      get "edit_calendar/:id", to: redirect { |params, _| "/calendars/#{params[:id]}/edit" }
-      patch "update_calendar/:id", to: 'calendars#update'
-      delete :clear_calendars, to: 'calendars#clear_all'
-      delete "remove_calendar/:id", to: 'calendars#destroy'
-
       # Other legacy redirects
       get :social_security_earnings, to: redirect('/social_security')
       post :upload_social_security_earnings, to: 'social_security#upload_earnings'
