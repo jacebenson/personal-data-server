@@ -181,6 +181,7 @@ Rails.application.routes.draw do
     # Netflix routes
     resources :netflix, only: [:index, :show] do
       collection do
+        get :upload
         post :upload
         delete :destroy_all
       end
@@ -189,6 +190,7 @@ Rails.application.routes.draw do
     # YouTube routes  
     resources :youtube, only: [:index, :show] do
       collection do
+        get :upload
         post :upload
         delete :destroy_all
       end
@@ -213,6 +215,7 @@ Rails.application.routes.draw do
     # Books (Goodreads) routes
     resources :books, only: [:index, :show] do
       collection do
+        get :upload
         post :upload
         delete :destroy_all
       end

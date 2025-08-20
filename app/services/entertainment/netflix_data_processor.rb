@@ -68,19 +68,28 @@ module Entertainment
       end
 
       # Check for existing record (to avoid duplicates)
-      existing_record = @user.entertainment_contents.netflix.find_by(
-        title: title,
-        date_consumed: date_consumed
-      )
+      # Use epoch timestamp for reliable date comparison with 1-day tolerance
+      date_epoch = date_consumed.to_time.to_i
+      one_day_seconds = 86400  # 24 hours * 60 minutes * 60 seconds
+      
+      # Find records with same title and date within 1 day
+      existing_record = @user.entertainment_contents.netflix.where(title: title).find do |record|
+        record_epoch = record.date_consumed.to_time.to_i
+        epoch_difference = (record_epoch - date_epoch).abs
+        epoch_difference <= one_day_seconds
+      end
 
       if existing_record
+        Rails.logger.info "Netflix duplicate found: '#{title}' on #{date_consumed} (existing ID: #{existing_record.id})"
         @duplicate_count += 1
         @skipped_count += 1
         return
       end
 
+      Rails.logger.info "Netflix creating new record: '#{title}' on #{date_consumed}"
+
       # Create the entertainment content record
-      @user.entertainment_contents.create!(
+      new_record = @user.entertainment_contents.create!(
         content_type: 'netflix',
         title: title,
         date_consumed: date_consumed,
@@ -88,6 +97,7 @@ module Entertainment
         imported_at: Time.current
       )
 
+      Rails.logger.info "Netflix record created: '#{title}' on #{date_consumed} (ID: #{new_record.id})"
       @imported_count += 1
 
     rescue => e
@@ -99,15 +109,25 @@ module Entertainment
 
   def parse_date(date_str)
     # Netflix provides dates in M/D/YY format (e.g., "6/7/25")
+    # Split the date and parse manually to avoid format issues
     begin
-      Date.strptime(date_str, '%m/%d/%y')
-    rescue Date::Error
-      # Try alternative formats just in case
-      begin
-        Date.strptime(date_str, '%m/%d/%Y')
-      rescue Date::Error
-        nil
+      parts = date_str.split('/')
+      return nil unless parts.length == 3
+      
+      month = parts[0].to_i
+      day = parts[1].to_i
+      year = parts[2].to_i
+      
+      # Handle 2-digit years (convert to 4-digit)
+      if year < 100
+        year += year < 50 ? 2000 : 1900
       end
+      
+      # Create date and return it
+      Date.new(year, month, day)
+    rescue => e
+      puts "Error parsing date '#{date_str}': #{e.message}"
+      nil
     end
   end
 end

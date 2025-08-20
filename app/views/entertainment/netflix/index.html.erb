@@ -179,6 +179,10 @@
           </h3>
           <div class="space-x-3">
             <%= link_to "Upload More Data", upload_entertainment_netflix_index_path, class: "inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" %>
+            <%= button_to "Clear All Data", destroy_all_entertainment_netflix_index_path, 
+                method: :delete, 
+                data: { confirm: "Are you sure you want to delete all Netflix viewing data? This action cannot be undone." }, 
+                class: "inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 text-sm leading-4 font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" %>
           </div>
         </div>
 

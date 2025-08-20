@@ -38,26 +38,31 @@ class Entertainment::YoutubeController < Entertainment::BaseController
   end
 
   def upload
-    # Process uploaded YouTube JSON
-    if params[:file].present?
-      begin
-        result = Entertainment::YoutubeDataProcessor.new(params[:file].path, current_user).process
-
-        message = "Successfully imported #{result[:count]} YouTube watch history records."
-        if result[:skipped] && result[:skipped] > 0
-          message += " Skipped #{result[:skipped]} records"
-          if result[:duplicates] && result[:duplicates] > 0
-            message += " (#{result[:duplicates]} duplicates)"
-          end
-          message += "."
-        end
-
-        redirect_to entertainment_youtube_index_path, notice: message
-      rescue => e
-        redirect_to entertainment_youtube_index_path, alert: "Error processing file: #{e.message}"
-      end
+    if request.get?
+      # Show upload form
+      render 'entertainment/youtube/upload'
     else
-      redirect_to entertainment_youtube_index_path, alert: "Please select a file to upload."
+      # Process uploaded YouTube JSON
+      if params[:file].present?
+        begin
+          result = Entertainment::YoutubeDataProcessor.new(params[:file].path, current_user).process
+
+          message = "Successfully imported #{result[:count]} YouTube watch history records."
+          if result[:skipped] && result[:skipped] > 0
+            message += " Skipped #{result[:skipped]} records"
+            if result[:duplicates] && result[:duplicates] > 0
+              message += " (#{result[:duplicates]} duplicates)"
+            end
+            message += "."
+          end
+
+          redirect_to entertainment_youtube_index_path, notice: message
+        rescue => e
+          redirect_to entertainment_youtube_index_path, alert: "Error processing file: #{e.message}"
+        end
+      else
+        redirect_to entertainment_youtube_index_path, alert: "Please select a file to upload."
+      end
     end
   end
 

@@ -58,7 +58,13 @@ class Entertainment::BooksController < Entertainment::BaseController
   end
 
   def upload
-    # Process uploaded Goodreads CSV
+    # Handle GET request - show upload form
+    if request.get?
+      render 'entertainment/books/upload'
+      return
+    end
+    
+    # Handle POST request - process uploaded Goodreads CSV
     if params[:file].present?
       begin
         result = Entertainment::GoodreadsDataProcessor.new(params[:file].path, current_user).process

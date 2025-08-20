@@ -43,10 +43,14 @@ class Entertainment::AudibleLibrariesController < Entertainment::BaseController
   end
 
   def upload
-    # Process uploaded Audible Library CSV
-    if params[:file].present?
-      begin
-        result = Entertainment::AudibleLibraryProcessor.new(params[:file].path, current_user).process
+    if request.get?
+      # Show upload form
+      render 'entertainment/audible_libraries/upload'
+    else
+      # Process uploaded Audible Library CSV
+      if params[:file].present?
+        begin
+          result = Entertainment::AudibleLibraryProcessor.new(params[:file].path, current_user).process
 
         message = "Successfully imported #{result[:count]} Audible library items."
         if result[:skipped] && result[:skipped] > 0

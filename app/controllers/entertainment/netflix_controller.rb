@@ -38,7 +38,13 @@ class Entertainment::NetflixController < Entertainment::BaseController
   end
 
   def upload
-    # Process uploaded Netflix CSV
+    # Handle GET request - show upload form
+    if request.get?
+      render 'entertainment/netflix/upload'
+      return
+    end
+    
+    # Handle POST request - process uploaded Netflix CSV
     if params[:file].present?
       begin
         result = Entertainment::NetflixDataProcessor.new(params[:file].path, current_user).process
