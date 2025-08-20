@@ -1,0 +1,143 @@
+<!-- LinkedIn Messages Section for Dashboard -->
+<div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg hover:shadow-lg transition-shadow duration-200">
+  <!-- Header -->
+  <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center">
+        <div class="h-8 w-8 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center mr-3">
+          <span class="text-xl">💼</span>
+        </div>
+        <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Recent LinkedIn Messages</h3>
+      </div>
+      <%= link_to view_communications_path(type: 'linkedin'), class: "text-blue-600 hover:text-blue-500 text-sm font-medium" do %>
+        View All →
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="p-6">
+    <% 
+      # Get recent LinkedIn messages for the last 2 weeks
+      two_weeks_ago = 2.weeks.ago
+      recent_messages = current_user.linkedin_messages.where("sent_at >= ?", two_weeks_ago).recent.limit(4)
+      total_messages_count = current_user.linkedin_messages.where("sent_at >= ?", two_weeks_ago).count
+      remaining_count = [total_messages_count - 4, 0].max
+    %>
+
+    <% if recent_messages.any? %>
+      <!-- Recent Messages List -->
+      <div class="space-y-3 mb-4">
+        <% recent_messages.each do |message| %>
+          <div class="flex items-start space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
+            <div class="flex-shrink-0">
+              <div class="h-8 w-8 bg-blue-200 dark:bg-blue-800 rounded-full flex items-center justify-center">
+                <span class="text-sm font-medium text-blue-700 dark:text-blue-300">
+                  <%= message.sender_display_name.first.upcase rescue "?" %>
+                </span>
+              </div>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between">
+                <p class="text-sm font-medium text-gray-900 dark:text-white truncate">
+                  <%= message.sender_display_name %>
+                </p>
+                <span class="text-xs text-gray-500 dark:text-gray-400 privacy-sensitive">
+                  <%= time_ago_in_words(message.sent_at) %> ago
+                </span>
+              </div>
+              <% if message.subject.present? %>
+                <p class="text-sm text-gray-600 dark:text-gray-300 truncate privacy-sensitive">
+                  <%= message.subject.length > 40 ? "#{message.subject[0..39]}..." : message.subject %>
+                </p>
+              <% end %>
+              <% if message.content.present? %>
+                <p class="text-xs text-gray-500 dark:text-gray-400 truncate mt-1 privacy-sensitive">
+                  <%= message.content_preview(60) %>
+                </p>
+              <% end %>
+              <% if message.recipient_display_name != message.sender_display_name %>
+                <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                  To: <%= message.recipient_display_name %>
+                </p>
+              <% end %>
+            </div>
+            <% if message.has_attachments? %>
+              <div class="flex-shrink-0">
+                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200">
+                  📎 <%= message.attachment_list.count %>
+                </span>
+              </div>
+            <% end %>
+            <% if message.is_draft? %>
+              <div class="flex-shrink-0">
+                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200">
+                  Draft
+                </span>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+
+      <!-- Summary Stats -->
+      <div class="grid grid-cols-2 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+        <div class="text-center">
+          <p class="text-2xl font-bold text-gray-900 dark:text-white privacy-sensitive">
+            <%= number_with_delimiter(total_messages_count) %>
+          </p>
+          <p class="text-sm text-gray-600 dark:text-gray-400">Last 2 weeks</p>
+        </div>
+        <% if remaining_count > 0 %>
+          <div class="text-center">
+            <p class="text-2xl font-bold text-blue-600 dark:text-blue-400 privacy-sensitive">
+              +<%= number_with_delimiter(remaining_count) %>
+            </p>
+            <p class="text-sm text-gray-600 dark:text-gray-400">More messages</p>
+          </div>
+        <% else %>
+          <div class="text-center">
+            <p class="text-2xl font-bold text-green-600 dark:text-green-400">
+              ✓
+            </p>
+            <p class="text-sm text-gray-600 dark:text-gray-400">All shown</p>
+          </div>
+        <% end %>
+      </div>
+
+      <!-- Conversation Stats -->
+      <% 
+        recent_conversations = recent_messages.group_by(&:conversation_id).keys.count
+        total_conversations = current_user.linkedin_messages.where("sent_at >= ?", two_weeks_ago).group(:conversation_id).count.keys.count
+      %>
+      <% if total_conversations > 0 %>
+        <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+          <div class="text-center">
+            <p class="text-sm text-gray-600 dark:text-gray-400">
+              <%= pluralize(total_conversations, 'conversation') %> active
+            </p>
+          </div>
+        </div>
+      <% end %>
+
+    <% else %>
+      <!-- No Messages State -->
+      <div class="text-center py-8">
+        <div class="h-16 w-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
+          <span class="text-2xl">💬</span>
+        </div>
+        <p class="text-gray-500 dark:text-gray-400 mb-4">No recent LinkedIn messages found</p>
+        <% total_all_messages = current_user.linkedin_messages.count %>
+        <% if total_all_messages > 0 %>
+          <p class="text-sm text-gray-400 dark:text-gray-500 mb-3">
+            You have <%= number_with_delimiter(total_all_messages) %> total LinkedIn messages
+          </p>
+        <% end %>
+        <%= link_to communications_path, 
+            class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" do %>
+          Import LinkedIn Messages
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>

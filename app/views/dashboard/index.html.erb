@@ -31,7 +31,7 @@
     <%= render 'shared/health_section' %>
 
     <!-- Other Categories -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8 mb-12">
       <!-- Financial & Shopping Combo Card -->
       <%= render 'shared/combo_card', 
           title: "Financial & Shopping", 
@@ -54,6 +54,10 @@
 
       <%= render 'calendars/shared/calendar_today' %>
 
+      <%= render 'emails/shared/email_section' %>
+
+      <%= render 'linkedin/shared/linkedin_section' %>
+      
       <%= render 'shared/entertainment_section' %>
     </div>
 
