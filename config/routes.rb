@@ -27,23 +27,16 @@ Rails.application.routes.draw do
     end
   end
 
-  # LinkedIn messages management routes
-  resources :linkedin, only: [:index, :show] do
-    collection do
-      get :messages
-      get :conversations
-      post :upload
-      delete :clear
-    end
+  # LinkedIn messages management routes (namespaced under linkedin)
+  namespace :linkedin do
+    root 'linkedin#index'
+    resources :messages, only: [:index, :show]
+    resources :conversations, only: [:index, :show]
     
-    member do
-      get :conversation
-    end
+    # LinkedIn data management
+    post 'upload', to: 'data#upload'
+    delete 'clear', to: 'data#clear'
   end
-  
-  # Specific route for individual conversations
-  get 'linkedin/conversations/:conversation_id', to: 'linkedin#conversation', as: 'linkedin_conversation'
-
   # Calendar management routes
   resources :calendars do
     member do

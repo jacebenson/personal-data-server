@@ -3,7 +3,7 @@
     <%= render 'shared/breadcrumb', breadcrumbs: [
       { name: "Home", path: root_path },
       { name: "Personal", path: personal_path },
-      { name: "LinkedIn", path: linkedin_path },
+      { name: "LinkedIn", path: linkedin_root_path },
       { name: "Messages", path: linkedin_messages_path },
       { name: "Message", path: nil }
     ] %>
@@ -18,7 +18,7 @@
           </p>
         </div>
         <div class="flex space-x-3">
-          <%= link_to messages_linkedin_index_path, 
+          <%= link_to linkedin_messages_path, 
               class: "inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600" do %>
             ← Back to Messages
           <% end %>
@@ -193,7 +193,7 @@
                       <%= message.sent_at.strftime("%b %d, %Y") %>
                     </span>
                     
-                    <%= link_to linkedin_path(message), class: "text-blue-600 hover:text-blue-500 text-xs font-medium" do %>
+                    <%= link_to linkedin_message_path(message), class: "text-blue-600 hover:text-blue-500 text-xs font-medium" do %>
                       View Message →
                     <% end %>
                   </div>

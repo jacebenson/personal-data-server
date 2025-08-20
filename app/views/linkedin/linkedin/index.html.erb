@@ -3,7 +3,7 @@
     <%= render 'shared/breadcrumb', breadcrumbs: [
       { name: "Home", path: root_path },
       { name: "Personal", path: personal_path },
-      { name:        <%= form_with url: upload_linkedin_index_path, method: :post, multipart: true, local: true, class: "space-y-4" do |form| %>"LinkedIn Messages", path: nil }
+      { name: "LinkedIn Messages", path: nil }
     ] %>
     
     <div class="mb-8">
@@ -126,7 +126,7 @@
           <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
             Browse, search, and filter your LinkedIn messages
           </p>
-          <%= link_to messages_linkedin_index_path, class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" do %>
+          <%= link_to linkedin_messages_path, class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" do %>
             View All Messages
           <% end %>
         </div>
@@ -144,7 +144,7 @@
           <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
             View messages grouped by conversation thread
           </p>
-          <%= link_to conversations_linkedin_index_path, class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500" do %>
+          <%= link_to linkedin_conversations_path, class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500" do %>
             View Conversations
           <% end %>
         </div>
@@ -205,7 +205,7 @@
                   <span class="text-xs text-gray-500 dark:text-gray-400">
                     <%= message.sent_at.strftime("%b %d, %Y") %>
                   </span>
-                  <%= link_to linkedin_path(message), class: "text-blue-600 hover:text-blue-500 text-xs font-medium" do %>
+                  <%= link_to linkedin_message_path(message), class: "text-blue-600 hover:text-blue-500 text-xs font-medium" do %>
                     View →
                   <% end %>
                 </div>
@@ -214,7 +214,7 @@
           <% end %>
         </div>
         <div class="px-6 py-3 border-t border-gray-200 dark:border-gray-700">
-          <%= link_to messages_linkedin_index_path, class: "text-blue-600 hover:text-blue-500 text-sm font-medium" do %>
+          <%= link_to linkedin_messages_path, class: "text-blue-600 hover:text-blue-500 text-sm font-medium" do %>
             View all messages →
           <% end %>
         </div>
@@ -235,7 +235,7 @@
             </p>
           </div>
           <% if @total_messages > 0 %>
-            <%= link_to clear_linkedin_index_path, 
+            <%= link_to linkedin_clear_path, 
                 method: :delete, 
                 data: { confirm: "Are you sure you want to delete all #{number_with_delimiter(@total_messages)} LinkedIn messages? This action cannot be undone." },
                 class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:bg-red-900 dark:text-red-300 dark:hover:bg-red-800" do %>
