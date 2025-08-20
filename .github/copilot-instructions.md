@@ -32,3 +32,4 @@ All user data is private and not shared with any third parties.
 - Do not use `rails console` for testing or debugging, instead use sqlite3 or create a test file in `test/` directory.
 - Do not try to start the server as it is generally running.  If you need to restart the server touch the file `tmp/restart.txt` to restart the server.
 - When testing you cannot open webpages as moste routes are protected by authentication.  Instead use the `rails test` command to run tests in the `test/` directory.
+- When writing queries use things the SQLITE3 supports.

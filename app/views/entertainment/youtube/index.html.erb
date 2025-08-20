@@ -1,0 +1,320 @@
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <%= render 'shared/breadcrumb', breadcrumbs: [
+        { name: "Home", path: root_path },
+        { name: "Entertainment", path: entertainment_index_path },
+        { name: "YouTube Watch History", path: entertainment_youtube_index_path }
+      ] %>
+    <div class="mb-8">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-white">📺 YouTube Watch History</h1>
+          <p class="mt-2 text-gray-600 dark:text-gray-400">
+            <% if @search.present? %>
+              Search results for "<%= @search %>" - <%= pluralize(@total_count, 'video') %> found
+              <% if @filter_year.present? %>
+                in <%= @filter_year %>
+              <% end %>
+            <% else %>
+              <%= pluralize(@total_count, 'video') %> watched
+              <% if @filter_year.present? %>
+                in <%= @filter_year %>
+              <% end %>
+            <% end %>
+          </p>
+        </div>
+        <div class="flex space-x-3">
+          <%= link_to "Upload More", upload_entertainment_youtube_index_path,
+              class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" %>
+          <%= link_to "Back to Entertainment", entertainment_index_path,
+              class: "inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Summary Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg class="h-8 w-8 text-red-600" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+              </svg>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Total Videos</dt>
+                <dd class="text-lg font-medium text-gray-900 dark:text-white"><%= @total_count %></dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Est. Watch Time</dt>
+                <dd class="text-lg font-medium text-gray-900 dark:text-white"><%= @total_hours_watched %> hours</dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Years Available</dt>
+                <dd class="text-lg font-medium text-gray-900 dark:text-white"><%= @years_available.length %></dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chart Section -->
+    <div class="mb-8">
+      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+          <div class="flex items-center mb-4">
+            <div class="flex-shrink-0">
+              <svg class="h-8 w-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+              </svg>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <h4 class="text-lg font-medium text-gray-900 dark:text-white">Watch Time by Month</h4>
+              <p class="text-sm text-gray-500 dark:text-gray-400">Estimated hours watched per month</p>
+            </div>
+          </div>
+          
+          <% if @chart_data.any? %>
+            <div class="h-32">
+              <%= line_chart @chart_data,
+                  height: "120px",
+                  colors: ["#E11D48"],
+                  suffix: "h",
+                  curve: false,
+                  points: true %>
+            </div>
+          <% else %>
+            <div class="flex items-center justify-center h-32">
+              <div class="text-center">
+                <svg class="mx-auto h-8 w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 00-2-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                </svg>
+                <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">No data for chart</p>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search & Filters -->
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg mb-6">
+      <div class="p-6">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Search & Filters</h3>
+        <%= form_tag entertainment_youtube_index_path, method: :get, local: true, class: "space-y-4" do %>
+          <!-- Search Field -->
+          <div class="flex flex-col sm:flex-row gap-4">
+            <div class="flex-1">
+              <%= text_field_tag :search, 
+                  @search,
+                  placeholder: "Search YouTube videos... (Press '/' to focus)",
+                  class: "block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-red-500 focus:ring-red-500",
+                  id: "youtube_search" %>
+            </div>
+            <div class="flex gap-2">
+              <%= submit_tag "Search", 
+                  class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" %>
+              <% if @search.present? %>
+                <%= link_to "Clear", entertainment_youtube_index_path(filter_year: @filter_year),
+                    class: "inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" %>
+              <% end %>
+            </div>
+          </div>
+          <!-- Search Results Info -->
+          <% if @search.present? %>
+            <div class="text-sm text-gray-600 dark:text-gray-400">
+              Showing results for "<%= @search %>" - <%= pluralize(@total_count, 'video') %> found
+            </div>
+          <% end %>
+          <!-- Year Filter Buttons -->
+          <div class="flex flex-wrap gap-3">
+            <%= link_to "All Years", entertainment_youtube_index_path(search: @search),
+                class: "inline-flex items-center px-3 py-2 border #{@filter_year.blank? ? 'border-red-500 bg-red-50 text-red-700' : 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50'} dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" %>
+            <% @years_available.each do |year| %>
+              <%= link_to year.to_s, entertainment_youtube_index_path(filter_year: year, search: @search),
+                  class: "inline-flex items-center px-3 py-2 border #{@filter_year.to_s == year.to_s ? 'border-red-500 bg-red-50 text-red-700' : 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50'} dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" %>
+            <% end %>
+          </div>
+          <%= hidden_field_tag :filter_year, @filter_year if @filter_year.present? %>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Records List -->
+    <div class="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-md">
+      <div class="px-4 py-5 sm:p-6">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">
+          Watch History
+          <% if @filter_year.present? || @search.present? %>
+            <span class="text-sm font-normal text-gray-500 dark:text-gray-400">
+              <% if @search.present? %>
+                - Results for "<%= @search %>"
+              <% end %>
+              <% if @filter_year.present? %>
+                - <%= @filter_year %>
+              <% end %>
+            </span>
+          <% end %>
+        </h3>
+
+        <% if @youtube_records.any? %>
+          <div class="space-y-3">
+            <% @youtube_records.each do |record| %>
+              <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                <div class="flex items-start justify-between">
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-start space-x-4">
+                      <div class="flex-shrink-0">
+                        <% metadata = record.parsed_metadata %>
+                        <% if metadata['video_id'].present? %>
+                          <img src="https://i3.ytimg.com/vi/<%= metadata['video_id'] %>/sddefault.jpg" 
+                               alt="<%= record.title %>" 
+                               class="h-20 w-32 rounded-md object-cover bg-gray-100 dark:bg-gray-800"
+                               onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                          <div class="h-20 w-32 bg-gray-100 dark:bg-gray-800 rounded-md flex items-center justify-center" style="display: none;">
+                            <svg class="h-8 w-8 text-red-600" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                            </svg>
+                          </div>
+                        <% else %>
+                          <div class="h-20 w-32 bg-gray-100 dark:bg-gray-800 rounded-md flex items-center justify-center">
+                            <svg class="h-8 w-8 text-red-600" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                            </svg>
+                          </div>
+                        <% end %>
+                      </div>
+                      <div class="flex-1 min-w-0">
+                        <h4 class="text-sm font-medium text-gray-900 dark:text-white">
+                          <% if metadata['link'].present? %>
+                            <a href="<%= metadata['link'] %>" target="_blank" class="text-red-600 hover:text-red-500 hover:underline">
+                              <%= record.title %>
+                            </a>
+                          <% else %>
+                            <%= record.title %>
+                          <% end %>
+                        </h4>
+                        <div class="flex items-center space-x-4 mt-1">
+                          <span class="text-sm text-gray-500 dark:text-gray-400">
+                            Watched <%= record.formatted_date_consumed %>
+                          </span>
+                          <span class="text-xs text-gray-400 dark:text-gray-500">
+                            <%= time_ago_in_words(record.date_consumed) %> ago
+                          </span>
+                        </div>
+                        <% if metadata['video_id'].present? %>
+                          <div class="mt-1">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                              ID: <%= metadata['video_id'] %>
+                            </span>
+                          </div>
+                        <% end %>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex items-center space-x-2 ml-4">
+                    <% if metadata['link'].present? %>
+                      <a href="<%= metadata['link'] %>" target="_blank" 
+                         class="inline-flex items-center p-2 border border-red-300 rounded-md shadow-sm text-sm font-medium text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                         title="Watch on YouTube">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-2M14 4h6m0 0v6m0-6L10 14"></path>
+                        </svg>
+                      </a>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+
+          <!-- Pagination -->
+          <% if @total_pages > 1 %>
+            <div class="mt-6 flex items-center justify-between">
+              <div class="flex-1 flex justify-between">
+                <% if @has_prev %>
+                  <%= link_to "Previous", entertainment_youtube_index_path(page: @current_page - 1, filter_year: @filter_year, search: @search),
+                      class: "relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600" %>
+                <% else %>
+                  <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-800 cursor-not-allowed">
+                    Previous
+                  </span>
+                <% end %>
+
+                <span class="text-sm text-gray-700 dark:text-gray-300">
+                  Page <%= @current_page %> of <%= @total_pages %>
+                </span>
+
+                <% if @has_next %>
+                  <%= link_to "Next", entertainment_youtube_index_path(page: @current_page + 1, filter_year: @filter_year, search: @search),
+                      class: "relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600" %>
+                <% else %>
+                  <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-800 cursor-not-allowed">
+                    Next
+                  </span>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+
+        <% else %>
+          <div class="text-center py-12">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No videos found</h3>
+            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              <% if @filter_year.present? %>
+                No YouTube videos watched in <%= @filter_year %>.
+              <% else %>
+                No YouTube watch history uploaded yet.
+              <% end %>
+            </p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // Focus search field when '/' is pressed
+  document.addEventListener('keydown', function(e) {
+    if (e.key === '/' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+      e.preventDefault();
+      document.getElementById('youtube_search').focus();
+    }
+  });
+</script>

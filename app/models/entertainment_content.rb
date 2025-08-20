@@ -3,8 +3,8 @@ class EntertainmentContent < ApplicationRecord
 
   validates :content_type, presence: true
   validates :title, presence: true
-  validates :date_consumed, presence: true
-  validates :source, presence: true
+  validates :date_consumed, presence: true, unless: :goodreads_content?
+  validates :source, presence: true, unless: :goodreads_content?
 
   scope :recent, -> { order(date_consumed: :desc) }
   scope :by_type, ->(type) { where(content_type: type) }
@@ -15,6 +15,7 @@ class EntertainmentContent < ApplicationRecord
   scope :audible_library, -> { where(content_type: 'audible_library') }
   scope :podcasts, -> { where(content_type: 'podcast') }
   scope :youtube, -> { where(content_type: 'youtube') }
+  scope :goodreads, -> { where(content_type: 'goodreads') }
 
   def formatted_date_consumed
     date_consumed&.strftime("%B %d, %Y")
@@ -28,6 +29,12 @@ class EntertainmentContent < ApplicationRecord
   end
 
   def self.content_types
-    %w[netflix audible_book audible_library podcast youtube]
+    %w[netflix audible_book audible_library podcast youtube goodreads]
+  end
+
+  private
+
+  def goodreads_content?
+    content_type == 'goodreads'
   end
 end

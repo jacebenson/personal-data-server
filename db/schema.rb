@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_16_083523) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_19_200347) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -219,6 +219,23 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_16_083523) do
     t.datetime "imported_at", default: -> { "CURRENT_TIMESTAMP" }
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "author"
+    t.integer "my_rating"
+    t.string "exclusive_shelf"
+    t.date "date_read"
+    t.integer "number_of_pages"
+    t.integer "year_published"
+    t.integer "original_publication_year"
+    t.string "isbn"
+    t.string "isbn13"
+    t.integer "book_id"
+    t.decimal "average_rating", precision: 3, scale: 2
+    t.string "publisher"
+    t.string "binding"
+    t.text "additional_authors"
+    t.index ["user_id", "content_type", "author"], name: "index_entertainment_contents_on_user_type_author"
+    t.index ["user_id", "content_type", "date_read"], name: "index_entertainment_contents_on_user_type_date_read"
+    t.index ["user_id", "content_type", "exclusive_shelf"], name: "index_entertainment_contents_on_user_type_shelf"
     t.index ["user_id", "content_type"], name: "index_entertainment_contents_on_user_id_and_content_type"
     t.index ["user_id", "date_consumed"], name: "index_entertainment_contents_on_user_id_and_date_consumed"
     t.index ["user_id", "title"], name: "index_entertainment_contents_on_user_id_and_title"
