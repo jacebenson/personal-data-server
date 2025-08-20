@@ -32,9 +32,25 @@
 
     <!-- Other Categories -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-      <%= render 'shared/money_section' %>
-
-      <%= render 'shared/shopping_section' %>
+      <!-- Financial & Shopping Combo Card -->
+      <%= render 'shared/combo_card', 
+          title: "Financial & Shopping", 
+          sections: [
+            {
+              icon: "💸",
+              color: "bg-green-100 dark:bg-green-900",
+              title: "Money",
+              link_path: financial_path,
+              partial_path: "financial/shared/money_section"
+            },
+            {
+              icon: "🛒",
+              color: "bg-orange-100 dark:bg-orange-900",
+              title: "Shopping", 
+              link_path: shopping_path,
+              partial_path: "shopping/shared/shopping_section"
+            }
+          ] %>
 
       <%= render 'calendars/shared/calendar_today' %>
 

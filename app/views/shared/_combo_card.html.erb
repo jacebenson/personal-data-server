@@ -1,0 +1,56 @@
+<!-- Combo Card - renders multiple sections in a single card -->
+<!-- Expects local variables:
+     - title: Main title for the card
+     - sections: Array of hashes with keys: title, link_path, partial_path, icon (optional), color (optional)
+-->
+
+<div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg hover:shadow-lg transition-shadow duration-200">
+  <!-- Card Header -->
+  <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+    <h3 class="text-xl font-semibold text-gray-900 dark:text-white"><%= title %></h3>
+  </div>
+  
+  <!-- Sections -->
+  <div class="divide-y divide-gray-200 dark:divide-gray-700">
+    <% sections.each_with_index do |section, index| %>
+      <div class="<%= index == 0 ? 'pt-0' : 'pt-4' %>">
+        <!-- Section Header -->
+        <% if section[:link_path] %>
+          <%= link_to section[:link_path], class: "block px-6 py-2 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors group" do %>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center">
+                <% if section[:icon] %>
+          <div class="h-8 w-8 <%= section[:color] || 'bg-gray-100 dark:bg-gray-700' %> rounded-lg flex items-center justify-center mr-3">
+            <span class="text-xl"><%= section[:icon] %></span>
+          </div>
+        <% end %>
+        <h4 class="text-lg font-medium text-gray-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400">
+          <%= section[:title] %>
+                </h4>
+              </div>
+              <svg class="h-5 w-5 text-gray-400 group-hover:text-purple-600 dark:group-hover:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </div>
+          <% end %>
+        <% else %>
+          <div class="px-6 py-2">
+            <div class="flex items-center">
+              <% if section[:icon] %>
+                <div class="h-8 w-8 <%= section[:color] || 'bg-gray-100 dark:bg-gray-700' %> rounded-lg flex items-center justify-center mr-3">
+                  <span class="text-xl"><%= section[:icon] %></span>
+                </div>
+              <% end %>
+              <h4 class="text-lg font-medium text-gray-900 dark:text-white"><%= section[:title] %></h4>
+            </div>
+          </div>
+        <% end %>
+        
+        <!-- Section Content -->
+        <div class="px-6 pb-4">
+          <%= render section[:partial_path] %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
