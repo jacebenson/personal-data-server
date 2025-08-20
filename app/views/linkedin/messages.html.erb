@@ -13,6 +13,8 @@
         View and search your imported LinkedIn messages
       </p>
     </div>
+    
+   
 
     <!-- Search and Filters -->
     <div class="bg-white dark:bg-gray-800 shadow rounded-lg mb-6">
@@ -84,6 +86,141 @@
         </div>
       </div>
     </div>
+
+    <!-- Search Debug Information -->
+    <% if (@search_subject.present? || @search_from.present? || @search_date_from.present? || @search_date_to.present?) && (@debug_contact_emails || @debug_search_conditions) %>
+      <div class="mb-6 bg-yellow-50 dark:bg-yellow-900 border border-yellow-200 dark:border-yellow-700 rounded-lg p-4">
+        <details class="group cursor-pointer bg-yellow-100 dark:bg-yellow-800 rounded-lg p-4">
+          <summary class="cursor-pointer text-yellow-800 dark:text-yellow-200 font-semibold">
+            Search Debug Information <span class="text-xs text-gray-500 dark:text-gray-400">(click to expand)</span>
+          </summary>
+          
+          <% if @search_from.present? %>
+            <div class="text-xs text-yellow-700 dark:text-yellow-300 space-y-2 mt-3">
+              <div><strong>Search term:</strong> "<%= @search_from %>"</div>
+              <div><strong>Total contacts in database:</strong> <%= @debug_total_contacts %></div>
+              
+              <% if @debug_detailed %>
+                <div class="border-t border-yellow-200 dark:border-yellow-700 pt-2">
+                  <strong>Contact Search Logic:</strong>
+                  
+                  <% if @debug_detailed[:search_words] && @debug_detailed[:search_words].length > 1 %>
+                    <div class="ml-2">
+                      <strong>Search words:</strong> <%= @debug_detailed[:search_words].join(", ") %>
+                    </div>
+                  <% end %>
+                  
+                  <% if @debug_detailed[:exact_matches]&.any? %>
+                    <div class="ml-2 mt-1">
+                      <strong>📍 Exact matches (highest priority):</strong>
+                      <% @debug_detailed[:exact_matches].each do |contact| %>
+                        <div class="ml-2 text-green-700 dark:text-green-300">
+                          ✓ ID <%= contact.id %>: 
+                          <%= contact.display_name.presence || "#{contact.given_name} #{contact.family_name}".strip %> - 
+                          <%= contact.emails %>
+                        </div>
+                      <% end %>
+                    </div>
+                  <% end %>
+                  
+                  <% if @debug_detailed[:word_start_matches]&.any? %>
+                    <div class="ml-2 mt-1">
+                      <strong>� Word-start matches (each word matches beginning of fields):</strong>
+                      <% @debug_detailed[:word_start_matches].each do |contact| %>
+                        <div class="ml-2 text-purple-700 dark:text-purple-300">
+                          ✓ ID <%= contact.id %>: 
+                          <%= contact.display_name.presence || "#{contact.given_name} #{contact.family_name}".strip %> - 
+                          <%= contact.emails %>
+                        </div>
+                      <% end %>
+                    </div>
+                  <% end %>
+                  
+                  <% if @debug_detailed[:word_matches]&.any? %>
+                    <div class="ml-2 mt-1">
+                      <strong>🔍 Word-anywhere matches (all words must appear somewhere):</strong>
+                      <% @debug_detailed[:word_matches].each do |contact| %>
+                        <div class="ml-2 text-blue-700 dark:text-blue-300">
+                          ✓ ID <%= contact.id %>: 
+                          <%= contact.display_name.presence || "#{contact.given_name} #{contact.family_name}".strip %> - 
+                          <%= contact.emails %>
+                        </div>
+                      <% end %>
+                    </div>
+                  <% end %>
+                  
+                  <% if @debug_detailed[:full_term_matches]&.any? %>
+                    <div class="ml-2 mt-1">
+                      <strong>📝 Partial matches (any field contains full term):</strong>
+                      <% @debug_detailed[:full_term_matches].each do |contact| %>
+                        <div class="ml-2 text-gray-600 dark:text-gray-400">
+                          - ID <%= contact.id %>: 
+                          <%= contact.display_name.presence || "#{contact.given_name} #{contact.family_name}".strip %> - 
+                          <%= contact.emails %>
+                        </div>
+                      <% end %>
+                    </div>
+                  <% end %>
+                  
+                  <div class="ml-2 mt-1">
+                    <strong>Total contacts with emails:</strong> <%= @debug_detailed[:total_contacts_with_emails] %>
+                  </div>
+                </div>
+              <% end %>
+              
+              <div class="border-t border-yellow-200 dark:border-yellow-700 pt-2">
+                <% if @debug_contact_names && @debug_contact_names.any? %>
+                  <div><strong>Matching contact names:</strong> <%= @debug_contact_names.join(", ") %></div>
+                <% else %>
+                  <div><strong>Matching contact names:</strong> <em>None found</em></div>
+                <% end %>
+                
+                <% if @debug_contact_emails && @debug_contact_emails.any? %>
+                  <div><strong>Found contact emails:</strong> <%= @debug_contact_emails.join(", ") %></div>
+                <% else %>
+                  <div><strong>Found contact emails:</strong> <em>None found</em></div>
+                <% end %>
+                
+                <% if @contact_matching_strategy %>
+                  <div><strong>Contact matching strategy used:</strong> 
+                    <span class="px-2 py-1 rounded text-xs 
+                      <% case @contact_matching_strategy %>
+                      <% when 'exact_match' %>
+                        bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100
+                      <% when 'word_start_match' %>
+                        bg-purple-100 text-purple-800 dark:bg-purple-800 dark:text-purple-100
+                      <% when 'word_anywhere_match' %>
+                        bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100
+                      <% when 'partial_match' %>
+                        bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-100
+                      <% when 'direct_name_only' %>
+                        bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100
+                      <% end %>">
+                      <%= @contact_matching_strategy.humanize %>
+                    </span>
+                  </div>
+                <% end %>
+                
+                <% if @matched_contact_emails && @matched_contact_emails.any? %>
+                  <div><strong>Using contact emails for LinkedIn search:</strong> <%= @matched_contact_emails.join(", ") %></div>
+                <% end %>
+                
+                <% if @matched_contact_names && @matched_contact_names.any? %>
+                  <div><strong>Using contact names for LinkedIn search:</strong> <%= @matched_contact_names.join(", ") %></div>
+                <% end %>
+              </div>
+              
+              <% if @debug_search_conditions %>
+                <div class="border-t border-yellow-200 dark:border-yellow-700 pt-2">
+                  <div><strong>LinkedIn Search SQL condition:</strong> <code class="bg-yellow-100 dark:bg-yellow-800 px-1 rounded text-xs"><%= @debug_search_conditions[0] %></code></div>
+                  <div><strong>Search parameters:</strong> <code class="bg-yellow-100 dark:bg-yellow-800 px-1 rounded text-xs"><%= @debug_search_conditions[1..-1].inspect %></code></div>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+        </details>
+      </div>
+    <% end %>
 
     <!-- Sidebar and Content -->
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
