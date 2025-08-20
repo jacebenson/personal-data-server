@@ -18,7 +18,7 @@
       <div class="space-y-2">
         <div class="flex items-center text-sm">
           <span class="text-lg mr-2">📦</span>
-          <span class="font-medium text-gray-900 dark:text-white">
+          <span class="font-medium text-gray-900 dark:text-white privacy-sensitive">
             <%= current_user.amazon_orders.count %>
           </span>
           <span class="text-gray-600 dark:text-gray-300 ml-1">total orders</span>
@@ -32,7 +32,7 @@
         </div>
         <div class="flex items-center text-sm">
           <span class="text-lg mr-2">📅</span>
-          <span class="font-medium text-gray-900 dark:text-white">
+          <span class="font-medium text-gray-900 dark:text-white privacy-sensitive">
             <%= current_user.amazon_orders.where('order_date >= ?', Date.current.beginning_of_year).count %>
           </span>
           <span class="text-gray-600 dark:text-gray-300 ml-1">this year</span>

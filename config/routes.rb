@@ -8,56 +8,6 @@ Rails.application.routes.draw do
   get "entertainment", to: "entertainment#index"
   get "shopping", to: "shopping#index"
 
-  # Legacy data_uploads routes - redirected to appropriate controllers
-  #resources :data_uploads, only: [:index] do
-  #  collection do
-  #    # Redirect to dashboard
-  #    get '', to: redirect('/dashboard')
-  #    
-  #    # Financial redirects
-  #    get :ally_bank_statements, to: redirect('/financial/bank_statements')
-  #    post :upload_ally_bank_statements, to: redirect('/financial/upload_bank_statements')
-  #    get :view_ally_bank_statements, to: redirect('/financial/view_bank_statements')
-  #    get :fidelity_data, to: redirect('/financial/fidelity_upload')
-  #    post :upload_fidelity_data, to: redirect('/financial/upload_fidelity_data')
-  #    get :principal_investments, to: redirect('/financial/principal_upload')
-  #    post :upload_principal_investments, to: redirect('/financial/upload_principal_data')
-  #    get :view_investments, to: redirect('/financial/view_investments')
-  #    get :manage_duplicates, to: redirect('/financial/manage_duplicates')
-  #    delete :clear_investments, to: redirect('/financial/clear_investments')
-#
-  #    # Shopping redirects
-  #    get :amazon_orders, to: redirect('/shopping/upload')
-  #    post :upload_amazon_orders, to: redirect('/shopping/upload_orders')
-  #    get :view_amazon_orders, to: redirect('/shopping/view_orders')
-  #    delete :clear_amazon_orders, to: redirect('/shopping/clear_orders')
-#
-  #    # Other legacy redirects
-  #    get :social_security_earnings, to: redirect('/social_security')
-  #    post :upload_social_security_earnings, to: 'social_security#upload_earnings'
-  #    get :view_social_security_earnings, to: redirect('/social_security/view_earnings')
-  #    get :communications, to: redirect('/communications')
-  #    post :upload_mbox, to: 'communications#upload_mbox'
-  #    post :upload_linkedin_messages, to: 'communications#upload_linkedin_messages'
-  #    get :view_communications, to: redirect('/communications/view')
-  #    get "view_communications/:id", to: redirect { |params, _| "/communications/#{params[:id]}" }
-  #    delete :clear_communications, to: 'communications#clear'
-  #    get :entertainment, to: redirect('/entertainment')
-  #    get :netflix, to: redirect('/entertainment/netflix')
-  #    post :upload_netflix, to: 'entertainment#upload_netflix'
-  #    get :view_netflix, to: redirect('/entertainment/view_netflix')
-  #    delete :clear_netflix, to: 'entertainment#clear_netflix'
-  #    get :youtube, to: redirect('/entertainment/youtube')
-  #    post :upload_youtube, to: 'entertainment#upload_youtube'
-  #    get :view_youtube, to: redirect('/entertainment/view_youtube')
-  #    delete :clear_youtube, to: 'entertainment#clear_youtube'
-  #    delete :remove_duplicates, to: redirect('/financial/remove_duplicates')
-  #    delete :remove_account_transactions, to: redirect('/financial/clear_bank_statements')
-  #    delete :remove_all_transactions, to: redirect('/financial/clear_bank_statements')
-  #    post :add_balance_adjustment, to: 'financial#add_balance_adjustment'
-  #  end
-  #end
-
   # Social Security management routes
   resources :social_security, only: [:index] do
     collection do
@@ -338,6 +288,9 @@ Rails.application.routes.draw do
 
   # Dashboard route
   get "dashboard", to: "dashboard#index"
+  
+  # User profile route
+  resource :user, only: [:show, :update]
 
   authenticated :user do
     root "dashboard#index", as: :authenticated_user_root

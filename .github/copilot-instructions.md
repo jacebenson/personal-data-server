@@ -26,6 +26,7 @@ All user data is private and not shared with any third parties.
 - Keep controllers thin and move business logic to models or service objects.
 - Use background jobs for long-running tasks to keep the application responsive.
 - Use Tailwind CSS for styling and layout.
+- Avoid Javascript if possible, instead use pages to achieve the affect Unless asked for specifically.
 - Use Turbo for enhancing user experience with minimal JavaScript.
 - Use Partials to simplify views and avoid duplication, these can exist in the `app/views/foldername/` unless shared, then use `app/views/shared/` directories.
 - We are not using kaminari for pagination, instead we use a simple pagination method that works with the current data set.

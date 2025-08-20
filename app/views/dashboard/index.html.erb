@@ -1,4 +1,4 @@
-<div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8<%= ' privacy-mode' if @privacy_mode %>">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="mb-8 flex justify-between items-center">
       <div>
@@ -8,10 +8,17 @@
       <!-- Privacy Toggle -->
       <div class="flex items-center space-x-3">
         <span class="text-sm text-gray-600 dark:text-gray-400">Privacy Mode</span>
-        <button id="privacy-toggle" type="button" class="relative inline-flex h-6 w-11 items-center rounded-full bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-gray-600 cursor-pointer">
-          <span class="sr-only">Toggle privacy mode</span>
-          <span id="privacy-toggle-switch" class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-1"></span>
-        </button>
+        <% if @privacy_mode %>
+          <%= link_to dashboard_path(privacy: false), class: "relative inline-flex h-6 w-11 items-center rounded-full bg-blue-500 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 cursor-pointer" do %>
+            <span class="sr-only">Disable privacy mode</span>
+            <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-6"></span>
+          <% end %>
+        <% else %>
+          <%= link_to dashboard_path(privacy: true), class: "relative inline-flex h-6 w-11 items-center rounded-full bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-gray-600 cursor-pointer" do %>
+            <span class="sr-only">Enable privacy mode</span>
+            <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-1"></span>
+          <% end %>
+        <% end %>
         <span class="text-sm text-gray-600 dark:text-gray-400">
           <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
@@ -45,76 +52,20 @@
   }
   
   .privacy-mode .privacy-sensitive {
-    filter: blur(4px);
+    filter: blur(8px);
     user-select: none;
   }
   
   .privacy-mode .privacy-sensitive:hover {
-    filter: blur(2px);
+    filter: blur(6px);
   }
   
   /* Chart axis blurring in privacy mode */
   .privacy-mode .chartkick-chart svg text {
-    filter: blur(4px);
+    filter: blur(12px);
   }
   
   .privacy-mode .chartkick-chart .highcharts-axis-labels text {
-    filter: blur(4px);
-  }
-  
-  /* Toggle switch styles */
-  .privacy-active {
-    background-color: #3B82F6 !important;
-  }
-  
-  .privacy-active .toggle-switch {
-    transform: translateX(1.25rem);
+    filter: blur(12px);
   }
 </style>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  const privacyToggle = document.getElementById('privacy-toggle');
-  const privacySwitch = document.getElementById('privacy-toggle-switch');
-  const body = document.body;
-  
-  if (!privacyToggle || !privacySwitch) {
-    console.error('Privacy toggle elements not found');
-    return;
-  }
-  
-  // Load saved privacy state
-  const isPrivacyMode = localStorage.getItem('privacyMode') === 'true';
-  
-  if (isPrivacyMode) {
-    enablePrivacyMode();
-  }
-  
-  privacyToggle.addEventListener('click', function(e) {
-    e.preventDefault();
-    console.log('Privacy toggle clicked'); // Debug log
-    
-    if (body.classList.contains('privacy-mode')) {
-      disablePrivacyMode();
-    } else {
-      enablePrivacyMode();
-    }
-  });
-  
-  function enablePrivacyMode() {
-    console.log('Enabling privacy mode'); // Debug log
-    body.classList.add('privacy-mode');
-    privacyToggle.classList.add('privacy-active');
-    privacySwitch.style.transform = 'translateX(1.25rem)';
-    localStorage.setItem('privacyMode', 'true');
-  }
-  
-  function disablePrivacyMode() {
-    console.log('Disabling privacy mode'); // Debug log
-    body.classList.remove('privacy-mode');
-    privacyToggle.classList.remove('privacy-active');
-    privacySwitch.style.transform = 'translateX(0.25rem)';
-    localStorage.setItem('privacyMode', 'false');
-  }
-});
-</script>

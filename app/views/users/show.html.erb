@@ -25,6 +25,26 @@
         </div>
       </div>
 
+      <!-- Privacy Settings -->
+      <div class="mb-8">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">Privacy Settings</h2>
+        <%= form_with model: @user, url: user_path, method: :patch, local: true, class: "space-y-4" do |form| %>
+          <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Default Privacy Mode</label>
+                <p class="text-sm text-gray-600">When enabled, the dashboard will load with privacy mode on by default</p>
+              </div>
+              <div class="flex items-center">
+                <%= form.check_box :setting_privacy_mode, 
+                    class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded",
+                    onchange: "this.form.submit()" %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+
       <!-- API Access Section -->
       <div class="mb-8">
         <h2 class="text-xl font-semibold text-gray-900 mb-4">API Access</h2>
