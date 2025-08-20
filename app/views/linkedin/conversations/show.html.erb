@@ -83,74 +83,77 @@
           <div class="space-y-4">
             <% day_messages.each do |message| %>
               <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
-                <!-- Message Header -->
-                <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                  <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-3">
-                      <div class="h-8 w-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
-                        <span class="text-blue-600 dark:text-blue-400 font-medium text-sm">
-                          <%= message.from_name.split.map(&:first).join.upcase %>
-                        </span>
-                      </div>
-                      <div>
-                        <p class="text-sm font-medium text-gray-900 dark:text-white">
-                          <%= message.from_name %>
-                        </p>
-                        <div class="flex items-center space-x-2 text-xs text-gray-500 dark:text-gray-400">
-                          <span>to <%= message.to_name %></span>
-                          <span>•</span>
-                          <span><%= message.sent_at.strftime("%I:%M %p") %></span>
-                        </div>
-                      </div>
+                <!-- Message Header and Content -->
+                <div class="px-6 py-4">
+                  <div class="flex items-start justify-between">
+                    <div class="flex-1 mr-4">
+                      <span class="text-sm font-medium text-gray-900 dark:text-white"><%= message.from_name %></span>
+                      <span class="text-sm text-gray-600 dark:text-gray-400">@ <%= message.sent_at.strftime("%I:%M %p") %>:</span>
+                      <% if message.content.present? %>
+                        <% 
+                          # Start with HTML tag removal
+                          cleaned_content = strip_tags(message.content)
+                          
+                          # 1. Convert LinkedIn activity URLs to embedded iframes (FIRST - highest priority)
+                          linkedin_activity_regex = /https:\/\/www\.linkedin\.com\/posts\/[^\/\s]+activity-(\d+)[-\w]*(?:\?[^\s]*)?/
+                          linked_content = cleaned_content.gsub(linkedin_activity_regex) do |url|
+                            activity_number = $1  # Captured group from regex
+                            # Use a placeholder that won't be matched by URL regex
+                            "LINKEDIN_IFRAME_#{activity_number}_PLACEHOLDER"
+                          end
+                          
+                          # 2. Convert other URLs to clickable links (will not match our placeholder)
+                          url_regex = /https?:\/\/[^\s]+/
+                          linked_content = linked_content.gsub(url_regex) do |url|
+                            "<a href=\"#{url}\" target=\"_blank\" rel=\"noopener\" class=\"text-blue-600 dark:text-blue-400 hover:underline\">#{url}</a>"
+                          end
+                          
+                          # 3. Replace LinkedIn placeholders with actual iframes (after URL processing)
+                          linked_content = linked_content.gsub(/LINKEDIN_IFRAME_(\d+)_PLACEHOLDER/) do |placeholder|
+                            activity_number = $1
+                            # Find the original URL from the cleaned content to display as copyable link
+                            original_url_match = cleaned_content.match(/https:\/\/www\.linkedin\.com\/posts\/[^\/\s]+activity-#{activity_number}[-\w]*(?:\?[^\s]*)?/)
+                            original_url = original_url_match ? original_url_match[0] : "https://www.linkedin.com/posts/activity-#{activity_number}"
+                            
+                            %Q{<div class="my-4">
+                              <div class="mb-2 p-2 bg-gray-100 dark:bg-gray-700 rounded border">
+                                <span class="text-xs text-gray-600 dark:text-gray-400">LinkedIn Post:</span>
+                                <input type="text" value="#{original_url}" readonly 
+                                       class="w-full text-xs bg-transparent border-none p-1 text-blue-600 dark:text-blue-400 font-mono select-all cursor-pointer" 
+                                       onclick="this.select(); document.execCommand('copy');" 
+                                       title="Click to select and copy">
+                              </div>
+                              <iframe src="https://www.linkedin.com/embed/feed/update/urn:li:activity:#{activity_number}" 
+                                      height="600" width="504" frameborder="0" allowfullscreen="" 
+                                      title="Embedded LinkedIn post" class="mx-auto">
+                              </iframe>
+                            </div>}
+                          end
+                          
+                          # 4. Convert phone numbers to tel: links
+                          # More specific regex that avoids matching numbers within existing links
+                          # Uses negative lookbehind to avoid matching numbers that come after href=" or inside URLs
+                          phone_regex = /(?<!href=")(?<!\/)\b(\+?1?[-.\s]?)?\(?([0-9]{3})\)?[-.\s]?([0-9]{3})[-.\s]?([0-9]{4})\b(?![^<]*<\/a>)/
+                          linked_content = linked_content.gsub(phone_regex) do |phone|
+                            # Clean phone number for tel: link (remove non-digits except +)
+                            clean_phone = phone.gsub(/[^\d+]/, '')
+                            "<a href=\"tel:#{clean_phone}\" class=\"text-blue-600 dark:text-blue-400 hover:underline\">#{phone}</a>"
+                          end
+                          
+                          # 5. Remove &nbsp; entities (lowest priority)
+                          linked_content = linked_content.gsub('&nbsp;', ' ').strip
+                        %>
+                        <span class="text-sm text-gray-900 dark:text-white ml-2"><%= raw(linked_content) %></span>
+                      <% else %>
+                        <span class="text-sm text-gray-500 dark:text-gray-400 italic ml-2">No message content available</span>
+                      <% end %>
                     </div>
                     
-                    <div class="flex items-center space-x-2">
-                      <% if message.is_draft? %>
-                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300">
-                          Draft
-                        </span>
-                      <% end %>
-                      
-                      <%= link_to linkedin_message_path(message), class: "text-blue-600 hover:text-blue-500 text-xs font-medium" do %>
-                        View Details
-                      <% end %>
-                    </div>
+                    <%= link_to linkedin_message_path(message), class: "text-blue-600 hover:text-blue-500 text-xs font-medium flex-shrink-0" do %>
+                      view details
+                    <% end %>
                   </div>
-                  
-                  <!-- Subject -->
-                  <% if message.subject.present? %>
-                    <div class="mt-3">
-                      <p class="text-sm font-medium text-gray-900 dark:text-white">
-                        <%= message.subject %>
-                      </p>
-                    </div>
-                  <% end %>
                 </div>
-                
-                <!-- Message Content -->
-                <div class="px-6 py-4">
-                  <% if message.content.present? %>
-                    <div class="prose dark:prose-invert max-w-none">
-                      <%= simple_format(message.content, class: "text-gray-900 dark:text-white whitespace-pre-wrap") %>
-                    </div>
-                  <% else %>
-                    <p class="text-gray-500 dark:text-gray-400 italic">No message content available</p>
-                  <% end %>
-                </div>
-                
-                <!-- Message Metadata -->
-                <% if message.folder.present? %>
-                  <div class="px-6 py-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
-                    <div class="flex items-center justify-between">
-                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
-                        <%= message.folder %>
-                      </span>
-                      <span class="text-xs text-gray-500 dark:text-gray-400">
-                        Added <%= time_ago_in_words(message.created_at) %> ago
-                      </span>
-                    </div>
-                  </div>
-                <% end %>
               </div>
             <% end %>
           </div>
