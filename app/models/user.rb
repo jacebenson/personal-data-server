@@ -18,6 +18,28 @@ class User < ApplicationRecord
   has_many :podcast_feeds, dependent: :destroy
   has_many :null_edge_attendees, dependent: :destroy
 
+  # Validations
+  validates :timezone, inclusion: { in: ActiveSupport::TimeZone.all.map(&:name) }, allow_blank: true
+
+  # Get user's timezone or default
+  def user_timezone
+    timezone.presence || "Central Time (US & Canada)"
+  end
+
+  # Get today's date in user's timezone
+  def current_date_in_timezone
+    Time.zone = user_timezone
+    Time.zone.today
+  end
+
+  # Get events for today in user's timezone
+  def todays_events
+    Time.zone = user_timezone
+    today_start = Time.zone.today.beginning_of_day
+    today_end = Time.zone.today.end_of_day
+    calendar_events.where(start_time: today_start..today_end).chronological
+  end
+
   # Generate a stable Bearer token based on user attributes
   def bearer_token
     return @bearer_token if @bearer_token

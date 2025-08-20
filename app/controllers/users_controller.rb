@@ -26,6 +26,6 @@ class UsersController < ApplicationController
   private
 
   def user_params
-    params.require(:user).permit(:setting_privacy_mode)
+    params.require(:user).permit(:setting_privacy_mode, :timezone)
   end
 end
