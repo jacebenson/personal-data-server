@@ -271,12 +271,6 @@ Rails.application.routes.draw do
   post 'entertainment/upload_goodreads', to: 'entertainment/books#upload'
   delete 'entertainment/clear_goodreads', to: 'entertainment/books#destroy_all'
   
-  get 'entertainment/podcasts', to: 'entertainment/podcasts#index'
-  post 'entertainment/upload_opml', to: 'entertainment/podcasts#upload_opml'
-  post 'entertainment/add_podcast_feed', to: 'entertainment/podcasts#add_feed'
-  delete 'entertainment/clear_podcast_feeds', to: 'entertainment/podcasts#destroy_all'
-  get 'entertainment/all_episodes', to: 'entertainment/podcasts#all_episodes'
-  
   # Individual podcast feed actions
   post 'entertainment/:id/sync_podcast_feed', to: 'entertainment/podcasts#sync'
   patch 'entertainment/:id/toggle_podcast_feed', to: 'entertainment/podcasts#toggle'
@@ -288,7 +282,7 @@ Rails.application.routes.draw do
   patch 'entertainment/podcast/:podcast_id/episode/:id/toggle_listened', to: 'entertainment/podcasts#toggle_episode_listened', as: :toggle_episode_listened_entertainment_index
   
   # Podcast feed sync route (for syncing all)
-  post 'entertainment/sync_all_podcast_feeds', to: 'entertainment/podcasts#sync_all'
+  post 'entertainment/sync_all_podcast_feeds', to: 'entertainment/podcasts#sync_all', as: :entertainment_sync_all_podcast_feeds
 
   # API routes for AI model context providers
   namespace :api do

@@ -1,42 +1,103 @@
 <!-- Entertainment Category -->
-<%= link_to entertainment_path, class: "group block" do %>
-  <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg hover:shadow-lg transition-shadow duration-200">
-    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center">
-          <div class="h-8 w-8 bg-red-100 dark:bg-red-900 rounded-lg flex items-center justify-center mr-3">
-            <span class="text-xl">🎬</span>
-          </div>
-          <h3 class="text-xl font-semibold text-gray-900 dark:text-white group-hover:text-red-600 dark:group-hover:text-red-400">Entertainment</h3>
+<div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg hover:shadow-lg transition-shadow duration-200">
+  <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center">
+        <div class="h-8 w-8 bg-red-100 dark:bg-red-900 rounded-lg flex items-center justify-center mr-3">
+          <span class="text-xl">🎬</span>
         </div>
+        <%= link_to entertainment_path, class: "group" do %>
+          <h3 class="text-xl font-semibold text-gray-900 dark:text-white group-hover:text-red-600 dark:group-hover:text-red-400">Entertainment</h3>
+        <% end %>
+      </div>
+      <%= link_to entertainment_path, class: "group" do %>
         <svg class="h-5 w-5 text-gray-400 group-hover:text-red-600 dark:group-hover:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
         </svg>
-      </div>
+      <% end %>
     </div>
-    <div class="p-6">
-      <div class="space-y-2">
-        <div class="flex items-center text-sm">
-          <span class="text-lg mr-2">👀</span>
-          <span class="font-medium text-gray-900 dark:text-white">
+  </div>
+  <div class="p-6">
+    <!-- 2x2 Grid of Entertainment Stats -->
+    <div class="grid grid-cols-2 gap-4">
+      <!-- Audible Sessions -->
+      <%= link_to entertainment_audible_index_path, class: "group p-3 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-red-300 dark:hover:border-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-200" do %>
+        <div class="text-center">
+          <div class="text-2xl mb-1">🎧</div>
+          <div class="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-red-600 dark:group-hover:text-red-400">
             <%= current_user.entertainment_contents.where(
-              content_type: ['netflix', 'youtube'],
-              date_consumed: Date.current.beginning_of_day..Date.current.end_of_day
+              content_type: 'audible_book',
+              date_consumed: 7.days.ago..Time.current
             ).count %>
-          </span>
-          <span class="text-gray-600 dark:text-gray-300 ml-1">videos today</span>
+          </div>
+          <div class="text-xs text-gray-500 dark:text-gray-400 group-hover:text-red-500 dark:group-hover:text-red-300">
+            Audible this week
+          </div>
         </div>
-        <div class="flex items-center text-sm">
-          <span class="text-lg mr-2">👂</span>
-          <span class="font-medium text-gray-900 dark:text-white">
+      <% end %>
+
+      <!-- Books Read -->
+      <%= link_to entertainment_books_path(filter: 'read'), class: "group p-3 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-red-300 dark:hover:border-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-200" do %>
+        <div class="text-center">
+          <div class="text-2xl mb-1">📚</div>
+          <div class="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-red-600 dark:group-hover:text-red-400">
             <%= current_user.entertainment_contents.where(
-              content_type: 'podcast',
-              date_consumed: 1.week.ago.beginning_of_day..Time.current
+              content_type: 'goodreads',
+              date_consumed: 7.days.ago..Time.current
             ).count %>
-          </span>
-          <span class="text-gray-600 dark:text-gray-300 ml-1">new podcast ep.</span>
+          </div>
+          <div class="text-xs text-gray-500 dark:text-gray-400 group-hover:text-red-500 dark:group-hover:text-red-300">
+            Books this week
+          </div>
+        </div>
+      <% end %>
+
+      <!-- YouTube Videos -->
+      <%= link_to entertainment_youtube_index_path, class: "group p-3 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-red-300 dark:hover:border-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-200" do %>
+        <div class="text-center">
+          <div class="text-2xl mb-1">📹</div>
+          <div class="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-red-600 dark:group-hover:text-red-400">
+            <%= current_user.entertainment_contents.where(
+              content_type: 'youtube',
+              date_consumed: 7.days.ago..Time.current
+            ).count %>
+          </div>
+          <div class="text-xs text-gray-500 dark:text-gray-400 group-hover:text-red-500 dark:group-hover:text-red-300">
+            YouTube this week
+          </div>
+        </div>
+      <% end %>
+
+      <!-- Netflix Shows/Movies -->
+      <%= link_to entertainment_netflix_index_path, class: "group p-3 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-red-300 dark:hover:border-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-200" do %>
+        <div class="text-center">
+          <div class="text-2xl mb-1">📺</div>
+          <div class="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-red-600 dark:group-hover:text-red-400">
+            <%= current_user.entertainment_contents.where(
+              content_type: 'netflix',
+              date_consumed: 7.days.ago..Time.current
+            ).count %>
+          </div>
+          <div class="text-xs text-gray-500 dark:text-gray-400 group-hover:text-red-500 dark:group-hover:text-red-300">
+            Netflix this week
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Total Library Stats at Bottom -->
+    <div class="mt-4 pt-3 border-t border-gray-100 dark:border-gray-700">
+      <div class="flex justify-between items-center text-xs text-gray-400 dark:text-gray-500">
+        <span class="font-medium">Total Library:</span>
+        <div class="flex space-x-4">
+          <%= link_to entertainment_books_path, class: "hover:text-red-600 dark:hover:text-red-400 transition-colors" do %>
+            <%= number_with_delimiter(current_user.entertainment_contents.where(content_type: 'goodreads').count) %> books
+          <% end %>
+          <%= link_to entertainment_audible_index_path, class: "hover:text-red-600 dark:hover:text-red-400 transition-colors" do %>
+            <%= number_with_delimiter(current_user.entertainment_contents.where(content_type: 'audible_book').count) %> sessions
+          <% end %>
         </div>
       </div>
     </div>
   </div>
-<% end %>
+</div>

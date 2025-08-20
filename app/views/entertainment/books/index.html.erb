@@ -49,7 +49,7 @@
           <div class="flex flex-wrap gap-4">
             <!-- Shelf Filter -->
             <div>
-              <%= form_with url: entertainment_books_index_path, method: :get, local: true, class: "flex items-center space-x-2" do |form| %>
+              <%= form_with url: entertainment_books_path, method: :get, local: true, class: "flex items-center space-x-2" do |form| %>
                 <%= form.hidden_field :filter_year, value: @filter_year %>
                 <%= form.hidden_field :search, value: @search %>
                 <%= form.select :filter,
@@ -67,7 +67,7 @@
             <!-- Year Filter -->
             <% if @years_available.any? %>
               <div>
-                <%= form_with url: entertainment_books_index_path, method: :get, local: true, class: "flex items-center space-x-2" do |form| %>
+                <%= form_with url: entertainment_books_path, method: :get, local: true, class: "flex items-center space-x-2" do |form| %>
                   <%= form.hidden_field :filter, value: @filter %>
                   <%= form.hidden_field :search, value: @search %>
                   <%= form.select :filter_year,
@@ -80,7 +80,7 @@
 
             <!-- Search -->
             <div>
-              <%= form_with url: entertainment_books_index_path, method: :get, local: true, class: "flex items-center space-x-2" do |form| %>
+              <%= form_with url: entertainment_books_path, method: :get, local: true, class: "flex items-center space-x-2" do |form| %>
                 <%= form.hidden_field :filter, value: @filter %>
                 <%= form.hidden_field :filter_year, value: @filter_year %>
                 <%= form.text_field :search, value: @search, placeholder: "Search books or authors...", 
@@ -92,12 +92,13 @@
 
           <!-- Actions -->
           <div class="flex space-x-2">
-            <%= link_to goodreads_entertainment_index_path, class: "inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600" do %>
+            <button onclick="document.getElementById('upload-section').scrollIntoView(); document.getElementById('upload-section').classList.toggle('hidden')" 
+                class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600">
               <svg class="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
               </svg>
               Upload More
-            <% end %>
+            </button>
 
             <% if @total_count > 0 %>
               <%= link_to destroy_all_entertainment_books_path, 
@@ -192,12 +193,12 @@
         <div class="bg-white dark:bg-gray-800 px-4 py-3 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 sm:px-6 mt-0">
           <div class="flex-1 flex justify-between sm:hidden">
             <% if @has_prev %>
-              <%= link_to entertainment_books_index_path(page: @current_page - 1, filter: @filter, filter_year: @filter_year, search: @search), class: "relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600" do %>
+              <%= link_to entertainment_books_path(page: @current_page - 1, filter: @filter, filter_year: @filter_year, search: @search), class: "relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600" do %>
                 Previous
               <% end %>
             <% end %>
             <% if @has_next %>
-              <%= link_to entertainment_books_index_path(page: @current_page + 1, filter: @filter, filter_year: @filter_year, search: @search), class: "ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600" do %>
+              <%= link_to entertainment_books_path(page: @current_page + 1, filter: @filter, filter_year: @filter_year, search: @search), class: "ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600" do %>
                 Next
               <% end %>
             <% end %>
@@ -217,7 +218,7 @@
             <div>
               <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
                 <% if @has_prev %>
-                  <%= link_to entertainment_books_index_path(page: @current_page - 1, filter: @filter, filter_year: @filter_year, search: @search), class: "relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600" do %>
+                  <%= link_to entertainment_books_path(page: @current_page - 1, filter: @filter, filter_year: @filter_year, search: @search), class: "relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600" do %>
                     <span class="sr-only">Previous</span>
                     <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                       <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
@@ -231,14 +232,14 @@
                       <%= page %>
                     </span>
                   <% else %>
-                    <%= link_to entertainment_books_index_path(page: page, filter: @filter, filter_year: @filter_year, search: @search), class: "relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600" do %>
+                    <%= link_to entertainment_books_path(page: page, filter: @filter, filter_year: @filter_year, search: @search), class: "relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600" do %>
                       <%= page %>
                     <% end %>
                   <% end %>
                 <% end %>
 
                 <% if @has_next %>
-                  <%= link_to entertainment_books_index_path(page: @current_page + 1, filter: @filter, filter_year: @filter_year, search: @search), class: "relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600" do %>
+                  <%= link_to entertainment_books_path(page: @current_page + 1, filter: @filter, filter_year: @filter_year, search: @search), class: "relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600" do %>
                     <span class="sr-only">Next</span>
                     <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                       <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
@@ -265,25 +266,81 @@
           <% end %>
         </p>
         <div class="mt-6">
-          <%= link_to goodreads_entertainment_index_path, class: "inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500" do %>
+          <button onclick="document.getElementById('upload-section').scrollIntoView(); document.getElementById('upload-section').classList.toggle('hidden')" 
+              class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
             <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
             </svg>
             Upload Goodreads Data
-          <% end %>
+          </button>
         </div>
       </div>
     <% end %>
 
     <!-- Actions -->
     <div class="mt-8 flex justify-between">
-      <%= link_to goodreads_entertainment_index_path, class: "inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600" do %>
-        ← Back to Upload
-      <% end %>
+      <button onclick="document.getElementById('upload-section').scrollIntoView(); document.getElementById('upload-section').classList.toggle('hidden')" 
+          class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600">
+        ← Upload Data
+      </button>
 
       <%= link_to entertainment_path, class: "inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600" do %>
         All Entertainment Data
       <% end %>
+    </div>
+
+    <!-- Upload Section (initially hidden) -->
+    <div id="upload-section" class="mt-8 hidden">
+      <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+        <div class="p-6">
+          <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-4">📚 Upload Goodreads Library Data</h2>
+          
+          <!-- Instructions -->
+          <div class="mb-6 p-4 bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 rounded-md">
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                </svg>
+              </div>
+              <div class="ml-3">
+                <h3 class="text-sm font-medium text-blue-800 dark:text-blue-200">How to get your Goodreads library data:</h3>
+                <div class="mt-2 text-sm text-blue-700 dark:text-blue-300">
+                  <ol class="list-decimal list-inside space-y-1">
+                    <li>Go to <a href="https://www.goodreads.com/review/import" target="_blank" class="underline">goodreads.com/review/import</a></li>
+                    <li>Sign in to your Goodreads account</li>
+                    <li>Click "Export Library" at the bottom of the page</li>
+                    <li>Download the CSV file when it's ready</li>
+                    <li>Upload the file below</li>
+                  </ol>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Upload Form -->
+          <%= form_with url: upload_entertainment_books_path, multipart: true, local: true, class: "space-y-4" do |form| %>
+            <div>
+              <%= form.label :file, "Select Goodreads CSV file", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+              <%= form.file_field :file, 
+                  accept: ".csv",
+                  required: true,
+                  class: "mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900 dark:file:text-blue-300" %>
+            </div>
+
+            <div class="flex space-x-3">
+              <%= form.submit "Upload Library Data", 
+                  class: "px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500" %>
+              
+              <%= link_to "Clear All Goodreads Data", 
+                  destroy_all_entertainment_books_path, 
+                  method: :delete, 
+                  confirm: "Are you sure you want to delete all Goodreads book data? This action cannot be undone.",
+                  class: "px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
     </div>
   </div>
 </div>

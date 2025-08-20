@@ -1,37 +1,5 @@
 class Entertainment::BooksController < Entertainment::BaseController
   def index
-    # Show Goodreads upload form
-    render 'entertainment/books/upload'
-  end
-
-  def upload
-    # Process uploaded Goodreads CSV
-    if params[:file].present?
-      begin
-        result = Entertainment::GoodreadsDataProcessor.new(params[:file].path, current_user).process
-
-        if result[:success]
-          message = "Successfully imported #{result[:count]} Goodreads book records."
-          if result[:skipped] && result[:skipped] > 0
-            message += " Skipped #{result[:skipped]} records (likely duplicates)."
-          end
-          redirect_to entertainment_books_path, notice: message
-        else
-          error_message = "Error processing file"
-          if result[:errors].any?
-            error_message += ": #{result[:errors].first}"
-          end
-          redirect_to entertainment_books_path, alert: error_message
-        end
-      rescue => e
-        redirect_to entertainment_books_path, alert: "Error processing file: #{e.message}"
-      end
-    else
-      redirect_to entertainment_books_path, alert: "Please select a file to upload."
-    end
-  end
-
-  def show
     # Show imported Goodreads records
     page = params[:page].to_i
     page = 1 if page < 1
@@ -87,6 +55,38 @@ class Entertainment::BooksController < Entertainment::BaseController
     @average_rating = rated_books.any? ? rated_books.average(:my_rating) : 0
     
     render 'entertainment/books/index'
+  end
+
+  def upload
+    # Process uploaded Goodreads CSV
+    if params[:file].present?
+      begin
+        result = Entertainment::GoodreadsDataProcessor.new(params[:file].path, current_user).process
+
+        if result[:success]
+          message = "Successfully imported #{result[:count]} Goodreads book records."
+          if result[:skipped] && result[:skipped] > 0
+            message += " Skipped #{result[:skipped]} records (likely duplicates)."
+          end
+          redirect_to entertainment_books_path, notice: message
+        else
+          error_message = "Error processing file"
+          if result[:errors].any?
+            error_message += ": #{result[:errors].first}"
+          end
+          redirect_to entertainment_books_path, alert: error_message
+        end
+      rescue => e
+        redirect_to entertainment_books_path, alert: "Error processing file: #{e.message}"
+      end
+    else
+      redirect_to entertainment_books_path, alert: "Please select a file to upload."
+    end
+  end
+
+  def show
+    # Redirect to index since that's where the data display logic is now
+    redirect_to entertainment_books_path(params.permit(:page, :filter, :filter_year, :search))
   end
 
   def destroy_all
