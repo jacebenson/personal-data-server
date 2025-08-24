@@ -1,0 +1,174 @@
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="mb-8">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-white">🎯 nullEDGE Event Tracking</h1>
+          <p class="mt-2 text-gray-600 dark:text-gray-400">
+            Track nullEDGE event attendee counts over time
+          </p>
+        </div>
+        <div class="flex space-x-3">
+          <%= link_to "View History", view_null_edge_index_path,
+              class: "inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
+          <%= link_to "Back to Home", authenticated_user_root_path,
+              class: "inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Summary Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+              </svg>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Total Records</dt>
+                <dd class="text-lg font-medium text-gray-900 dark:text-white"><%= @total_records %></dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+              </svg>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Latest Count</dt>
+                <dd class="text-lg font-medium text-gray-900 dark:text-white">
+                  <%= @latest_record&.count || 'N/A' %>
+                  <% if @latest_record %>
+                    <span class="text-xs text-gray-500 dark:text-gray-400 block">
+                      <%= @latest_record.formatted_date %>
+                    </span>
+                  <% end %>
+                </dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg class="h-8 w-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">This Year</dt>
+                <dd class="text-lg font-medium text-gray-900 dark:text-white"><%= @this_year_records %></dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg class="h-8 w-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">This Month</dt>
+                <dd class="text-lg font-medium text-gray-900 dark:text-white"><%= @this_month_records %></dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Manual Entry Section -->
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg mb-6">
+      <div class="p-6">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Add Current Registration Count</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+          Enter the current registration count from the nullEDGE event page manually.
+        </p>
+        
+        <%= form_with url: fetch_attendees_null_edge_index_path, method: :post, local: true, class: "space-y-4" do |form| %>
+          <div class="flex items-end space-x-4">
+            <div class="flex-1">
+              <%= form.label :count, "Registration Count", class: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1" %>
+              <%= form.number_field :count, 
+                  placeholder: "e.g., 329", 
+                  min: 1,
+                  class: "block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white" %>
+            </div>
+            <div>
+              <%= form.submit "Add Count", 
+                  class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
+            </div>
+          </div>
+        <% end %>
+        
+        <% if @last_fetch %>
+          <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
+            <span class="text-sm text-gray-500 dark:text-gray-400">
+              Last updated: <%= time_ago_in_words(@last_fetch) %> ago
+            </span>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <% if @total_records > 0 %>
+      <div class="bg-white dark:bg-gray-800 shadow rounded-lg mb-6">
+        <div class="p-6">
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Quick Stats</h3>
+          <div class="text-sm text-gray-600 dark:text-gray-400">
+            <p>Total records: <%= @total_records %></p>
+            <% if @latest_record %>
+              <p>Latest entry: <%= @latest_record.count %> attendees on <%= @latest_record.formatted_date %></p>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Actions -->
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+      <div class="p-6">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Actions</h3>
+        <div class="space-y-4">
+          <div>
+            <%= link_to "View Attendee History", view_null_edge_index_path,
+                class: "inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
+          </div>
+          
+          <% if @total_records > 0 %>
+            <div>
+              <%= link_to "Clear All Data", clear_null_edge_index_path, 
+                  method: :delete,
+                  confirm: "Are you sure you want to delete all nullEDGE attendee records? This action cannot be undone.",
+                  class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

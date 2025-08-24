@@ -1,0 +1,33 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user: one
+  date: 2025-08-07 01:29:41
+  action: MyString
+  symbol: MyString
+  description: MyString
+  investment_type: MyString
+  quantity: 9.99
+  price: 9.99
+  commission: 9.99
+  fees: 9.99
+  amount: 9.99
+  account: MyString
+  account_number: MyString
+  settlement_date: 2025-08-07 01:29:42
+
+two:
+  user: two
+  date: 2025-08-07 01:29:41
+  action: MyString
+  symbol: MyString
+  description: MyString
+  investment_type: MyString
+  quantity: 9.99
+  price: 9.99
+  commission: 9.99
+  fees: 9.99
+  amount: 9.99
+  account: MyString
+  account_number: MyString
+  settlement_date: 2025-08-07 01:29:42

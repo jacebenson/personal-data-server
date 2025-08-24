@@ -1,0 +1,45 @@
+<!-- Financial Data Category -->
+<%= link_to financial_path, class: "group block" do %>
+
+    <div class="p-6">
+      <div class="space-y-3">
+        <div>
+          <% current_investments = current_user.investments.sum(:amount) %>
+          <% investment_goal = current_user.investment_goal || 0 %>
+          <!--goal should show k, M, or B based on size, and show one decimal place-->
+          <% if investment_goal > 0 %>
+            <% if investment_goal >= 1_000_000_000 %>
+              <% goal_display = "$#{number_with_delimiter((investment_goal / 1_000_000_000).round(1))}B" %>
+            <% elsif investment_goal >= 1_000_000 %>
+              <% goal_display = "$#{number_with_delimiter((investment_goal / 1_000_000).round(1))}M" %>
+            <% else %>
+              <% goal_display = "$#{number_with_delimiter((investment_goal / 1000).round(1))}k" %>
+            <% end %>
+          <% else %>
+            <% goal_display = "No Goal Set" %>
+          <% end %>
+
+          <% if investment_goal > 0 %>
+
+            <p class="text-2xl font-bold text-gray-900 dark:text-white">
+              <span class="privacy-sensitive">$<%= number_with_delimiter((current_investments / 1000).round(0)) %>k</span> / <span class="privacy-sensitive"><%= goal_display %></span>
+            </p>
+          <% end %>
+        </div>
+        <div>
+          <% discretionary_account = current_user.discretionary_account.presence || 'No Account Set' %>
+          <% pocket_money = discretionary_account != 'No Account Set' ? current_user.bank_statements.where(account: discretionary_account).sum(:amount) : 0 %>
+          
+          <p class="text-lg font-semibold text-gray-900 dark:text-white">
+            <span class="privacy-sensitive">$<%= number_with_delimiter(pocket_money.round(0)) %></span> in your pocket
+            <% if discretionary_account == 'No Account Set' %>
+              <span class="text-sm text-gray-500 dark:text-gray-400 block">(Set discretionary account in profile)</span>
+            <% else %>
+              <span class="text-sm text-gray-500 dark:text-gray-400 block">(<%= discretionary_account %>)</span>
+            <% end %>
+          </p>
+        </div>
+      </div>
+    </div>
+  
+<% end %>

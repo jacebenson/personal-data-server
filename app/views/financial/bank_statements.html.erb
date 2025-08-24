@@ -1,0 +1,318 @@
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="mb-8">
+      <%= render 'shared/breadcrumb', breadcrumbs: [
+        { name: "Home", path: root_path },
+        { name: "Financial", path: financial_path },
+        { name: "Upload Bank Statements", path: nil }
+      ] %>
+
+      <h1 class="text-3xl font-bold text-gray-900 dark:text-white">🏦 Upload Bank Statements</h1>
+      <p class="mt-2 text-gray-600 dark:text-gray-400">Upload a CSV file and map columns to database fields</p>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+      <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white">CSV File Upload & Column Mapping</h3>
+      </div>
+
+      <div class="p-6">
+        <%= form_with url: upload_bank_statements_financial_index_path, multipart: true, local: true, class: "space-y-6", id: "bank-statement-form" do |form| %>
+          
+          <!-- Bank Selection Dropdown -->
+          <div>
+            <label for="bank_type" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Select Your Bank
+            </label>
+            <div class="mt-1">
+              <%= form.select :bank_type,
+                  options_for_select([
+                    ['Pick one', ''],
+                    ['Ally Bank', 'ally'],
+                    ['Chase Bank', 'chase'],
+                    ['Bank of America', 'boa'],
+                    ['Wells Fargo', 'wells_fargo'],
+                    ['Capital One', 'capital_one'],
+                    ['Custom/Other', 'custom']
+                  ], ''),
+                  {},
+                  {
+                    id: "bank-type-select",
+                    class: "block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 p-1",
+                    onchange: "updateBankSettings(this.value)"
+                  } %>
+            </div>
+          </div>
+
+          <div>
+            <label for="file" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Select CSV File
+            </label>
+            <div class="mt-1">
+              <%= form.file_field :file,
+                  accept: ".csv",
+                  required: true,
+                  id: "csv-file-input",
+                  class: "p-1 block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" %>
+            </div>
+            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400" id="csv-format-hint">
+              Bank CSV format expected: Date, Time, Amount, Type, Description
+            </p>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Account Name</label>
+            <% if @existing_accounts.present? %>
+              <div class="mt-1 space-y-2">
+                <!-- Dropdown for existing accounts -->
+                <select id="account-selector" class="p-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500" onchange="handleAccountSelection(this.value)">
+                  <option value="">Select existing account or enter new one below</option>
+                  <% @existing_accounts.each do |account| %>
+                    <option value="<%= account %>"><%= account %></option>
+                  <% end %>
+                </select>
+                
+                <!-- Text input for account name -->
+                <%= form.text_field :default_account,
+                    value: "Savings",
+                    placeholder: "e.g., Checking, Savings, or select from dropdown above",
+                    id: "default-account-field",
+                    class: "p-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500" %>
+              </div>
+              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Select an existing account above or type a new account name</p>
+            <% else %>
+              <%= form.text_field :default_account,
+                  value: "Savings",
+                  placeholder: "e.g., Checking, Savings",
+                  id: "default-account-field",
+                  class: "p-1 mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500" %>
+              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">This will be used as the account name for all transactions</p>
+            <% end %>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Current Account Balance</label>
+            <%= form.number_field :current_balance,
+                step: 0.01,
+                placeholder: "0.00",
+                class: "p-1 mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500" %>
+            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Enter your current account balance as it appears in your bank account today</p>
+          </div>
+
+          <!-- Hidden fields for column mapping - will be updated by JavaScript -->
+          <%= form.hidden_field :date_column, value: "Date", id: "date-column" %>
+          <%= form.hidden_field :time_column, value: " Time", id: "time-column" %>
+          <%= form.hidden_field :amount_column, value: " Amount", id: "amount-column" %>
+          <%= form.hidden_field :type_column, value: " Type", id: "type-column" %>
+          <%= form.hidden_field :description_column, value: " Description", id: "description-column" %>
+
+          <div class="flex items-center justify-between">
+            <div class="flex space-x-3">
+              <%= link_to "Back to Financial", financial_path, class: "inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600" %>
+            </div>
+            <%= form.submit "Upload & Process", class: "inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Instructions - Dynamic based on bank selection -->
+    <div class="mt-8 border rounded-md p-4" id="bank-instructions">
+      <!--<h4 class="text-sm font-medium text-blue-800 dark:text-blue-200">How to get your Ally Bank statements:</h4>
+      <ul class="mt-2 text-sm text-blue-700 dark:text-blue-300 list-disc list-inside space-y-1">
+        <li>Log in to your Ally Bank account</li>
+        <li>Go to Account History or Statements</li>
+        <li>Export as CSV for the desired date range</li>
+        <li>Upload the CSV file using the form above</li>
+      </ul>-->
+    </div>
+  </div>
+</div>
+
+<script>
+// Bank configurations
+const bankConfigs = {
+  ally: {
+    name: 'Ally Bank',
+    defaultAccount: 'Ally Savings',
+    csvHint: 'Ally Bank CSV format expected: Date, Time, Amount, Type, Description',
+    instructions: {
+      title: 'How to get your Ally Bank statements:',
+      downloadLink: 'https://secure.ally.com/dashboard',
+      steps: [
+        'Log in to your Ally Bank account',
+        'Go to each account in the "Accounts" menu',
+        'On right right side, above the transactions is a "Download" link, click it',
+        'Select the desired date range and download the CSV file',
+        'Upload the CSV file using the form above'
+      ]
+    },
+    columns: {
+      date: 'Date',
+      time: ' Time',
+      amount: ' Amount',
+      type: ' Type',
+      description: ' Description'
+    }
+  },
+  chase: {
+    name: 'Chase Bank',
+    defaultAccount: 'Chase Checking',
+    csvHint: 'Chase Bank CSV format expected: Transaction Date, Description, Amount, Type, Balance',
+    instructions: {
+      title: 'How to get your Chase Bank statements:',
+      downloadLink: 'https://www.chase.com/personal/financial-goals/download-account-statements',
+      steps: [
+        'Log in to your Chase account',
+        'Go to Account Activity',
+        'Select "Download" and choose CSV format',
+        'Select your date range and download',
+        'Upload the CSV file using the form above'
+      ]
+    },
+    columns: {
+      date: 'Transaction Date',
+      time: '',
+      amount: 'Amount',
+      type: 'Type',
+      description: 'Description'
+    }
+  },
+  boa: {
+    name: 'Bank of America',
+    defaultAccount: 'BofA Checking',
+    csvHint: 'Bank of America CSV format expected: Date, Description, Amount, Running Bal.',
+    instructions: {
+      title: 'How to get your Bank of America statements:',
+      downloadLink: 'https://www.bankofamerica.com/online-banking/download-statements.go',
+      steps: [
+        'Log in to your Bank of America account',
+        'Go to Accounts and select your account',
+        'Click "Download Transactions"',
+        'Choose CSV format and date range',
+        'Upload the CSV file using the form above'
+      ]
+    },
+    columns: {
+      date: 'Date',
+      time: '',
+      amount: 'Amount',
+      type: '',
+      description: 'Description'
+    }
+  },
+  wells_fargo: {
+    name: 'Wells Fargo',
+    defaultAccount: 'Wells Fargo Checking',
+    csvHint: 'Wells Fargo CSV format expected: Date, Amount, Description',
+    instructions: {
+      title: 'How to get your Wells Fargo statements:',
+      downloadLink: 'https://www.wellsfargo.com/online-banking/download-statements/',
+      steps: [
+        'Log in to your Wells Fargo account',
+        'Go to Account Summary',
+        'Select your account and click "Download"',
+        'Choose CSV format and date range',
+        'Upload the CSV file using the form above'
+      ]
+    },
+    columns: {
+      date: 'Date',
+      time: '',
+      amount: 'Amount',
+      type: '',
+      description: 'Description'
+    }
+  },
+  capital_one: {
+    name: 'Capital One',
+    defaultAccount: 'Capital One Checking',
+    csvHint: 'Capital One CSV format expected: Transaction Date, Posted Date, Description, Debit, Credit',
+    instructions: {
+      title: 'How to get your Capital One statements:',
+      downloadLink: 'https://www.capitalone.com/online-banking/download-statements/',
+      steps: [
+        'Log in to your Capital One account',
+        'Go to Accounts and select your account',
+        'Click "View Statements & Documents"',
+        'Download transactions as CSV',
+        'Upload the CSV file using the form above'
+      ]
+    },
+    columns: {
+      date: 'Transaction Date',
+      time: '',
+      amount: 'Debit',
+      type: '',
+      description: 'Description'
+    }
+  },
+  custom: {
+    name: 'Custom/Other',
+    defaultAccount: 'My Account',
+    csvHint: 'Custom CSV format - you can map columns manually after upload',
+    instructions: {
+      title: 'For custom bank CSV files:',
+      downloadLink: '',
+      steps: [
+        'Export your bank statements as CSV',
+        'Ensure your CSV has columns for date, amount, and description',
+        'Upload the CSV file and map columns on the next step',
+        'Review the mapping before importing'
+      ]
+    },
+    columns: {
+      date: 'Date',
+      time: '',
+      amount: 'Amount',
+      type: '',
+      description: 'Description'
+    }
+  }
+};
+
+function updateBankSettings(bankType) {
+  const config = bankConfigs[bankType];
+  
+  // Update account name field
+  document.getElementById('default-account-field').value = config.defaultAccount;
+  
+  // Update CSV format hint
+  document.getElementById('csv-format-hint').textContent = config.csvHint;
+  
+  // Update hidden column mapping fields
+  document.getElementById('date-column').value = config.columns.date;
+  document.getElementById('time-column').value = config.columns.time;
+  document.getElementById('amount-column').value = config.columns.amount;
+  document.getElementById('type-column').value = config.columns.type;
+  document.getElementById('description-column').value = config.columns.description;
+  
+  // Update instructions
+  const instructionsDiv = document.getElementById('bank-instructions');
+  const bgColor = bankType === 'custom' ? 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-600' : 'bg-blue-50 dark:bg-blue-900 border-blue-200 dark:border-blue-700';
+  const textColor = bankType === 'custom' ? 'text-gray-800 dark:text-gray-200' : 'text-blue-800 dark:text-blue-200';
+  const listColor = bankType === 'custom' ? 'text-gray-700 dark:text-gray-300' : 'text-blue-700 dark:text-blue-300';
+  
+  instructionsDiv.className = `mt-8 border rounded-md p-4 ${bgColor}`;
+  instructionsDiv.innerHTML = `
+    <h4 class="text-sm font-medium ${textColor}">${config.instructions.title}</h4>
+    <ul class="mt-2 text-sm ${listColor} list-disc list-inside space-y-1">
+      ${config.instructions.downloadLink ? `<li>Download your <a class="
+      ${textColor}" target="_blank" href="${config.instructions.downloadLink}">transactions here</a></li>` : ''}
+      ${config.instructions.steps.map(step => `<li>${step}</li>`).join('')}
+    </ul>
+  `;
+}
+
+// Handle account selection from dropdown
+function handleAccountSelection(selectedAccount) {
+  if (selectedAccount) {
+    document.getElementById('default-account-field').value = selectedAccount;
+  }
+}
+
+// Initialize with default bank (Ally)
+document.addEventListener('DOMContentLoaded', function() {
+  updateBankSettings('ally');
+});
+</script>

@@ -1,0 +1,33 @@
+<% if @total_content_count > 0 || @podcast_feeds_count > 0 %>
+  <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+    <div class="p-6">
+      <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-4">Entertainment Summary</h3>
+      <div class="grid grid-cols-1 md:grid-cols-6 gap-4">
+        <div class="text-center">
+          <p class="text-2xl font-semibold text-red-600"><%= @netflix_count || 0 %></p>
+          <p class="text-sm text-gray-500 dark:text-gray-400">Netflix Items</p>
+        </div>
+        <div class="text-center">
+          <p class="text-2xl font-semibold text-red-600"><%= @youtube_count || 0 %></p>
+          <p class="text-sm text-gray-500 dark:text-gray-400">YouTube Videos</p>
+        </div>
+        <div class="text-center">
+          <p class="text-2xl font-semibold text-orange-600"><%= @audible_books_count || 0 %></p>
+          <p class="text-sm text-gray-500 dark:text-gray-400">Audible Listening</p>
+        </div>
+        <div class="text-center">
+          <p class="text-2xl font-semibold text-blue-600"><%= @audible_library_count || 0 %></p>
+          <p class="text-sm text-gray-500 dark:text-gray-400">Audible Library</p>
+        </div>
+        <div class="text-center">
+          <p class="text-2xl font-semibold text-purple-600"><%= @podcast_feeds_count || 0 %></p>
+          <p class="text-sm text-gray-500 dark:text-gray-400">Podcast Feeds</p>
+        </div>
+        <div class="text-center">
+          <p class="text-2xl font-semibold text-gray-900 dark:text-white"><%= (@total_content_count || 0) + (@podcast_feeds_count || 0) %></p>
+          <p class="text-sm text-gray-500 dark:text-gray-400">Total Items</p>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>

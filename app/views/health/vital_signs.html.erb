@@ -1,0 +1,157 @@
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <!-- Header -->
+  <div class="md:flex md:items-center md:justify-between">
+    <div class="flex-1 min-w-0">
+      <h1 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
+        Vital Signs - <%= @patient.full_name %>
+      </h1>
+      <p class="mt-1 text-sm text-gray-500">
+        Patient DOB: <%= @patient.formatted_birth_date || 'Not specified' %>
+        <span class="mx-2">•</span>
+        Gender: <%= @patient.gender&.capitalize || 'Not specified' %>
+      </p>
+    </div>
+    <div class="mt-4 flex md:mt-0 md:ml-4 space-x-3">
+      <%= link_to "← Back to Overview", health_path(@patient),
+          class: "bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200" %>
+    </div>
+  </div>
+
+  <!-- Vital Signs Content -->
+  <div class="mt-8">
+    <% if @vital_signs.any? %>
+      <div class="bg-white shadow overflow-hidden sm:rounded-md">
+        <ul class="divide-y divide-gray-200">
+          <% @vital_signs.each do |vital_sign| %>
+            <li class="px-6 py-4">
+              <div class="flex items-center justify-between">
+                <div class="flex-1">
+                  <div class="flex justify-between items-start">
+                    <p class="text-lg font-medium text-gray-900">
+                      Vital Signs Measurement
+                    </p>
+                    <% if vital_sign.measurement_date.present? %>
+                      <span class="text-sm text-gray-500">
+                        <%= Date.parse(vital_sign.measurement_date).strftime("%m/%d/%Y") rescue vital_sign.measurement_date %>
+                      </span>
+                    <% end %>
+                  </div>
+
+                  <div class="mt-2 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
+                    <% if vital_sign.height.present? %>
+                      <div class="flex items-center">
+                        <span class="flex items-center">
+                          <svg class="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                          </svg>
+                          Height: <span class="ml-1 font-medium"><%= vital_sign.height %></span>
+                        </span>
+                      </div>
+                    <% end %>
+
+                    <% if vital_sign.weight.present? %>
+                      <div class="flex items-center">
+                        <span class="flex items-center">
+                          <svg class="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                          </svg>
+                          Weight: <span class="ml-1 font-medium"><%= vital_sign.weight_with_hover %></span>
+                        </span>
+                      </div>
+                    <% end %>
+
+                    <% if vital_sign.bmi.present? %>
+                      <div class="flex items-center">
+                        <span class="flex items-center">
+                          <svg class="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                          </svg>
+                          BMI: <span class="ml-1 font-medium"><%= vital_sign.bmi %></span>
+                        </span>
+                      </div>
+                    <% end %>
+
+                    <% if vital_sign.systolic_bp.present? || vital_sign.diastolic_bp.present? %>
+                      <div class="flex items-center">
+                        <span class="flex items-center">
+                          <svg class="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                          </svg>
+                          Blood Pressure: <span class="ml-1 font-medium"><%= vital_sign.systolic_bp %>/<%= vital_sign.diastolic_bp %></span>
+                        </span>
+                      </div>
+                    <% end %>
+
+                    <% if vital_sign.heart_rate.present? %>
+                      <div class="flex items-center">
+                        <span class="flex items-center">
+                          <svg class="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                          </svg>
+                          Heart Rate: <span class="ml-1 font-medium"><%= vital_sign.heart_rate %> bpm</span>
+                        </span>
+                      </div>
+                    <% end %>
+
+                    <% if vital_sign.temperature.present? %>
+                      <div class="flex items-center">
+                        <span class="flex items-center">
+                          <svg class="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                          </svg>
+                          Temperature: <span class="ml-1 font-medium"><%= vital_sign.temperature %>°F</span>
+                        </span>
+                      </div>
+                    <% end %>
+                      <div class="flex items-center">
+                        <svg class="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2h2zm3-3a1 1 0 00-1 1v1h4V5a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                        </svg>
+                        Normal: <span class="ml-1 font-medium"><%= vital_sign.reference_range %></span>
+                      </div>
+                    <% end %>
+
+                    <% if vital_sign.status.present? %>
+                      <div class="flex items-center">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%=
+                          case vital_sign.status&.downcase
+                          when 'normal', 'n'
+                            'bg-green-100 text-green-800'
+                          when 'high', 'h'
+                            'bg-red-100 text-red-800'
+                          when 'low', 'l'
+                            'bg-yellow-100 text-yellow-800'
+                          when 'critical'
+                            'bg-red-100 text-red-800'
+                          else
+                            'bg-gray-100 text-gray-800'
+                          end
+                        %>">
+                          <%= vital_sign.status.upcase if vital_sign.status.present? %>
+                        </span>
+                      </div>
+                    <% end %>
+                  </div>
+
+                  <% if vital_sign.notes.present? %>
+                    <div class="mt-3 text-sm text-gray-600">
+                      <p><strong>Notes:</strong> <%= vital_sign.notes %></p>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+    <% else %>
+      <div class="text-center py-12">
+        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H9a2 2 0 01-2-2z" />
+        </svg>
+        <h3 class="mt-2 text-sm font-medium text-gray-900">No vital signs found</h3>
+        <p class="mt-1 text-sm text-gray-500">No vital sign measurements are available for this patient.</p>
+      </div>
+    <% end %>
+  </div>
+</div>

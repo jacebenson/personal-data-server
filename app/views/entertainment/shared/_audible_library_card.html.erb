@@ -1,0 +1,82 @@
+<div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+  <div class="p-6">
+    <div class="flex items-center">
+      <div class="flex-shrink-0">
+        <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+        </svg>
+      </div>
+      <div class="ml-4 flex-1">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Audible</h3>
+        <p class="text-sm text-gray-500 dark:text-gray-400">Library & listening history</p>
+        <div class="mt-2 grid grid-cols-2 gap-4">
+          <div>
+            <p class="text-lg font-semibold text-gray-900 dark:text-white"><%= @audible_library_count || 0 %></p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">Library books</p>
+          </div>
+          <div>
+            <p class="text-lg font-semibold text-gray-900 dark:text-white"><%= @audible_books_count || 0 %></p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">Listening sessions</p>
+          </div>
+        </div>
+        <div class="mt-2">
+          <p class="text-xs text-gray-500 dark:text-gray-400">
+            <% if (@audible_library_count || 0) > 0 || (@audible_books_count || 0) > 0 %>
+              <% if @last_audible_library_upload && @last_audible_upload %>
+                Last updates: Library <%= @last_audible_library_upload.strftime("%b %d") %>, Listening <%= @last_audible_upload.strftime("%b %d") %>
+              <% elsif @last_audible_library_upload %>
+                Last library upload: <%= @last_audible_library_upload.strftime("%B %d, %Y") %>
+              <% elsif @last_audible_upload %>
+                Last listening upload: <%= @last_audible_upload.strftime("%B %d, %Y") %>
+              <% else %>
+                No recent uploads
+              <% end %>
+            <% else %>
+              No data uploaded
+            <% end %>
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="mt-6 space-y-3">
+      <div class="grid grid-cols-2 gap-3">
+        <% if (@audible_library_count || 0) > 0 %>
+          <%= link_to "View Library", entertainment_audible_libraries_path,
+              class: "flex justify-center py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600" %>
+        <% else %>
+          <div class="flex justify-center py-2 px-3 border border-gray-200 dark:border-gray-700 rounded-md text-sm font-medium text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-gray-800">
+            View Library
+          </div>
+        <% end %>
+        <% if (@audible_books_count || 0) > 0 %>
+          <%= link_to "View Listening", entertainment_audible_index_path,
+              class: "flex justify-center py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600" %>
+        <% else %>
+          <div class="flex justify-center py-2 px-3 border border-gray-200 dark:border-gray-700 rounded-md text-sm font-medium text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-gray-800">
+            View Listening
+          </div>
+        <% end %>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <%= link_to "Upload Library", entertainment_audible_libraries_path,
+            class: "flex justify-center py-2 px-3 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
+        <%= link_to "Upload Listening", entertainment_audible_index_path,
+            class: "flex justify-center py-2 px-3 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500" %>
+      </div>
+      <% if (@audible_library_count || 0) > 0 || (@audible_books_count || 0) > 0 %>
+        <div class="grid grid-cols-2 gap-3">
+          <% if (@audible_library_count || 0) > 0 %>
+            <%= link_to "Clear Library", destroy_all_entertainment_audible_libraries_path, method: :delete,
+                confirm: "Are you sure you want to delete all Audible library records?",
+                class: "flex justify-center py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600" %>
+          <% end %>
+          <% if (@audible_books_count || 0) > 0 %>
+            <%= link_to "Clear Listening", destroy_all_entertainment_audible_index_path, method: :delete,
+                confirm: "Are you sure you want to delete all Audible listening records?",
+                class: "flex justify-center py-2 px-3 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600" %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

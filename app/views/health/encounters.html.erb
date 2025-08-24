@@ -1,0 +1,105 @@
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <!-- Header -->
+  <div class="md:flex md:items-center md:justify-between">
+    <div class="flex-1 min-w-0">
+      <h1 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
+        Encounters - <%= @patient.full_name %>
+      </h1>
+      <p class="mt-1 text-sm text-gray-500">
+        Patient DOB: <%= @patient.formatted_birth_date || 'Not specified' %>
+        <span class="mx-2">•</span>
+        Gender: <%= @patient.gender&.capitalize || 'Not specified' %>
+      </p>
+    </div>
+    <div class="mt-4 flex md:mt-0 md:ml-4 space-x-3">
+      <%= link_to "← Back to Overview", health_path(@patient),
+          class: "bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200" %>
+    </div>
+  </div>
+
+  <!-- Encounters Content -->
+  <div class="mt-8">
+    <% if @encounters.any? %>
+      <div class="bg-white shadow overflow-hidden sm:rounded-md">
+        <ul class="divide-y divide-gray-200">
+          <% @encounters.each do |encounter| %>
+            <li class="px-6 py-4">
+              <div class="flex items-center justify-between">
+                <div class="flex-1">
+                  <div class="flex justify-between items-start">
+                    <p class="text-lg font-medium text-gray-900">
+                      <%= encounter.encounter_type.presence || 'Healthcare Visit' %>
+                    </p>
+                    <% if encounter.encounter_date.present? %>
+                      <span class="text-sm text-gray-500">
+                        <%= Date.parse(encounter.encounter_date).strftime("%B %d, %Y") rescue encounter.encounter_date %>
+                      </span>
+                    <% end %>
+                  </div>
+
+                  <div class="mt-2 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-500">
+                    <% if encounter.provider_name.present? %>
+                      <span class="flex items-center">
+                        <svg class="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+                        </svg>
+                        Provider: <span class="ml-1 font-medium"><%= encounter.provider_name %></span>
+                      </span>
+                    <% end %>
+
+                    <% if encounter.provider_specialty.present? %>
+                      <span class="flex items-center">
+                        <svg class="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2h2zm3-3a1 1 0 00-1 1v1h4V5a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                        </svg>
+                        Specialty: <span class="ml-1 font-medium"><%= encounter.provider_specialty %></span>
+                      </span>
+                    <% end %>
+
+                    <% if encounter.facility_name.present? %>
+                      <span class="flex items-center">
+                        <svg class="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 0v12h8V4H6z" clip-rule="evenodd"></path>
+                        </svg>
+                        Facility: <span class="ml-1 font-medium"><%= encounter.facility_name %></span>
+                      </span>
+                    <% end %>
+
+                    <% if encounter.status.present? %>
+                      <span class="flex items-center">
+                        <svg class="flex-shrink-0 mr-1.5 h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                        </svg>
+                        Status: <span class="ml-1 font-medium"><%= encounter.status.humanize %></span>
+                      </span>
+                    <% end %>
+                  </div>
+
+                  <% if encounter.diagnosis.present? %>
+                    <div class="mt-3 text-sm text-gray-600">
+                      <p><strong>Diagnosis:</strong> <%= encounter.diagnosis %></p>
+                    </div>
+                  <% end %>
+
+                  <% if encounter.notes.present? %>
+                    <div class="mt-3 text-sm text-gray-600">
+                      <p><strong>Notes:</strong> <%= encounter.notes %></p>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+    <% else %>
+      <div class="text-center py-12">
+        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+        </svg>
+        <h3 class="mt-2 text-sm font-medium text-gray-900">No encounters found</h3>
+        <p class="mt-1 text-sm text-gray-500">No healthcare encounters are available for this patient.</p>
+      </div>
+    <% end %>
+  </div>
+</div>

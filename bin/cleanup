@@ -1,0 +1,48 @@
+#!/bin/bash
+# Project Cleanup Script for Personal Data Server
+# Run this script to clean up temporary files and logs
+
+echo "🧹 Cleaning up Personal Data Server..."
+
+# Clear Rails cache
+echo "Clearing Rails cache..."
+rm -rf tmp/cache/*
+
+# Truncate large log files
+echo "Cleaning log files..."
+if [ -f log/development.log ] && [ $(stat -c%s log/development.log) -gt 10485760 ]; then
+    echo "Truncating large development.log ($(du -h log/development.log | cut -f1))"
+    echo "" > log/development.log
+fi
+
+if [ -f log/test.log ] && [ $(stat -c%s log/test.log) -gt 10485760 ]; then
+    echo "Truncating large test.log ($(du -h log/test.log | cut -f1))"
+    echo "" > log/test.log
+fi
+
+# Clean temporary uploads (keep structure)
+echo "Cleaning temporary uploads..."
+find tmp/uploads -type f -mtime +7 -delete 2>/dev/null
+
+# Check for orphaned migration entries
+echo "Checking database migration consistency..."
+ORPHANED=$(rails db:migrate:status 2>/dev/null | grep "NO FILE" | wc -l)
+if [ "$ORPHANED" -gt 0 ]; then
+    echo "⚠️  Found $ORPHANED orphaned migration entries"
+    echo "   Run 'rails db:migrate:status' to review"
+    echo "   Use 'sqlite3 storage/development.sqlite3 \"DELETE FROM schema_migrations WHERE version = 'VERSION_NUMBER';\"' to clean up"
+fi
+
+# Check migration folder cleanliness
+MIGRATION_COUNT=$(ls -1 db/migrate/*.rb 2>/dev/null | wc -l)
+echo "📊 Current migrations: $MIGRATION_COUNT files"
+if [ "$MIGRATION_COUNT" -gt 10 ]; then
+    echo "   Consider migration cleanup if history is getting complex"
+fi
+
+# Report cleanup results
+echo "✅ Cleanup complete!"
+echo "📊 Current sizes:"
+du -sh tmp/* 2>/dev/null | sort -hr | head -5
+echo "📊 Log sizes:"
+du -sh log/*.log 2>/dev/null

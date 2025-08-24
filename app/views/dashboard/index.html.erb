@@ -1,0 +1,87 @@
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8<%= ' privacy-mode' if @privacy_mode %>">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="mb-8 flex justify-between items-center">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Personal Dashboard</h1>
+        <p class="mt-2 text-gray-600 dark:text-gray-400">Your personal data at a glance</p>
+      </div>
+      <!-- Privacy Toggle -->
+      <div class="flex items-center space-x-3">
+        <span class="text-sm text-gray-600 dark:text-gray-400">Privacy Mode</span>
+        <% if @privacy_mode %>
+          <%= link_to dashboard_path(privacy: false), class: "relative inline-flex h-6 w-11 items-center rounded-full bg-blue-500 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 cursor-pointer" do %>
+            <span class="sr-only">Disable privacy mode</span>
+            <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-6"></span>
+          <% end %>
+        <% else %>
+          <%= link_to dashboard_path(privacy: true), class: "relative inline-flex h-6 w-11 items-center rounded-full bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:bg-gray-600 cursor-pointer" do %>
+            <span class="sr-only">Enable privacy mode</span>
+            <span class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-1"></span>
+          <% end %>
+        <% end %>
+        <span class="text-sm text-gray-600 dark:text-gray-400">
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+          </svg>
+        </span>
+      </div>
+    </div>
+
+    <%= render 'shared/health_section' %>
+
+    <!-- Other Categories -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8 mb-12">
+      <!-- Financial & Shopping Combo Card -->
+      <%= render 'shared/combo_card', 
+          title: "Financial & Shopping", 
+          sections: [
+            {
+              icon: "💸",
+              color: "bg-green-100 dark:bg-green-900",
+              title: "Money",
+              link_path: financial_path,
+              partial_path: "financial/shared/dashboard_money_section"
+            },
+            {
+              icon: "🛒",
+              color: "bg-orange-100 dark:bg-orange-900",
+              title: "Shopping", 
+              link_path: shopping_path,
+              partial_path: "shopping/shared/shopping_section"
+            }
+          ] %>
+
+      <%= render 'calendars/shared/calendar_today' %>
+      
+      <%= render 'shared/entertainment_section' %>
+    </div>
+
+    <%= render 'shared/nulledge_section' %>
+
+  </div>
+</div>
+
+<style>
+  .privacy-sensitive {
+    transition: filter 0.3s ease;
+  }
+  
+  .privacy-mode .privacy-sensitive {
+    filter: blur(8px);
+    user-select: none;
+  }
+  
+  .privacy-mode .privacy-sensitive:hover {
+    filter: blur(6px);
+  }
+  
+  /* Chart axis blurring in privacy mode */
+  .privacy-mode .chartkick-chart svg text {
+    filter: blur(12px);
+  }
+  
+  .privacy-mode .chartkick-chart .highcharts-axis-labels text {
+    filter: blur(12px);
+  }
+</style>

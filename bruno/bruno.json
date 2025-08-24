@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "personal-data-server",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}

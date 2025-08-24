@@ -1,0 +1,960 @@
+<style>
+  /* Custom styles for collapsible sections */
+  details > summary {
+    list-style: none;
+  }
+
+  details > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  details > summary svg {
+    transform: rotate(-90deg);
+    transition: transform 0.2s ease-in-out;
+  }
+
+  details[open] > summary svg {
+    transform: rotate(0deg);
+  }
+
+  details > div {
+    animation: slideDown 0.3s ease-in-out;
+  }
+
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      max-height: 0;
+    }
+    to {
+      opacity: 1;
+      max-height: 1000px;
+    }
+  }
+
+  /* Enhanced hover effects */
+  .health-record-row {
+    transition: all 0.15s ease-in-out;
+  }
+
+  .health-record-row:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+</style>
+
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="mb-8">
+            <%= render 'shared/breadcrumb', breadcrumbs: [
+      { name: "Home", path: root_path },
+      { name: "Health", path: nil }
+    ] %>
+      <div class="flex justify-between items-center">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Health Records</h1>
+          <p class="mt-2 text-gray-600 dark:text-gray-400">Complete view of health data for <%= @patient.first_name %> <%= @patient.last_name %></p>
+        </div>
+        <div class="flex space-x-3">
+          <%= link_to import_health_index_path,
+              class: "inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" do %>
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            Import More Data
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Patient Information Card -->
+    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg mb-8">
+      <div class="px-4 py-5 sm:p-6">
+        <div class="flex items-center">
+          <div class="flex-shrink-0">
+            <svg class="h-12 w-12 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+            </svg>
+          </div>
+          <div class="ml-5">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white">
+              <%= @patient.first_name %> <%= @patient.last_name %>
+            </h3>
+            <div class="mt-1 text-sm text-gray-500 dark:text-gray-400 space-y-1">
+              <p><strong>DOB:</strong> <%= @patient.birth_date %></p>
+              <p><strong>Gender:</strong> <%= @patient.gender %></p>
+              <% if @patient.email.present? %>
+                <p><strong>Email:</strong> <%= @patient.email %></p>
+              <% end %>
+              <% if @patient.phone.present? %>
+                <p><strong>Phone:</strong> <%= @patient.phone %></p>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Summary Stats -->
+    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-8">
+      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
+                  Allergies
+                </dt>
+                <dd class="text-lg font-medium text-gray-900 dark:text-white">
+                  <%= @summary_stats[:total_allergies] %>
+                  <% if @summary_stats[:active_allergies] > 0 %>
+                    <span class="text-sm text-red-600">(<%= @summary_stats[:active_allergies] %> active)</span>
+                  <% end %>
+                </dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg class="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+              </svg>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
+                  Medications
+                </dt>
+                <dd class="text-lg font-medium text-gray-900 dark:text-white">
+                  <%= @summary_stats[:total_medications] %>
+                  <% if @summary_stats[:active_medications] > 0 %>
+                    <span class="text-sm text-green-600">(<%= @summary_stats[:active_medications] %> active)</span>
+                  <% end %>
+                </dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg class="h-6 w-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
+                  Problems
+                </dt>
+                <dd class="text-lg font-medium text-gray-900 dark:text-white">
+                  <%= @summary_stats[:total_problems] %>
+                  <% if @summary_stats[:active_problems] > 0 %>
+                    <span class="text-sm text-yellow-600">(<%= @summary_stats[:active_problems] %> active)</span>
+                  <% end %>
+                </dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg class="h-6 w-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
+              </svg>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
+                  Immunizations
+                </dt>
+                <dd class="text-lg font-medium text-gray-900 dark:text-white">
+                  <%= @summary_stats[:total_immunizations] %>
+                </dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg class="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+              </svg>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
+                  Vital Signs
+                </dt>
+                <dd class="text-lg font-medium text-gray-900 dark:text-white">
+                  <%= @summary_stats[:total_vital_signs] %>
+                </dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg class="h-6 w-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+              </svg>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
+                  Encounters
+                </dt>
+                <dd class="text-lg font-medium text-gray-900 dark:text-white">
+                  <%= @summary_stats[:total_encounters] %>
+                </dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <svg class="h-6 w-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+              </svg>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
+                  Sleep Sessions
+                </dt>
+                <dd class="text-lg font-medium text-gray-900 dark:text-white">
+                  <%= @summary_stats[:total_sleep_sessions] %>
+                </dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Health Records Sections -->
+    <div class="space-y-6">
+
+      <!-- Allergies Section -->
+      <% if @allergies.any? %>
+        <details class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden" open>
+          <summary class="px-4 py-5 sm:px-6 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700">
+            <div class="flex justify-between items-center">
+              <div>
+                <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white flex items-center">
+                  <svg class="h-5 w-5 text-red-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  Allergies (<%= @allergies.count %>)
+                </h3>
+                <p class="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-400">
+                  Known allergies and adverse reactions
+                </p>
+              </div>
+              <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </div>
+          </summary>
+          <div class="border-t border-gray-200 dark:border-gray-700">
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead class="bg-gray-50 dark:bg-gray-800">
+                  <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Allergen</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Reaction</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Severity</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Onset Date</th>
+                  </tr>
+                </thead>
+                <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+                  <% @allergies.each do |allergy| %>
+                    <tr class="health-record-row">
+                      <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                        <%= allergy.allergen %>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <%= allergy.reaction.present? ? allergy.reaction : '-' %>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <% if allergy.severity.present? %>
+                          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%=
+                            case allergy.severity.downcase
+                            when 'severe'
+                              'bg-red-100 text-red-800'
+                            when 'moderate'
+                              'bg-yellow-100 text-yellow-800'
+                            when 'mild'
+                              'bg-green-100 text-green-800'
+                            else
+                              'bg-gray-100 text-gray-800'
+                            end
+                          %>">
+                            <%= allergy.severity.capitalize %>
+                          </span>
+                        <% else %>
+                          -
+                        <% end %>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <% if allergy.status.present? %>
+                          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%=
+                            allergy.status.downcase == 'active' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800'
+                          %>">
+                            <%= allergy.status.capitalize %>
+                          </span>
+                        <% else %>
+                          -
+                        <% end %>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <%= allergy.onset_date.present? ? allergy.onset_date : '-' %>
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+      <% end %>
+
+      <!-- Medications Section -->
+      <% if @medications.any? %>
+        <details class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden" open>
+          <summary class="px-4 py-5 sm:px-6 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700">
+            <div class="flex justify-between items-center">
+              <div>
+                <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white flex items-center">
+                  <svg class="h-5 w-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+                  </svg>
+                  Medications (<%= @medications.count %>)
+                </h3>
+                <p class="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-400">
+                  Current and past medications
+                </p>
+              </div>
+              <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </div>
+          </summary>
+          <div class="border-t border-gray-200 dark:border-gray-700">
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead class="bg-gray-50 dark:bg-gray-800">
+                  <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Medication</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Dosage</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Frequency</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Route</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Start Date</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Prescriber</th>
+                  </tr>
+                </thead>
+                <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+                  <% @medications.each do |medication| %>
+                    <tr class="health-record-row">
+                      <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
+                        <div class="max-w-xs truncate" title="<%= medication.medication_name %>">
+                          <%= medication.medication_name %>
+                        </div>
+                      </td>
+                      <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                        <div class="max-w-xs truncate" title="<%= medication.dosage %>">
+                          <%= medication.dosage.present? ? medication.dosage : '-' %>
+                        </div>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <%= medication.frequency.present? ? medication.frequency : '-' %>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <%= medication.route.present? ? medication.route : '-' %>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <%= medication.formatted_start_date || '-' %>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <% if medication.status.present? %>
+                          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%=
+                            medication.status.downcase == 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                          %>">
+                            <%= medication.status.capitalize %>
+                          </span>
+                        <% else %>
+                          -
+                        <% end %>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <%= medication.prescriber.present? ? medication.prescriber : '-' %>
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+      <% end %>
+
+      <!-- Problems Section -->
+      <% if @problems.any? %>
+        <details class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+          <summary class="px-4 py-5 sm:px-6 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700">
+            <div class="flex justify-between items-center">
+              <div>
+                <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white flex items-center">
+                  <svg class="h-5 w-5 text-yellow-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  Health Problems (<%= @problems.count %>)
+                </h3>
+                <p class="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-400">
+                  Medical conditions and diagnoses
+                </p>
+              </div>
+              <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </div>
+          </summary>
+          <div class="border-t border-gray-200 dark:border-gray-700">
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead class="bg-gray-50 dark:bg-gray-800">
+                  <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Problem</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Code</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Onset Date</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Resolved Date</th>
+                  </tr>
+                </thead>
+                <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+                  <% @problems.each do |problem| %>
+                    <tr class="health-record-row">
+                      <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
+                        <%= problem.problem_name %>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <% if problem.code.present? %>
+                          <span class="font-mono text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
+                            <%= problem.code %>
+                          </span>
+                        <% else %>
+                          -
+                        <% end %>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <% if problem.status.present? %>
+                          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%=
+                            case problem.status.downcase
+                            when 'active'
+                              'bg-yellow-100 text-yellow-800'
+                            when 'resolved'
+                              'bg-green-100 text-green-800'
+                            when 'inactive'
+                              'bg-gray-100 text-gray-800'
+                            else
+                              'bg-blue-100 text-blue-800'
+                            end
+                          %>">
+                            <%= problem.status.capitalize %>
+                          </span>
+                        <% else %>
+                          -
+                        <% end %>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <%= problem.onset_date.present? ? problem.onset_date : '-' %>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <%= problem.resolved_date.present? ? problem.resolved_date : '-' %>
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+      <% end %>
+
+      <!-- Immunizations Section -->
+      <% if @immunizations.any? %>
+        <details class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+          <summary class="px-4 py-5 sm:px-6 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700">
+            <div class="flex justify-between items-center">
+              <div>
+                <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white flex items-center">
+                  <svg class="h-5 w-5 text-purple-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
+                  </svg>
+                  Immunizations (<%= @immunizations.count %>)
+                </h3>
+                <p class="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-400">
+                  Vaccination history
+                </p>
+              </div>
+              <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </div>
+          </summary>
+          <div class="border-t border-gray-200 dark:border-gray-700">
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead class="bg-gray-50 dark:bg-gray-800">
+                  <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Vaccine</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Code</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Date Given</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Administrator</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Site</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Route</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Lot Number</th>
+                  </tr>
+                </thead>
+                <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+                  <% @immunizations.each do |immunization| %>
+                    <tr class="health-record-row">
+                      <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
+                        <div class="max-w-xs truncate" title="<%= immunization.vaccine_name %>">
+                          <%= immunization.vaccine_name %>
+                        </div>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <% if immunization.vaccine_code.present? %>
+                          <span class="font-mono text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
+                            <%= immunization.vaccine_code %>
+                          </span>
+                        <% else %>
+                          -
+                        <% end %>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <%= immunization.administration_date.present? ? immunization.administration_date : '-' %>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <%= immunization.administrator.present? ? immunization.administrator : '-' %>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <%= immunization.site.present? ? immunization.site : '-' %>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <%= immunization.route.present? ? immunization.route : '-' %>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <% if immunization.lot_number.present? %>
+                          <span class="font-mono text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded">
+                            <%= immunization.lot_number %>
+                          </span>
+                        <% else %>
+                          -
+                        <% end %>
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+      <% end %>
+
+      <!-- Vital Signs Section -->
+      <% if @vital_signs.any? %>
+        <details class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+          <summary class="px-4 py-5 sm:px-6 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700">
+            <div class="flex justify-between items-center">
+              <div>
+                <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white flex items-center">
+                  <svg class="h-5 w-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                  </svg>
+                  Vital Signs (<%= @vital_signs.count %>)
+                </h3>
+                <p class="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-400">
+                  Recorded vital sign measurements
+                </p>
+              </div>
+              <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </div>
+          </summary>
+          <div class="border-t border-gray-200 dark:border-gray-700">
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead class="bg-gray-50 dark:bg-gray-800">
+                  <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Date</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Height</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Weight (lbs)</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">BMI</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">BP</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Heart Rate</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Temperature</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Resp Rate</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">O2 Sat</th>
+                  </tr>
+                </thead>
+                <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+                  <% @vital_signs.each do |vital_sign| %>
+                    <tr class="health-record-row">
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <%= vital_sign.measurement_date.present? ? vital_sign.measurement_date : '-' %>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <%= vital_sign.height.present? ? "#{vital_sign.height} cm" : '-' %>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <%= vital_sign.weight_with_hover %>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <%= vital_sign.bmi.present? ? vital_sign.bmi.round(1) : '-' %>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <% if vital_sign.systolic_bp.present? && vital_sign.diastolic_bp.present? %>
+                          <%= "#{vital_sign.systolic_bp}/#{vital_sign.diastolic_bp}" %>
+                        <% else %>
+                          -
+                        <% end %>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <%= vital_sign.heart_rate.present? ? "#{vital_sign.heart_rate} bpm" : '-' %>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <%= vital_sign.temperature.present? ? "#{vital_sign.temperature}°C" : '-' %>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <%= vital_sign.respiratory_rate.present? ? "#{vital_sign.respiratory_rate}/min" : '-' %>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <%= vital_sign.oxygen_saturation.present? ? "#{vital_sign.oxygen_saturation}%" : '-' %>
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+      <% end %>
+
+      <!-- Encounters Section -->
+      <% if @encounters.any? %>
+        <details class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+          <summary class="px-4 py-5 sm:px-6 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700">
+            <div class="flex justify-between items-center">
+              <div>
+                <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white flex items-center">
+                  <svg class="h-5 w-5 text-indigo-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                  </svg>
+                  Healthcare Encounters (<%= @encounters.count %>)
+                </h3>
+                <p class="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-400">
+                  Medical visits and encounters
+                </p>
+              </div>
+              <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </div>
+          </summary>
+          <div class="border-t border-gray-200 dark:border-gray-700">
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead class="bg-gray-50 dark:bg-gray-800">
+                  <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Date</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Type</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Reason</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Provider</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Facility</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                  </tr>
+                </thead>
+                <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+                  <% @encounters.each do |encounter| %>
+                    <tr class="health-record-row">
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <%= encounter.encounter_date.present? ? encounter.encounter_date : '-' %>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <%= encounter.encounter_type.present? ? encounter.encounter_type.capitalize : '-' %>
+                      </td>
+                      <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                        <div class="max-w-xs truncate" title="<%= encounter.reason_for_visit %>">
+                          <%= encounter.reason_for_visit.present? ? encounter.reason_for_visit : '-' %>
+                        </div>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <% if encounter.provider_name.present? %>
+                          <div>
+                            <%= encounter.provider_name %>
+                            <% if encounter.provider_specialty.present? %>
+                              <div class="text-xs text-gray-400"><%= encounter.provider_specialty %></div>
+                            <% end %>
+                          </div>
+                        <% else %>
+                          -
+                        <% end %>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <%= encounter.facility_name.present? ? encounter.facility_name : '-' %>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <% if encounter.encounter_status.present? %>
+                          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            <%= encounter.encounter_status.capitalize %>
+                          </span>
+                        <% else %>
+                          -
+                        <% end %>
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+      <% else %>
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+          <div class="px-4 py-5 sm:px-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white flex items-center">
+              <svg class="h-5 w-5 text-indigo-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+              </svg>
+              Healthcare Encounters (0)
+            </h3>
+            <p class="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-400">
+              No healthcare encounters found in the imported data.
+            </p>
+          </div>
+        </div>
+      <% end %>
+
+      <!-- Sleep Data Section -->
+      <% if @sleep_data.any? %>
+        <details class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+          <summary class="px-4 py-5 sm:px-6 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700">
+            <div class="flex justify-between items-center">
+              <div>
+                <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white flex items-center">
+                  <svg class="h-5 w-5 text-purple-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                  </svg>
+                  Sleep Data (<%= @sleep_data.count %>)
+                </h3>
+                <p class="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-400">
+                  CPAP therapy sessions and sleep quality metrics
+                </p>
+              </div>
+              <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </div>
+          </summary>
+          <div class="border-t border-gray-200 dark:border-gray-700">
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead class="bg-gray-50 dark:bg-gray-800">
+                  <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Date</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Usage</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">AHI</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Sleep Score</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Mask Fit</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Leak</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Compliance</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Mode</th>
+                  </tr>
+                </thead>
+                <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+                  <% @sleep_data.each do |session| %>
+                    <tr class="health-record-row">
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <%= session.formatted_date %>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <div>
+                          <span class="font-medium"><%= session.usage_hours_display %></span>
+                          <div class="text-xs text-gray-400">
+                            <%= session.compliance_percentage %>% compliance
+                          </div>
+                        </div>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <% if session.ahi.present? %>
+                          <div>
+                            <span class="font-medium"><%= session.ahi %></span>
+                            <div class="text-xs">
+                              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= 
+                                case session.ahi_severity
+                                when 'Normal'
+                                  'bg-green-100 text-green-800'
+                                when 'Mild'
+                                  'bg-yellow-100 text-yellow-800'
+                                when 'Moderate'
+                                  'bg-orange-100 text-orange-800'
+                                when 'Severe'
+                                  'bg-red-100 text-red-800'
+                                else
+                                  'bg-gray-100 text-gray-800'
+                                end
+                              %>">
+                                <%= session.ahi_severity %>
+                              </span>
+                            </div>
+                          </div>
+                        <% else %>
+                          -
+                        <% end %>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <% if session.sleep_score.present? %>
+                          <div>
+                            <span class="font-medium"><%= session.sleep_score %></span>
+                            <div class="text-xs">
+                              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= 
+                                case session.sleep_quality_indicator
+                                when 'Excellent'
+                                  'bg-green-100 text-green-800'
+                                when 'Good'
+                                  'bg-blue-100 text-blue-800'
+                                when 'Fair'
+                                  'bg-yellow-100 text-yellow-800'
+                                when 'Poor'
+                                  'bg-red-100 text-red-800'
+                                else
+                                  'bg-gray-100 text-gray-800'
+                                end
+                              %>">
+                                <%= session.sleep_quality_indicator %>
+                              </span>
+                            </div>
+                          </div>
+                        <% else %>
+                          -
+                        <% end %>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <% if session.mask_score.present? %>
+                          <div>
+                            <span class="font-medium"><%= session.mask_score %></span>
+                            <div class="text-xs text-gray-400"><%= session.mask_fit_status %></div>
+                          </div>
+                        <% else %>
+                          -
+                        <% end %>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <% if session.leak_score.present? %>
+                          <div>
+                            <span class="font-medium"><%= session.leak_score %></span>
+                            <div class="text-xs text-gray-400"><%= session.leak_status %></div>
+                          </div>
+                        <% else %>
+                          -
+                        <% end %>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= 
+                          case session.compliance_status
+                          when 'Compliant'
+                            'bg-green-100 text-green-800'
+                          when 'Partial'
+                            'bg-yellow-100 text-yellow-800'
+                          when 'Non-compliant'
+                            'bg-red-100 text-red-800'
+                          else
+                            'bg-gray-100 text-gray-800'
+                          end
+                        %>">
+                          <%= session.compliance_status %>
+                        </span>
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <%= session.mode.present? ? session.mode : '-' %>
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+      <% else %>
+        <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+          <div class="px-4 py-5 sm:px-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white flex items-center">
+              <svg class="h-5 w-5 text-purple-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+              </svg>
+              Sleep Data (0)
+            </h3>
+            <p class="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-400">
+              No sleep therapy data found. Import your ResMed CPAP data to track sleep quality and compliance.
+            </p>
+          </div>
+        </div>
+      <% end %>
+
+    </div>
+
+    <!-- Empty State -->
+    <% if @summary_stats.values.sum == 0 %>
+      <div class="text-center py-12">
+        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No health records found</h3>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Get started by importing health data from a CCD/XML file.</p>
+        <div class="mt-6">
+          <%= link_to import_health_index_path,
+              class: "inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" do %>
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            Import Health Data
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,59 @@
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('balance-adjustment-modal');
+    const openModalBtn = document.getElementById('balance-adjustment-btn');
+    const closeModalBtn = document.getElementById('close-modal');
+    const cancelModalBtn = document.getElementById('cancel-modal');
+    const accountSelect = document.getElementById('account_name');
+    const currentBalanceDisplay = document.getElementById('current_balance_display');
+
+    // Account balances (calculated from server data)
+    const accountBalances = {
+      <% @account_summaries.each do |account, data| %>
+        '<%= account %>': <%= data[:deposits] - data[:withdrawals] %>,
+      <% end %>
+    };
+
+    // Open modal
+    openModalBtn.addEventListener('click', function() {
+      modal.classList.remove('hidden');
+    });
+
+    // Close modal
+    function closeModal() {
+      modal.classList.add('hidden');
+      // Reset form
+      accountSelect.value = '';
+      currentBalanceDisplay.value = '';
+      document.getElementById('balance_amount').value = '';
+    }
+
+    closeModalBtn.addEventListener('click', closeModal);
+    cancelModalBtn.addEventListener('click', closeModal);
+
+    // Close modal when clicking outside
+    modal.addEventListener('click', function(e) {
+      if (e.target === modal) {
+        closeModal();
+      }
+    });
+
+    // Update current balance when account is selected
+    accountSelect.addEventListener('change', function() {
+      const selectedAccount = this.value;
+      if (selectedAccount && accountBalances[selectedAccount] !== undefined) {
+        const balance = accountBalances[selectedAccount];
+        currentBalanceDisplay.value = '$' + balance.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+      } else {
+        currentBalanceDisplay.value = '';
+      }
+    });
+
+    // Close modal on Escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+        closeModal();
+      }
+    });
+  });
+</script>

@@ -1,0 +1,31 @@
+<!-- Financial Data Category -->
+<%= link_to financial_path, class: "group block" do %>
+
+    <div class="p-6">
+      <div class="space-y-3">
+        <div>
+          <% current_investments = current_user.investments.sum(:amount) %>
+          <% investment_goal = current_user.investment_goal || 0 %>
+          <% goal_display = investment_goal > 0 ? "$#{number_with_delimiter((investment_goal / 1000).round(0))}k" : "No Goal Set" %>
+          
+          <p class="text-2xl font-bold text-gray-900 dark:text-white">
+            <span class="privacy-sensitive">$<%= number_with_delimiter((current_investments / 1000).round(0)) %>k</span> / <span class="privacy-sensitive"><%= goal_display %></span>
+          </p>
+        </div>
+        <div>
+          <% discretionary_account = current_user.discretionary_account.presence || 'No Account Set' %>
+          <% pocket_money = discretionary_account != 'No Account Set' ? current_user.bank_statements.where(account: discretionary_account).sum(:amount) : 0 %>
+          
+          <p class="text-lg font-semibold text-gray-900 dark:text-white">
+            <span class="privacy-sensitive">$<%= number_with_delimiter(pocket_money.round(0)) %></span> in your pocket
+            <% if discretionary_account == 'No Account Set' %>
+              <span class="text-sm text-gray-500 dark:text-gray-400 block">(Set discretionary account in profile)</span>
+            <% else %>
+              <span class="text-sm text-gray-500 dark:text-gray-400 block">(<%= discretionary_account %>)</span>
+            <% end %>
+          </p>
+        </div>
+      </div>
+    </div>
+  
+<% end %>

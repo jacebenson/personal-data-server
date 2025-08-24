@@ -1,0 +1,108 @@
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Upload Social Security Earnings</h1>
+      <p class="mt-2 text-gray-600 dark:text-gray-400">Upload your lifetime earnings history from SSA.gov</p>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg">
+      <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Social Security Statement XML</h3>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          Upload the XML file downloaded from your Social Security Statement on SSA.gov
+        </p>
+      </div>
+
+      <div class="p-6">
+        <%= form_with url: upload_earnings_social_security_index_path, method: :post, multipart: true, local: true, class: "space-y-6" do |form| %>
+          <div>
+            <label for="file" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              Social Security Statement XML File
+            </label>
+            <div class="mt-1">
+              <%= form.file_field :file,
+                    accept: ".xml",
+                    required: true,
+                    class: "block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-orange-500 focus:border-orange-500 dark:bg-gray-700 dark:text-white text-sm" %>
+            </div>
+            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+              Select the XML file containing your Social Security earnings history
+            </p>
+          </div>
+
+          <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md p-4">
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                </svg>
+              </div>
+              <div class="ml-3">
+                <h3 class="text-sm font-medium text-blue-800 dark:text-blue-200">
+                  How to get your Social Security Statement XML
+                </h3>
+                <div class="mt-2 text-sm text-blue-700 dark:text-blue-300">
+                  <ul class="list-disc list-inside space-y-1">
+                    <li>Go to <a href="https://www.ssa.gov/myaccount/" target="_blank" class="underline">SSA.gov</a> and sign in to your my Social Security account</li>
+                    <li>Navigate to "View Earnings Record" or "Social Security Statement"</li>
+                    <li>Look for an "Export" or "Download" option to get XML format</li>
+                    <li>Save the XML file and upload it here</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-gray-50 dark:bg-gray-700 rounded-md p-4">
+            <h4 class="text-sm font-medium text-gray-900 dark:text-white mb-2">What will be imported:</h4>
+            <ul class="text-sm text-gray-600 dark:text-gray-400 space-y-1">
+              <li>• Year-by-year earnings history</li>
+              <li>• FICA earnings (subject to Social Security tax)</li>
+              <li>• Medicare earnings (subject to Medicare tax)</li>
+              <li>• Complete lifetime earnings summary</li>
+            </ul>
+          </div>
+
+          <div class="flex justify-between">
+            <%= link_to "Cancel", financial_path,
+                class: "py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500" %>
+            <%= form.submit "Upload Social Security Data",
+                class: "py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <% if current_user.social_security_earnings.any? %>
+      <div class="mt-8 bg-white dark:bg-gray-800 shadow rounded-lg">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white">Current Data</h3>
+        </div>
+        <div class="p-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="text-center">
+              <p class="text-2xl font-bold text-orange-600"><%= current_user.social_security_earnings.count %></p>
+              <p class="text-sm text-gray-500 dark:text-gray-400">Years of Data</p>
+            </div>
+            <div class="text-center">
+              <p class="text-2xl font-bold text-orange-600">
+                $<%= number_with_delimiter(current_user.social_security_earnings.sum(:fica_earnings).to_i) %>
+              </p>
+              <p class="text-sm text-gray-500 dark:text-gray-400">Total FICA Earnings</p>
+            </div>
+            <div class="text-center">
+              <p class="text-2xl font-bold text-orange-600">
+                <%= current_user.social_security_earnings.minimum(:year) %>-<%= current_user.social_security_earnings.maximum(:year) %>
+              </p>
+              <p class="text-sm text-gray-500 dark:text-gray-400">Years Covered</p>
+            </div>
+          </div>
+          <div class="mt-4 text-center">
+            <%= link_to "View Detailed Earnings History", view_earnings_social_security_index_path,
+                class: "text-orange-600 hover:text-orange-500 font-medium" %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

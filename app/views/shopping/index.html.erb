@@ -1,0 +1,184 @@
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="mb-8">
+      <%= render 'shared/breadcrumb', breadcrumbs: [
+        { name: "Home", path: root_path },
+        { name: "Shopping", path: shopping_path }
+      ] %>
+      <h1 class="text-3xl font-bold text-gray-900 dark:text-white">🛒 Shopping Data</h1>
+      <p class="mt-2 text-gray-600 dark:text-gray-400">Manage your Amazon order data and shopping history</p>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <div class="h-8 w-8 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
+                <span class="text-xl">📦</span>
+              </div>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Total Orders</dt>
+                <dd class="text-lg font-medium text-gray-900 dark:text-white"><%= @amazon_orders_count %></dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <div class="h-8 w-8 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center">
+                <span class="text-xl">📱</span>
+              </div>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Digital Items</dt>
+                <dd class="text-lg font-medium text-gray-900 dark:text-white"><%= @amazon_digital_orders_count %></dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <div class="h-8 w-8 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center">
+                <span class="text-xl">📅</span>
+              </div>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Last Upload</dt>
+                <dd class="text-lg font-medium text-gray-900 dark:text-white">
+                  <%= @last_amazon_upload&.strftime('%m/%d/%Y') || 'Never' %>
+                </dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+        <div class="p-5">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <div class="h-8 w-8 bg-yellow-100 dark:bg-yellow-900 rounded-lg flex items-center justify-center">
+                <span class="text-xl">💾</span>
+              </div>
+            </div>
+            <div class="ml-5 w-0 flex-1">
+              <dl>
+                <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">Digital Upload</dt>
+                <dd class="text-lg font-medium text-gray-900 dark:text-white">
+                  <%= @last_digital_upload&.strftime('%m/%d/%Y') || 'Never' %>
+                </dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Cards -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Upload Amazon Orders -->
+      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg hover:shadow-lg transition-shadow duration-200">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white">📦 Upload Amazon Orders</h3>
+          <p class="text-sm text-gray-600 dark:text-gray-400">Upload retail order history from Amazon</p>
+        </div>
+        <div class="p-6">
+          <div class="flex items-center justify-between">
+            <div class="flex-1">
+              <p class="text-sm text-gray-600 dark:text-gray-400">
+                Upload your Amazon retail order history CSV file to track physical purchases.
+              </p>
+            </div>
+            <div class="ml-4">
+              <%= link_to upload_shopping_index_path, class: "inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" do %>
+                Upload Orders
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Upload Digital Items -->
+      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg hover:shadow-lg transition-shadow duration-200">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white">📱 Upload Digital Items</h3>
+          <p class="text-sm text-gray-600 dark:text-gray-400">Upload digital purchases from Amazon</p>
+        </div>
+        <div class="p-6">
+          <div class="flex items-center justify-between">
+            <div class="flex-1">
+              <p class="text-sm text-gray-600 dark:text-gray-400">
+                Upload your Amazon digital items CSV file to track eBooks, MP3s, apps, and subscriptions.
+              </p>
+            </div>
+            <div class="ml-4">
+              <%= link_to upload_digital_shopping_index_path, class: "inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500" do %>
+                Upload Digital
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- View Orders -->
+      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg hover:shadow-lg transition-shadow duration-200">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white">👀 View All Orders</h3>
+          <p class="text-sm text-gray-600 dark:text-gray-400">Browse your complete order history</p>
+        </div>
+        <div class="p-6">
+          <div class="flex items-center justify-between">
+            <div class="flex-1">
+              <p class="text-sm text-gray-600 dark:text-gray-400">
+                View, search, and analyze your complete Amazon order history.
+              </p>
+            </div>
+            <div class="ml-4">
+              <%= link_to view_orders_shopping_index_path, class: "inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500" do %>
+                View Orders
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Clear Data -->
+      <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg hover:shadow-lg transition-shadow duration-200">
+        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white">🗑️ Clear Data</h3>
+          <p class="text-sm text-gray-600 dark:text-gray-400">Remove all shopping data</p>
+        </div>
+        <div class="p-6">
+          <div class="flex items-center justify-between">
+            <div class="flex-1">
+              <p class="text-sm text-gray-600 dark:text-gray-400">
+                Permanently delete all Amazon order data from your account.
+              </p>
+            </div>
+            <div class="ml-4">
+              <%= link_to clear_orders_shopping_index_path, method: :delete, 
+                  confirm: "Are you sure you want to delete all Amazon order data? This cannot be undone.",
+                  class: "inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" do %>
+                Clear All
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

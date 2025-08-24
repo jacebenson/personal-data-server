@@ -1,0 +1,29 @@
+<!-- Calendars (iCal) -->
+<div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+  <div class="p-6">
+    <div class="flex items-center">
+      <div class="flex-shrink-0">
+        <svg class="h-8 w-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+        </svg>
+      </div>
+      <div class="ml-4 flex-1">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Calendar Data</h3>
+        <p class="text-sm text-gray-500 dark:text-gray-400">iCal calendar exports</p>
+        <div class="mt-2">
+          <p class="text-2xl font-semibold text-purple-600 dark:text-purple-400"><%= number_with_delimiter(@calendar_events_count) %></p>
+          <p class="text-xs text-gray-500 dark:text-gray-400">Events imported</p>
+        </div>
+      </div>
+    </div>
+    <div class="mt-6">
+      <%= link_to @calendar_events_count > 0 ? calendars_path : new_calendar_path, class: "w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500" do %>
+        <% if @calendar_events_count > 0 %>
+          View Calendar Events
+        <% else %>
+          Import Calendar Data
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+</div>

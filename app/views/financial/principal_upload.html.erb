@@ -1,0 +1,90 @@
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="mb-8">
+      <%= link_to financial_index_path, class: "inline-flex items-center text-green-600 hover:text-green-500" do %>
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+        Back to Financial
+      <% end %>
+
+      <h1 class="mt-4 text-3xl font-bold text-gray-900 dark:text-white">Upload Principal Investment Data</h1>
+      <p class="mt-2 text-gray-600 dark:text-gray-400">Upload OFX files exported from your Principal investment account</p>
+    </div>
+
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Upload OFX File</h3>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          Select the OFX file exported from your Principal account
+        </p>
+      </div>
+
+      <div class="p-6">
+        <%= form_with url: upload_principal_data_financial_index_path, method: :post, multipart: true, local: true, class: "space-y-6" do |form| %>
+          <!-- File Upload -->
+          <div>
+            <%= form.label :file, "Principal OFX File", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+            <div class="mt-1">
+              <%= form.file_field :file,
+                  accept: ".ofx,.qfx",
+                  required: true,
+                  class: "block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100 dark:file:bg-green-900 dark:file:text-green-300" %>
+            </div>
+            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              Upload the OFX file downloaded from your Principal account
+            </p>
+          </div>
+
+          <!-- Expected Format Info -->
+          <div class="bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 rounded-md p-4">
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                </svg>
+              </div>
+              <div class="ml-3">
+                <h3 class="text-sm font-medium text-blue-800 dark:text-blue-200">Expected Principal OFX Format</h3>
+                <div class="mt-2 text-sm text-blue-700 dark:text-blue-300">
+                  <p>Your OFX file should contain investment transactions including:</p>
+                  <ul class="list-disc list-inside mt-1 space-y-1">
+                    <li>Buy/Sell transactions (BUYMF, SELLMF)</li>
+                    <li>Dividend payments (INCOME)</li>
+                    <li>Reinvestment transactions (REINVEST)</li>
+                    <li>Transfer transactions (TRANSFER)</li>
+                    <li>Transaction dates, amounts, and security information</li>
+                  </ul>
+                  <p class="mt-2"><strong>File formats:</strong> .ofx or .qfx files</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- OFX Information -->
+          <div class="bg-yellow-50 dark:bg-yellow-900 border border-yellow-200 dark:border-yellow-700 rounded-md p-4">
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                </svg>
+              </div>
+              <div class="ml-3">
+                <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-200">About OFX Files</h3>
+                <div class="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
+                  <p>OFX (Open Financial Exchange) is a standard format used by many financial institutions. These files contain structured transaction data that can be imported into financial software.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="flex justify-end">
+            <%= form.submit "Upload Principal Data",
+                class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

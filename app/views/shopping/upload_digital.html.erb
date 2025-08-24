@@ -1,0 +1,68 @@
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="mb-8">
+      <%= render 'shared/breadcrumb', breadcrumbs: [
+        { name: "Home", path: root_path },
+        { name: "Shopping", path: shopping_path },
+        { name: "Upload Digital Items", path: nil }
+      ] %>
+      <h1 class="text-3xl font-bold text-gray-900 dark:text-white">📱 Upload Amazon Digital Items</h1>
+      <p class="mt-2 text-gray-600 dark:text-gray-400">Upload your Amazon digital items CSV file</p>
+    </div>
+
+    <!-- Instructions -->
+    <div class="mb-8 p-4 bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 rounded-md">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+          </svg>
+        </div>
+        <div class="ml-3">
+          <h3 class="text-sm font-medium text-blue-800 dark:text-blue-200">How to get your Amazon digital items data:</h3>
+          <div class="mt-2 text-sm text-blue-700 dark:text-blue-300">
+            <ol class="list-decimal list-inside space-y-1">
+              <li>Go to <a href="https://www.amazon.com/hz/privacy-central/data-requests/preview.html" target="_blank" class="underline">Amazon Privacy Central</a></li>
+              <li>Request "Your Orders" export</li>
+              <li>Wait for the export to be ready (usually takes a few hours)</li>
+              <li>Download and extract the ZIP file</li>
+              <li>Navigate to the "Digital-Ordering.1" folder</li>
+              <li>Upload the "Digital Items.csv" file below</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Digital Orders Upload -->
+    <div class="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+      <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white">📱 Digital Items</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400">eBooks, MP3s, Apps, Subscriptions</p>
+      </div>
+      <div class="p-6">
+        <%= form_with url: upload_digital_orders_shopping_index_path, method: :post, multipart: true, local: true, class: "space-y-6" do |form| %>
+          <div>
+            <%= form.label :file, "Select Digital Items CSV File", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+            <div class="mt-1">
+              <%= form.file_field :file,
+                  accept: ".csv",
+                  required: true,
+                  class: "block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900 dark:file:text-blue-300" %>
+            </div>
+            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+              Upload the "Digital Items.csv" file from your Amazon data export.
+            </p>
+          </div>
+
+          <div class="flex items-center justify-between">
+            <div class="flex space-x-3">
+              <%= link_to "Back to Shopping", shopping_path, class: "inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600" %>
+            </div>
+            <%= form.submit "Upload Digital Items", class: "inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
