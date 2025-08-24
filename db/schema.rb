@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_23_193205) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_24_125728) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -403,6 +403,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_23_193205) do
     t.string "timezone", default: "Central Time (US & Canada)"
     t.decimal "investment_goal"
     t.string "discretionary_account"
+    t.decimal "weight_goal", precision: 4, scale: 2
+    t.decimal "weight_breakdown", precision: 2
+    t.decimal "investment_breakdown", precision: 2
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end

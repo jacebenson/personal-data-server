@@ -263,6 +263,12 @@ Rails.application.routes.draw do
   # User profile route
   resource :user, only: [ :show, :update ]
 
+  # using devise, lets make a route for editing password
+  # devise_scope :user do
+  #   get "user/edit_password", to: "devise/passwords#edit", as: :edit_user_password
+  #   patch "user/update_password", to: "devise/passwords#update", as: :update_user_password
+  # end
+
   authenticated :user do
     root "dashboard#index", as: :authenticated_user_root
   end
